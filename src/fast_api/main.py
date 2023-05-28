@@ -3,6 +3,7 @@ from typing import Any
 
 from fastapi import FastAPI, status
 from fastapi.responses import HTMLResponse
+
 from src.utilities import logger
 
 app = FastAPI()
