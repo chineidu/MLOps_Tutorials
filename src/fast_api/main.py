@@ -4,7 +4,8 @@ from typing import Any
 from fastapi import FastAPI, status
 from fastapi.responses import HTMLResponse
 
-from src.utilities import logger
+from src.fast_api.schema import DBOutput, Output, UserInput
+from src.utilities import DB, _make_prediction, _save_json_data, logger
 
 app = FastAPI()
 API_NAME = 'Sample API'
@@ -26,10 +27,25 @@ def index() -> Any:
     return HTMLResponse(content=body)
 
 
-@app.get(path='/message', status_code=status.HTTP_200_OK)
-def home() -> dict[str, str]:
-    """This is the homepage."""
-    return {"message": "The API is functional!"}
+@app.post(path='/predict', status_code=status.HTTP_200_OK)
+def predict_income(user_input: UserInput) -> Output:
+    """This is used to predict the user's income."""
+
+    # Parse the input
+    name, role = user_input.name, user_input.role
+    result = _make_prediction(name=name, role=role)
+    # Save data to a file
+    _save_json_data(data=result)
+    # Update the database
+    DB["data"].append(result)
+
+    return result  # type: ignore
+
+
+@app.get(path="/users", status_code=status.HTTP_200_OK)
+def get_results() -> DBOutput:
+    """This returns the data stored in the database."""
+    return DB  # type: ignore
 
 
 if __name__ == '__main__':
