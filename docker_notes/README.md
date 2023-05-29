@@ -4,17 +4,25 @@
 
 - [Docker Notes](#docker-notes)
   - [Table of Content](#table-of-content)
-  - [Docker Image](#docker-image)
-  - [Docker Container](#docker-container)
-  - [Dockerfile](#dockerfile)
-  - [Build A Docker Image](#build-a-docker-image)
-  - [Create And Run A Docker Container](#create-and-run-a-docker-container)
-  - [Starting And Stoping Docker Containers](#starting-and-stoping-docker-containers)
-  - [Remove Docker Images](#remove-docker-images)
-  - [Remove Docker Containers](#remove-docker-containers)
-  - [Inspecting Docker Images and Containers](#inspecting-docker-images-and-containers)
+  - [Introduction](#introduction)
+    - [Docker Image](#docker-image)
+    - [Docker Container](#docker-container)
+    - [Dockerfile](#dockerfile)
+  - [Build A Docker Image And Run A Container](#build-a-docker-image-and-run-a-container)
+    - [Build A Docker Image](#build-a-docker-image)
+    - [Create And Run A Docker Container](#create-and-run-a-docker-container)
+    - [Starting And Stoping Docker Containers](#starting-and-stoping-docker-containers)
+  - [Remove Docker Images and Containers](#remove-docker-images-and-containers)
+    - [Remove Docker Images](#remove-docker-images)
+    - [Inspecting Docker Images and Containers](#inspecting-docker-images-and-containers)
+  - [Rename And Push A Docker Image To DockerHub](#rename-and-push-a-docker-image-to-dockerhub)
+    - [Rename An Image](#rename-an-image)
+    - [Push A Docker Image To DockerHub](#push-a-docker-image-to-dockerhub)
+  - [Volumes](#volumes)
 
-## Docker Image
+## Introduction
+
+### Docker Image
 
 ```text
 - Read-only template that defines the contents of a Dockerfile.
@@ -22,7 +30,7 @@
 - Images are built using Dockerfiles. i.e. using the docker `build` command.
 ```
 
-## Docker Container
+### Docker Container
 
 ```text
 - Runnable instance of a docker image.
@@ -31,7 +39,7 @@
 - Docker containers can be run on any machine that has Docker installed.
 ```
 
-## Dockerfile
+### Dockerfile
 
 ```text
 - A Dockerfile is a text file that contains instructions on how to build a Docker image. It is a simple text file that contains a series of instructions that are executed in order to create a Docker image. The instructions in a Dockerfile can be used to install software, copy files, and configure settings.
@@ -68,7 +76,9 @@ CMD [ "python3", "src/main.py", "--host", "0.0.0.0"]
 
 ```
 
-## Build A Docker Image
+## Build A Docker Image And Run A Container
+
+### Build A Docker Image
 
 ```shell
 docker build -t image_name:version -f Dockerfile .
@@ -80,7 +90,7 @@ docker build -t mlops:v1 -f Dockerfile .
 docker build --help
 ```
 
-## Create And Run A Docker Container
+### Create And Run A Docker Container
 
 ```shell
 # Run the container in and interactive mode and publish the exposed ports
@@ -101,7 +111,7 @@ docker run -it -d --rm mlops:v1 --name cool_app -p 8000:8000
 docker run --help
 ```
 
-## Starting And Stoping Docker Containers
+### Starting And Stoping Docker Containers
 
 ```shell
 # List all containers
@@ -119,13 +129,14 @@ docker stop container_id
 docker [start|stop] --help
 ```
 
-## Remove Docker Images
+## Remove Docker Images and Containers
+
+### Remove Docker Images
 
 ```shell
 # Remove image(s)
-docker rmi image_name image_name2 image_name3
-docker image rm image_name image_name2 image_name3
-docker image rm image_id image_id2 image_id3
+docker rmi [image_name|image_id image_name2|image_id image_name3|image_id]
+docker rmimage rm i [image_name|image_id image_name2|image_id image_name3|image_id]
 
 # e.g.
 docker image rm 5a7c0da524ef
@@ -134,17 +145,7 @@ docker image rm 5a7c0da524ef
 docker image --help
 ```
 
-## Remove Docker Containers
-
-```shell
-# Remove container(s)
-docker rm container_1 container_2 container_3
-
-# e.g.
-docker rm 5a7c0da524ef
-```
-
-## Inspecting Docker Images and Containers
+### Inspecting Docker Images and Containers
 
 ```shell
 # Inspect image
@@ -157,5 +158,38 @@ docker image inspect 5a7c0da524ef
 docker inspect [container_name|image_id]
 
 # e.g.
-docker inspect mlops:v1
+docker inspect [mlops:v1|5a7c0da524ef]
 ```
+
+## Rename And Push A Docker Image To DockerHub
+
+### Rename An Image
+
+```shell
+# Note: The image has to exist locally!
+# You can rename an image using docker `tag` command.
+# This command creates a clone/copy of the image.
+docker tag old_image_name:tag new_image_name:tag
+
+# e.g.
+docker tag mlops:v1 chineidu/mlops:v1
+
+```
+
+### Push A Docker Image To DockerHub
+
+```shell
+# Push image to docker hub
+docker push account_name/image_name
+
+# e.g.
+docker push chineidu/mlops:v1
+
+# Inspect container
+docker inspect [container_name|image_id]
+
+# e.g.
+docker inspect [mlops:v1|5a7c0da524ef]
+```
+
+## Volumes
