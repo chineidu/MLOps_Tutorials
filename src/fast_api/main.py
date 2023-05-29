@@ -32,8 +32,12 @@ def predict_income(user_input: UserInput) -> Output:
     """This is used to predict the user's income."""
 
     # Parse the input
-    name, role = user_input.name, user_input.role
-    result = _make_prediction(name=name, role=role)
+    name, role, experience = (
+        user_input.name,
+        user_input.role,
+        user_input.experience,
+    )
+    result = _make_prediction(name=name, role=role, experience=experience)
     # Save data to a file
     _save_json_data(data=result)
     # Update the database

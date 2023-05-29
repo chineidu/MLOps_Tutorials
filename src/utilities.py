@@ -1,7 +1,7 @@
 """This module contains utility functions."""
 import json
 import logging
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 
@@ -29,15 +29,30 @@ def _save_json_data(*, data: dict[str, Any]) -> None:
     logger.info("Saving done ...\n")
 
 
-def _make_prediction(*, name: str, role: str) -> dict[str, Any]:
+def _make_prediction(*, name: str, role: str, experience: Optional[float]) -> dict[str, Any]:
     """This is used to make predictions."""
-    LOW, HIGH, SIZE = 300_000, 1_200_000, 10
-    SCALER = np.random.random()
+    LOW, HIGH = 300_000, 800_000
+    MAX, SIZE, CONSTANT = 5, 10, 0.02
+
+    experience = (
+        CONSTANT
+        if experience is None
+        else (CONSTANT if experience == 0 else experience)  # type:ignore
+    )
+
+    _res = np.random.random() * experience
+    SCALER = MAX if _res > MAX else _res
     salaries = np.random.randint(low=LOW, high=HIGH, size=SIZE)
+
     estimated_salary = np.round(
         (np.random.choice(a=salaries, size=1, replace=False)[0] * SCALER), 2
     )
-    result = {"name": name, "role": role, "predicted_salary": estimated_salary}
+    result = {
+        "name": name,
+        "role": role,
+        "experience": float(experience),
+        "predicted_salary": float(estimated_salary),
+    }
 
     return result
 

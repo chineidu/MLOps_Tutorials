@@ -26,7 +26,9 @@
     - [Pull A Docker Image From DockerHub](#pull-a-docker-image-from-dockerhub)
   - [Managing Data](#managing-data)
     - [Types of Data](#types-of-data)
-  - [Volumne](#volumne)
+  - [Volume](#volume)
+    - [Anonymous Volume](#anonymous-volume)
+    - [Named Volume](#named-volume)
 
 ## Introduction
 
@@ -64,6 +66,7 @@
 ```
 
 ```Dockerfile
+# Base image
 FROM python:3.10-slim-buster
 
 # Create working directory
@@ -81,7 +84,6 @@ EXPOSE 8000
 
 # Entry point
 CMD [ "python3", "src/main.py", "--host", "0.0.0.0"]
-
 ```
 
 ## Build A Docker Image And Run A Container
@@ -89,7 +91,7 @@ CMD [ "python3", "src/main.py", "--host", "0.0.0.0"]
 ### Build A Docker Image
 
 ```shell
-docker build -t image_name:version -f Dockerfile .
+docker build -t image_name:tag -f Dockerfile .
 
 # e.g.
 docker build -t mlops:v1 -f Dockerfile .
@@ -102,7 +104,7 @@ docker build --help
 
 ```shell
 # Run the container in and interactive mode and publish the exposed ports
-docker run -it -p xxxx:xxxx image_name:version
+docker run -it -p xxxx:xxxx image_name:tag
 
 # e.g.
 docker run -it  -p 8000:8000 mlops:v1
@@ -110,7 +112,7 @@ docker run -it  -p 8000:8000 mlops:v1
 # Run the container in a detached and  interactive mode and publish
 # the exposed ports. Assign a name to the container and delete the
 # container once it's been stopped.
-docker run -it -p xxxx:xxxx -d --rm --name container_name image_name:version
+docker run -it -p xxxx:xxxx -d --rm --name container_name image_name:tag
 
 # e.g.
 docker run -it -p 8000:8000 -d --rm --name cool_app mlops:v1
@@ -263,7 +265,7 @@ docker pull chineidu/mlops:v1
   - It's read + write + permanent and it's stored with `containers` and `volumes`.
 ```
 
-## Volumne
+## Volume
 
 ```text
 - A Docker volume is a directory that is mounted into a container.
@@ -275,4 +277,35 @@ Types of Volumes
 
 - Named volumes: They're persistent and can be shared between containers.
 - Anonymous volumes: They're temporary and are not shared between containers.
+```
+
+### Anonymous Volume
+
+```Dockerfile
+# Base image
+FROM python:3.10-slim-buster
+
+# Add the image layers
+# ...
+
+EXPOSE 8000
+
+# Anonymous volume
+VOLUME ["/opt/data"]
+
+# Entry point
+CMD [ "python3", "src/main.py", "--host", "0.0.0.0"]
+```
+
+### Named Volume
+
+```text
+-v local_dir_name:/dir_name_on_docker_container
+```
+
+```Dockerfile
+docker run -it -p xxxx:xxxx --rm -v local_dir_name:/docker_dir_name image_name:tag
+
+# e.g.
+docker run -it -p 8000:8000 --rm -v data:/opt/data mlops:v1
 ```
