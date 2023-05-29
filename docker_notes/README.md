@@ -14,10 +14,14 @@
     - [Starting And Stoping Docker Containers](#starting-and-stoping-docker-containers)
   - [Remove Docker Images and Containers](#remove-docker-images-and-containers)
     - [Remove Docker Images](#remove-docker-images)
-    - [Inspecting Docker Images and Containers](#inspecting-docker-images-and-containers)
-  - [Rename And Push A Docker Image To DockerHub](#rename-and-push-a-docker-image-to-dockerhub)
+    - [Remove Containers](#remove-containers)
+    - [Inspecting Docker Images](#inspecting-docker-images)
+    - [Inspecting Docker Containers](#inspecting-docker-containers)
+  - [Rename And Push|Pull A Docker Image To|From DockerHub](#rename-and-pushpull-a-docker-image-tofrom-dockerhub)
+    - [Login To DockerHub](#login-to-dockerhub)
     - [Rename An Image](#rename-an-image)
     - [Push A Docker Image To DockerHub](#push-a-docker-image-to-dockerhub)
+    - [Pull A Docker Image From DockerHub](#pull-a-docker-image-from-dockerhub)
   - [Volumes](#volumes)
 
 ## Introduction
@@ -136,7 +140,7 @@ docker [start|stop] --help
 ```shell
 # Remove image(s)
 docker rmi [image_name|image_id image_name2|image_id image_name3|image_id]
-docker rmimage rm i [image_name|image_id image_name2|image_id image_name3|image_id]
+docker image rm [image_name|image_id image_name2|image_id image_name3|image_id]
 
 # e.g.
 docker image rm 5a7c0da524ef
@@ -145,7 +149,22 @@ docker image rm 5a7c0da524ef
 docker image --help
 ```
 
-### Inspecting Docker Images and Containers
+### Remove Containers
+
+```shell
+docker rm [container_name|container_id]
+
+# e.g.
+docker rm [5a7c0da524ef|cool_app]
+
+# Remove all stopped containers
+docker container prune [container_name|container_id]
+
+# e.g.
+docker container prune [5a7c0da524ef|cool_app]
+```
+
+### Inspecting Docker Images
 
 ```shell
 # Inspect image
@@ -153,15 +172,29 @@ docker image inspect [image_name|image_id]
 
 # e.g.
 docker image inspect 5a7c0da524ef
-
-# Inspect container
-docker inspect [container_name|image_id]
-
-# e.g.
-docker inspect [mlops:v1|5a7c0da524ef]
 ```
 
-## Rename And Push A Docker Image To DockerHub
+### Inspecting Docker Containers
+
+```shell
+
+# Inspect container
+docker inspect [container_name|container_id]
+
+# e.g.
+docker inspect [cool_app|5a7c0da524ef]
+```
+
+## Rename And Push|Pull A Docker Image To|From DockerHub
+
+### Login To DockerHub
+
+```shell
+docker login
+
+# For more commands
+docker login --help
+```
 
 ### Rename An Image
 
@@ -173,7 +206,6 @@ docker tag old_image_name:tag new_image_name:tag
 
 # e.g.
 docker tag mlops:v1 chineidu/mlops:v1
-
 ```
 
 ### Push A Docker Image To DockerHub
@@ -184,12 +216,16 @@ docker push account_name/image_name
 
 # e.g.
 docker push chineidu/mlops:v1
+```
 
-# Inspect container
-docker inspect [container_name|image_id]
+### Pull A Docker Image From DockerHub
+
+```shell
+# Push image to docker hub
+docker pull account_name/image_name
 
 # e.g.
-docker inspect [mlops:v1|5a7c0da524ef]
+docker pull chineidu/mlops:v1
 ```
 
 ## Volumes
