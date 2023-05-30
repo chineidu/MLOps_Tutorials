@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+import re
 from typing import Any, Optional
 
 import numpy as np
@@ -53,9 +54,20 @@ def _save_database(*, data: dict[str, list[str]]) -> None:
     logger.info("Saving done ...\n")
 
 
+def _check_role(*, role: str) -> bool:
+    """This returns True if the role matches the pattern otherwise False."""
+    THRESH = 0
+    PATTERN = r"(eng|data|\bML\b|machine|dev)"
+
+    matches = re.compile(pattern=PATTERN, flags=re.I).findall(string=role)
+    result = len(matches) > THRESH
+    return result
+
+
+# pylint: disable=too-many-locals
 def _make_prediction(*, name: str, role: str, experience: Optional[float]) -> dict[str, Any]:
     """This is used to make predictions."""
-    LOW, HIGH = 300_000, 800_000
+    LOW, HIGH = 100_000, 300_000
     MAX, SIZE, CONSTANT = 5, 10, 0.02
 
     experience = (
@@ -63,14 +75,16 @@ def _make_prediction(*, name: str, role: str, experience: Optional[float]) -> di
         if experience is None
         else (CONSTANT if experience == 0 else experience)  # type:ignore
     )
+    # Weights
+    is_developer = _check_role(role=role)
+    role_weight = 80_000 if is_developer else 10_000
+    experience_weight = np.random.random() * experience
 
-    _res = np.random.random() * experience
-    SCALER = MAX if _res > MAX else _res
+    SCALER = MAX if experience_weight > MAX else experience_weight
     salaries = np.random.randint(low=LOW, high=HIGH, size=SIZE)
+    salary_ = (np.random.choice(a=salaries, size=1, replace=False)[0] * SCALER) + role_weight
 
-    estimated_salary = np.round(
-        (np.random.choice(a=salaries, size=1, replace=False)[0] * SCALER), 2
-    )
+    estimated_salary = np.round(salary_, 2)
     result = {
         "name": name,
         "role": role,

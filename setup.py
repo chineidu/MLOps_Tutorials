@@ -12,9 +12,10 @@ dev_packages = ["pre-commit==3.3.2"]
 style_packages = ["black==22.3.0", "isort==5.10.1", "mypy==1.2.0", "pylint==2.15.10"]
 
 test_packages = ["pytest==7.1.2", "pytest-cov==2.10.1"]
+NAME = "custom_app"
 
 setup(
-    name="dudl",
+    name=NAME,
     version=0.1,
     description="MLOps Tutorial Using Python",
     author="Chinedu Ezeofor",

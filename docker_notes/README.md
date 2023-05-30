@@ -41,6 +41,9 @@
       - [Set ENV Variables Using Dockerfile](#set-env-variables-using-dockerfile)
       - [Set ENV Variables Using CLI](#set-env-variables-using-cli)
       - [Set ENV Variables Using An ENV File And CLI](#set-env-variables-using-an-env-file-and-cli)
+  - [Networking In Docker](#networking-in-docker)
+    - [Types of Connections In A Docker Container](#types-of-connections-in-a-docker-container)
+    - [1. Connection Between The Docker container And The Internet (Web)](#1-connection-between-the-docker-container-and-the-internet-web)
 
 ## Introduction
 
@@ -507,3 +510,17 @@ docker run -it -p 8000:5000 --env PORT=5000 --rm \
 docker run -it -p 8000:5000 --env-file ./.env --rm \
   --name cool_app mlops:v1
 ```
+
+## Networking In Docker
+
+### Types of Connections In A Docker Container
+
+```text
+1. Connection between the docker container and the internet (web).
+2. Connection between the docker container and the localhost (local machine).
+3. Connection between the docker container and another docker container.
+```
+
+### 1. Connection Between The Docker container And The Internet (Web)
+
+a
