@@ -10,6 +10,7 @@ class UserInput(BaseModel):
     name: str
     role: str
     experience: Optional[float]
+    department: str
 
     class Config:
         """Sample Payload."""
@@ -18,6 +19,7 @@ class UserInput(BaseModel):
             "example": {
                 "name": "Neidu",
                 "role": "ML Engineer",
+                "department": "Data",
                 "experience": 3,
             }
         }
@@ -28,6 +30,7 @@ class Output(BaseModel):
 
     name: Optional[str]
     role: Optional[str]
+    department: str
     experience: Optional[int]
     predicted_salary: Optional[float]
 

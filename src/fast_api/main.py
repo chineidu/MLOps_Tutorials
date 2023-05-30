@@ -1,11 +1,12 @@
 """This module contains simple API endpoints."""
+import os
 from typing import Any
 
 from fastapi import FastAPI, status
 from fastapi.responses import HTMLResponse
 
 from src.fast_api.schema import DBOutput, Output, UserInput
-from src.utilities import DB, _make_prediction, _save_json_data, logger
+from src.utilities import DB, _make_prediction, _save_database, _save_json_data, logger
 
 app = FastAPI()
 API_NAME = 'Sample API'
@@ -32,16 +33,21 @@ def predict_income(user_input: UserInput) -> Output:
     """This is used to predict the user's income."""
 
     # Parse the input
-    name, role, experience = (
+    name, role, department, experience = (
         user_input.name,
         user_input.role,
+        user_input.department,
         user_input.experience,
     )
     result = _make_prediction(name=name, role=role, experience=experience)
+    result["department"] = department
+
     # Save data to a file
     _save_json_data(data=result)
+
     # Update the database
     DB["data"].append(result)
+    _save_database(data=DB)
 
     return result  # type: ignore
 
@@ -55,10 +61,10 @@ def get_results() -> DBOutput:
 if __name__ == '__main__':
     import uvicorn
 
-    host, port = "0.0.0.0", 8000
+    HOST, PORT = "0.0.0.0", int(os.getenv("PORT", 8000))  # pylint:disable=invalid-envvar-default
 
     # Use this for debugging purposes only
     logger.warning("Running in development mode. Do not run like this in production.")
 
     # Run the server
-    uvicorn.run("main:app", host=host, port=port, log_level="info", reload=True)
+    uvicorn.run("main:app", host=HOST, port=PORT, log_level="info", reload=True)

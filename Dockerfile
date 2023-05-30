@@ -13,7 +13,14 @@ RUN pip install --upgrade pip \
 # Copy source code
 COPY ["./", "./"]
 
-EXPOSE 8000
+# Set arg variable(s)
+ARG DEFAULT_PORT=8000
+
+# Set env variable(s)
+# with a default value of DEFAULT_PORT
+ENV PORT ${DEFAULT_PORT}
+
+EXPOSE ${PORT}
 
 # Entry point
 CMD [ "python3", "src/fast_api/main.py", "--host", "0.0.0.0"]
