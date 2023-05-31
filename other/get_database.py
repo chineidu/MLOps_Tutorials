@@ -3,20 +3,17 @@
 from pymongo import MongoClient
 
 
+## TO DO: Create a mongodb connection and connect to api
 def get_database():
     """This is used to create a MongoDB connection."""
     # Provide the mongodb atlas url to connect python to mongodb using pymongo
-    CONNECTION_STRING = "mongodb://0.0.0.0:27017/names"
+    CONNECTION_STRING = "mongodb://mongodb:27017/names"
 
-    # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
+    # Create a connection using MongoClient.
     client = MongoClient(CONNECTION_STRING)
 
-    # Create the database for our example (we will use the same database throughout the tutorial
-    return client['user_shopping_list']
+    # Create the database
+    return client['user_details']
 
 
-# This is added so that many files can reuse the function get_database()
-if __name__ == "__main__":
-
-    # Get the database
-    dbname = get_database()
+DB = get_database()
