@@ -62,6 +62,7 @@ if __name__ == '__main__':
     import uvicorn
 
     HOST, PORT = "0.0.0.0", int(os.getenv("PORT", 8000))  # pylint:disable=invalid-envvar-default
+    HOST = "localhost"
 
     # Use this for debugging purposes only
     logger.warning("Running in development mode. Do not run like this in production.")

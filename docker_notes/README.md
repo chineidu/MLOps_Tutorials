@@ -43,7 +43,9 @@
       - [Set ENV Variables Using An ENV File And CLI](#set-env-variables-using-an-env-file-and-cli)
   - [Networking In Docker](#networking-in-docker)
     - [Types of Connections In A Docker Container](#types-of-connections-in-a-docker-container)
-    - [1. Connection Between The Docker container And The Internet (Web)](#1-connection-between-the-docker-container-and-the-internet-web)
+      - [1. Connection Between The Docker Container And The Internet (Web)](#1-connection-between-the-docker-container-and-the-internet-web)
+      - [2. Connection Between The Docker Container And The Localhost](#2-connection-between-the-docker-container-and-the-localhost)
+      - [3. Connection Between The Docker Container And Another Docker Container](#3-connection-between-the-docker-container-and-another-docker-container)
 
 ## Introduction
 
@@ -521,6 +523,54 @@ docker run -it -p 8000:5000 --env-file ./.env --rm \
 3. Connection between the docker container and another docker container.
 ```
 
-### 1. Connection Between The Docker container And The Internet (Web)
+#### 1. Connection Between The Docker Container And The Internet (Web)
 
-a
+```text
+- This is the default behaviour.
+- In order to allow access to the container, the ports must be correctly exposed.
+```
+
+#### 2. Connection Between The Docker Container And The Localhost
+
+```text
+- You can communicate with a server running on your local machine by using `host.docker.internal`
+- e.g. url = "http://host.docker.internal:8000/users"
+```
+
+#### 3. Connection Between The Docker Container And Another Docker Container
+
+```text
+Method 1 (IP Address):
+--------
+- To get ip address of a docker container, run `docker container inspect container_name`
+- Update the address of the url using the ip address of the container.
+- e.g. url = "http://172.17.0.2:8000/users"
+
+
+Method 2 (Using Network):
+--------
+- Create a network that all the containers can communicate with using the command: `docker network create network_name`
+- Connect to the created network by using the flag `--network network_name`
+- Once the network has been created and connected to, update the url using the container's name.
+- e.g. url = "http://container_name:8000/users"
+
+NOTE:
+----
+- Communication between containers requires all containers to be connected to the `SAME` Docker network.
+```
+
+```shell
+# Create docker network
+docker network create network_name
+
+# e.g.
+docker network create api_network
+
+# View all existing networks
+docker network ls
+
+# Connect to a docker network
+# The network's name is: api_network
+# image: mlops:v1
+docker run -it -p 8000:8000 --name cool_app --rm --network api_network mlops:v1
+```
