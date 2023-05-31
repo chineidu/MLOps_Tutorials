@@ -292,8 +292,13 @@ docker pull chineidu/mlops:v1
 Types of Volumes
 ----------------
 
-- Named volumes: They're persistent and can be shared between containers. Editing files in the volume is not possible.
-- Anonymous volumes: They're temporary and are not shared between containers.
+Named volumes:
+- They're persistent and can be shared between containers.
+- Editing files in the volume is not possible because we don't know exactly where the files are stored.
+- Bind mount can be used instead to map a directory to the docker container.
+
+Anonymous volumes:
+- They're temporary and are not shared between containers.
 ```
 
 #### Anonymous Volume
@@ -325,7 +330,6 @@ docker -v /opt/data
 #### Named Volume
 
 ```text
-
 -v local_dir_name:/dir_name_on_docker_container
 ```
 
@@ -543,7 +547,7 @@ docker run -it -p 8000:5000 --env-file ./.env --rm \
 Method 1 (IP Address):
 --------
 - To get ip address of a docker container, run `docker container inspect container_name`
-- Update the address of the url using the ip address of the container.
+- Update the address of the url you want to connect with using the ip address of the container.
 - e.g. url = "http://172.17.0.2:8000/users"
 
 
@@ -573,4 +577,7 @@ docker network ls
 # The network's name is: api_network
 # image: mlops:v1
 docker run -it -p 8000:8000 --name cool_app --rm --network api_network mlops:v1
+
+# For more commands
+docker network --help
 ```

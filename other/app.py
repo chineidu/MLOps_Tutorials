@@ -9,7 +9,8 @@ from get_database import DB
 from schema import Output, UserInput
 
 app = FastAPI()
-API_NAME = 'Sample API'
+CONTAINER_NAME, OTHER_PORT = "cool_app", 8000
+OTHER_URL = os.getenv("OTHER_URL", f"http://{CONTAINER_NAME}:{OTHER_PORT}/users")
 
 
 @app.get(path='/', status_code=status.HTTP_200_OK)
@@ -18,7 +19,7 @@ def index() -> Any:
     return {"message": "This API is working!"}
 
 
-@app.post(path='/predict', status_code=status.HTTP_200_OK)
+@app.post(path='/predict', status_code=status.HTTP_200_OK, response_model=Output)
 def predict_gender(name: UserInput) -> Output:
     """This is used to predict a person's gender based on the name."""
 
@@ -42,6 +43,14 @@ def get_users() -> list[str]:
     user_data = [str(doc) for doc in documents]
 
     return user_data
+
+
+@app.get(path='/other_users', status_code=status.HTTP_200_OK)
+def get_other_users() -> Any:
+    """This returns the data in the database. This is connected to a server
+    running on another container."""
+    response = requests.get(url=OTHER_URL)
+    return response.json()
 
 
 if __name__ == '__main__':

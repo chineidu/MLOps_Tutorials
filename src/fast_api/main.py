@@ -28,7 +28,7 @@ def index() -> Any:
     return HTMLResponse(content=body)
 
 
-@app.post(path='/predict', status_code=status.HTTP_200_OK)
+@app.post(path='/predict', status_code=status.HTTP_200_OK, response_model=Output)
 def predict_income(user_input: UserInput) -> Output:
     """This is used to predict the user's income."""
 
@@ -52,7 +52,7 @@ def predict_income(user_input: UserInput) -> Output:
     return result  # type: ignore
 
 
-@app.get(path="/users", status_code=status.HTTP_200_OK)
+@app.get(path="/users", status_code=status.HTTP_200_OK, response_model=DBOutput)
 def get_results() -> DBOutput:
     """This returns the data stored in the database."""
     return DB  # type: ignore
@@ -62,7 +62,6 @@ if __name__ == '__main__':
     import uvicorn
 
     HOST, PORT = "0.0.0.0", int(os.getenv("PORT", 8000))  # pylint:disable=invalid-envvar-default
-    HOST = "localhost"
 
     # Use this for debugging purposes only
     logger.warning("Running in development mode. Do not run like this in production.")
