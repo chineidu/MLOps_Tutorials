@@ -47,6 +47,7 @@
       - [2. Connection Between The Docker Container And The Localhost](#2-connection-between-the-docker-container-and-the-localhost)
       - [3. Connection Between The Docker Container And Another Docker Container](#3-connection-between-the-docker-container-and-another-docker-container)
   - [Docker Compose](#docker-compose)
+    - [Sample Docker-compose File](#sample-docker-compose-file)
     - [Start And Stop The Containers](#start-and-stop-the-containers)
 
 ## Introduction
@@ -597,6 +598,35 @@ https://docs.docker.com/compose/compose-file/compose-file-v3/
 ```
 
 - An example docker-compose file can be found [here](https://github.com/chineidu/MLOps_Tutorials/blob/main/docker-compose.yml)
+
+### Sample Docker-compose File
+
+```yml
+version: "3.8"
+
+  my_app:
+    build:
+      context: ./other
+      dockerfile: Dockerfile
+    image: other_service:v1
+    container_name: other_app
+    environment:
+      - OTHER_URL=http://cool_app:8000/users
+      - USERNAME=neidu
+      - PASSWORD=password
+
+    # OR (Another way of passing env vars)
+    # Note: You need to create a folder which contains the env file
+    env_file:
+      - abs_path/to/env_file # e.g. folder/env_file
+
+    ports:
+      - 6060:6060
+    volumes:
+      - ./other:/opt # Bind mount
+    depends_on:
+      - mongodb
+```
 
 ### Start And Stop The Containers
 
