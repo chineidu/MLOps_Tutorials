@@ -596,6 +596,8 @@ Docs:
 https://docs.docker.com/compose/compose-file/compose-file-v3/
 ```
 
+- An example docker-compose file can be found [here](https://github.com/chineidu/MLOps_Tutorials/blob/main/docker-compose.yml)
+
 ### Start And Stop The Containers
 
 ```shell
