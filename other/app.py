@@ -28,8 +28,8 @@ def predict_gender(name: UserInput) -> Output:
 
     # Add collection
     users_collection = DB["users"]
+    # Save data
     users_collection.insert_one(response.json())
-    logging.info("Data inserted!")
 
     return response.json()
 

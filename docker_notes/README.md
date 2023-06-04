@@ -46,6 +46,8 @@
       - [1. Connection Between The Docker Container And The Internet (Web)](#1-connection-between-the-docker-container-and-the-internet-web)
       - [2. Connection Between The Docker Container And The Localhost](#2-connection-between-the-docker-container-and-the-localhost)
       - [3. Connection Between The Docker Container And Another Docker Container](#3-connection-between-the-docker-container-and-another-docker-container)
+  - [Docker Compose](#docker-compose)
+    - [Start And Stop The Containers](#start-and-stop-the-containers)
 
 ## Introduction
 
@@ -580,4 +582,29 @@ docker run -it -p 8000:8000 --name cool_app --rm --network api_network mlops:v1
 
 # For more commands
 docker network --help
+```
+
+## Docker Compose
+
+```text
+- Docker Compose is a tool that helps you define and run multi-container applications.
+- With Compose, you can create a YAML file that defines the services that make up your application. Then, with a single command, you can start up all of the services in your application.
+- You can add a custom network but by default, docker-compose create a network for all the containers to communicate with one another.
+
+Docs:
+-----
+https://docs.docker.com/compose/compose-file/compose-file-v3/
+```
+
+### Start And Stop The Containers
+
+```shell
+# Start Containers
+docker-compose up
+
+# Start Containers (Force build)
+docker-compose up --build
+
+# Stop Containers
+docker-compose down
 ```

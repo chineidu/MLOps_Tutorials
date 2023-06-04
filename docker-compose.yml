@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  service_1:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: mlops:v2
+    container_name: cool_app
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/opt # Bind mount
+
+  service_2:
+    build:
+      context: ./other
+      dockerfile: Dockerfile
+    image: other_service:v1
+    container_name: other_app
+    environment:
+      - OTHER_URL=http://cool_app:8000/users
+      - USERNAME=neidu
+      - PASSWORD=password
+    ports:
+      - 6060:6060
+    volumes:
+      - ./other:/opt # Bind mount
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:7.0-rc-jammy
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=neidu
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - data:/data/db # Named volume
+
+#  Named volumes ONLY!
+volumes:
+  data:
