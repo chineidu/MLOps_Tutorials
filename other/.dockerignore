@@ -93,4 +93,7 @@ venv/
 */*/*/*.swp
 
 docker_notes
-other
+k8s_notes
+Makefile
+*.pem
+data

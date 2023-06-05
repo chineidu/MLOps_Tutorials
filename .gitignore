@@ -163,3 +163,4 @@ cython_debug/
 data
 notepad.py
 *.json
+*.pem

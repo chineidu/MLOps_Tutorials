@@ -8,7 +8,7 @@ services:
     image: mlops:v2
     container_name: cool_app
     ports:
-      - 8000:8000
+      - "8000:8000"
     volumes:
       - ./:/opt # Bind mount
 
@@ -23,7 +23,7 @@ services:
       - USERNAME=neidu
       - PASSWORD=password
     ports:
-      - 6060:6060
+      - "6060:6060"
     volumes:
       - ./other:/opt # Bind mount
     depends_on:

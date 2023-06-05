@@ -49,6 +49,11 @@
   - [Docker Compose](#docker-compose)
     - [Sample Docker-compose File](#sample-docker-compose-file)
     - [Start And Stop The Containers](#start-and-stop-the-containers)
+    - [NOTE](#note)
+  - [Deploying Containers](#deploying-containers)
+    - [Using EC2 Instances](#using-ec2-instances)
+      - [1. Build And Run The Dockerfile On Remote Server (EC2 Instance)](#1-build-and-run-the-dockerfile-on-remote-server-ec2-instance)
+      - [2. Build Locally And Run The Dockerfile On Remote Server (EC2 Instance)](#2-build-locally-and-run-the-dockerfile-on-remote-server-ec2-instance)
 
 ## Introduction
 
@@ -631,12 +636,93 @@ version: "3.8"
 ### Start And Stop The Containers
 
 ```shell
-# Start Containers
+# Start ALL Containers
 docker-compose up
+
+# Start Specific Containers
+docker-compose up -d service_1 service_2
 
 # Start Containers (Force build)
 docker-compose up --build
 
+# For more commands
+docker-compose up --help
+
 # Stop Containers
 docker-compose down
+```
+
+### NOTE
+
+```text
+- Bind mounts (volumes) are only recommended during development.
+- For production purposes, you can copy the a snapshop of the required files/folders in the dockerfile during the build phase.
+```
+
+## Deploying Containers
+
+```text
+There are a few ways of deploying docker containers in cloud provider. e.g. AWS.
+
+1. EC2 Instances: You can also deploy Docker containers directly on EC2 instances. In this approach, you provision EC2 instances, install Docker, and manage the container deployment and scaling manually. This method provides more flexibility but requires more operational overhead compared to the managed services mentioned above.
+
+2. Amazon Elastic Container Service (ECS): ECS is a fully managed container orchestration service provided by AWS. It supports Docker containers and allows you to easily run and scale containerized applications. ECS provides features like auto-scaling, load balancing, and integration with other AWS services.
+
+3. AWS Fargate: Fargate is a serverless compute engine for containers on AWS. It allows you to run containers without managing the underlying infrastructure. Fargate integrates with ECS and EKS, enabling you to deploy Docker containers as tasks or pods, respectively, without worrying about the server infrastructure.
+
+4. Amazon Elastic Kubernetes Service (EKS): EKS is a managed Kubernetes service that simplifies the deployment and management of Kubernetes clusters on AWS. With EKS, you can deploy Docker containers as part of Kubernetes pods and take advantage of Kubernetes features for container orchestration.
+
+
+Other methods:
+
+5. AWS Lambda: While not specifically designed for Docker containers, AWS Lambda is a serverless compute service that allows you to run code without provisioning or managing servers. You can package your application as a Docker container and deploy it as a Lambda function using the AWS Lambda Container Image Support.
+
+6. AWS Batch: AWS Batch is a fully managed service for running batch computing workloads. It allows you to run Docker containers as part of batch jobs, which can be useful for processing large amounts of data or performing compute-intensive tasks.
+```
+
+### Using EC2 Instances
+
+- Docker can be installed on an EC2 instance using [this](https://www.cyberciti.biz/faq/how-to-install-docker-on-amazon-linux-2/).
+
+```shell
+# Apply pending updates
+sudo yum update
+
+# Install docker, run
+sudo yum install docker
+
+# Add group membership for the default ec2-user so you can run
+# all docker commands without using the sudo command
+sudo usermod -a -G docker ec2-user
+id ec2-user
+
+# Reload a Linux user's group assignments to docker w/o logout
+newgrp docker
+
+# Start the Docker service
+sudo systemctl start docker.service
+```
+
+#### 1. Build And Run The Dockerfile On Remote Server (EC2 Instance)
+
+```text
+This involves:
+- Create EC2 instance(s) and SSH into them.
+- Install Docker on the remote server.
+- Save the source code and the Dockerfile on the remote server.
+- Build and run the Docker container on the remote server.
+
+- This approach is not advisable.
+```
+
+#### 2. Build Locally And Run The Dockerfile On Remote Server (EC2 Instance)
+
+```text
+This involves:
+- Build the docker image locally and push the built image to a remote Docker repository like Dockerhub.
+- Create EC2 instance(s) and SSH into them.
+- Install Docker on the remote server.
+- Pull the Docker image from the remote Docker repository and run the Docker container on the remote server.
+
+- This is better than the first method but requires a lot of managing by the developer.
 ```
