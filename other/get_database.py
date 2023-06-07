@@ -1,19 +1,25 @@
 """This is used to configure the database."""
 import os
-from typing import Optional
+from typing import Any, Optional
 
 from pymongo import MongoClient
 
-USERNAME, PASSWORD = os.getenv("USERNAME"), os.getenv("PASSWORD")
+USERNAME, PASSWORD, HOST_NAME = (
+    os.getenv("USERNAME"),
+    os.getenv("PASSWORD"),
+    os.getenv("HOST_NAME"),
+)
 
 
-def get_database(*, username: Optional[str], password: Optional[str]):
+def get_database(
+    *, username: Optional[str], password: Optional[str], host_name: Optional[str]
+) -> Any:
     """This is used to create a MongoDB connection."""
     # Provide the mongodb atlas url to connect python to mongodb using pymongo
-    HOST_NAME, PORT, DB_NAME = "mongodb", 27017, "names"
+    PORT, DB_NAME = 27017, "names"
 
     CONNECTION_STRING = (
-        f"mongodb://{username}:{password}@{HOST_NAME}:{PORT}/{DB_NAME}?authSource=admin"
+        f"mongodb://{username}:{password}@{host_name}:{PORT}/{DB_NAME}?authSource=admin"
     )
 
     # Create a connection using MongoClient.
@@ -23,4 +29,4 @@ def get_database(*, username: Optional[str], password: Optional[str]):
     return client["user_details"]
 
 
-DB = get_database(username=USERNAME, password=PASSWORD)
+DB = get_database(username=USERNAME, password=PASSWORD, host_name=HOST_NAME)

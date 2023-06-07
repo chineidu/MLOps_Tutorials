@@ -18,10 +18,8 @@ services:
       dockerfile: Dockerfile
     image: other_service:v1
     container_name: other_app
-    environment:
-      - OTHER_URL=http://cool_app:8000/users
-      - USERNAME=neidu
-      - PASSWORD=password
+    env_file:
+      - "./envs/.env" # Location of file containing the env vars
     ports:
       - "6060:6060"
     volumes:
@@ -30,7 +28,7 @@ services:
       - mongodb
 
   mongodb:
-    image: mongo:7.0-rc-jammy
+    image: mongo:7.0-rc
     container_name: mongodb
     environment:
       - MONGO_INITDB_ROOT_USERNAME=neidu

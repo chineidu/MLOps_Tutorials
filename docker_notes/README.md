@@ -54,6 +54,10 @@
     - [Using EC2 Instances](#using-ec2-instances)
       - [1. Build And Run The Dockerfile On Remote Server (EC2 Instance)](#1-build-and-run-the-dockerfile-on-remote-server-ec2-instance)
       - [2. Build Locally And Run The Dockerfile On Remote Server (EC2 Instance)](#2-build-locally-and-run-the-dockerfile-on-remote-server-ec2-instance)
+    - [Using Container Orchestrators](#using-container-orchestrators)
+      - [Using Elastic Container Service (ECS)](#using-elastic-container-service-ecs)
+        - [1. Using EC2 Launch Type](#1-using-ec2-launch-type)
+        - [2. Using Fargate Launch Type](#2-using-fargate-launch-type)
 
 ## Introduction
 
@@ -273,17 +277,20 @@ docker pull chineidu/mlops:v1
 ### Types of Data
 
 ```text
-- Application data:
+- Application data
+------------------
   - This is the data added to the image and container in the build phase.
   - It contains the code and the environment.
   - It's read-only and can't be changed once the image has been built.
 
-- Temporary App data:
+- Temporary App data
+--------------------
   - This is the data produced in the running container.
   - It's stored in memory or temporary files.
   - It's read + write + temporary and it's stored in the container.
 
-- Permanent App data:
+- Permanent App data
+--------------------
   - This is the data produced in the running container.
   - It's stored in files or in a database.
   - It must NOT be lost.
@@ -300,12 +307,14 @@ docker pull chineidu/mlops:v1
 Types of Volumes
 ----------------
 
-Named volumes:
+Named volumes
+-------------
 - They're persistent and can be shared between containers.
 - Editing files in the volume is not possible because we don't know exactly where the files are stored.
 - Bind mount can be used instead to map a directory to the docker container.
 
-Anonymous volumes:
+Anonymous volumes
+-----------------
 - They're temporary and are not shared between containers.
 ```
 
@@ -712,6 +721,8 @@ This involves:
 - Save the source code and the Dockerfile on the remote server.
 - Build and run the Docker container on the remote server.
 
+Note:
+-----
 - This approach is not advisable.
 ```
 
@@ -724,5 +735,116 @@ This involves:
 - Install Docker on the remote server.
 - Pull the Docker image from the remote Docker repository and run the Docker container on the remote server.
 
+Note:
+-----
 - This is better than the first method but requires a lot of managing by the developer.
+```
+
+### Using Container Orchestrators
+
+```text
+Container Orchestrator
+----------------------
+- A container orchestrator is a software tool that automates the deployment, scaling, and management of containerized applications. Container orchestration is essential for running large-scale containerized applications, as it can help to ensure that applications are running reliably and efficiently.
+
+
+Features:
+---------
+- Deployment And Load Balanceing: Container orchestrators can automatically deploy containerized applications to a cluster of hosts. This can be done in a rolling or blue-green deployment, depending on the application's requirements.
+
+- Scaling: Container orchestrators can automatically scale containerized applications up or down based on demand. This can help to ensure that applications are always running at the optimal number of containers.
+
+- Management: Container orchestrators can help to manage containerized applications by providing features such as health monitoring, logging, and tracing. This can help to identify and resolve problems with applications quickly and easily.
+
+
+Examples of Container Orchestrator
+----------------------------------
+1. ECS
+2. EKS (AWS K8s managed service)
+3. K8s (Open source)
+4. Docker Swarm
+```
+
+#### Using Elastic Container Service (ECS)
+
+```text
+Cluster
+-------
+- This is the physical resources the containers will run on.
+
+Task Definition
+---------------
+- A task definition is a blueprint that describes how a Docker container should be launched and run within a cluster.
+- It defines various parameters such as the container image, CPU and memory requirements, networking settings, logging configuration, and more.
+
+Task
+----
+- This is an instance of a task definition.
+
+Service
+-------
+- This ensures that a certain number of `tasks` are running at all times.
+- It restarts contains exited/crashed containers.
+
+Load Balancer
+-------------
+- A load balancer is a device that distributes (routes) network or application traffic across a number of servers.
+- Load balancers are used to increase capacity (concurrent users) and reliability of applications.
+
+```
+
+##### 1. Using EC2 Launch Type
+
+```text
+- It allows you to run containerized applications on Amazon Elastic Compute Cloud (EC2) instances that you manage yourself.
+
+- When you choose to use the EC2 launch type, you maintain control over your infrastructure but are required to provision, scale, and monitor EC2 instances.
+
+
+Benefits
+--------
+- Control: You have full control over your infrastructure, including the type and size of EC2 instances, the operating system, and the networking configuration.
+
+- Flexibility: You can use the EC2 launch type to run a wide variety of containerized applications, including those that require specific hardware or software configurations.
+
+- Cost-effectiveness: You can optimize your costs by using Spot Instances or Reserved Instances.
+
+
+Drawbacks
+---------
+- Complexity: Managing EC2 instances can be complex, especially if you need to scale your application.
+
+- Security: You are responsible for securing your EC2 instances and the data that they store.
+
+- Maintenance: You are responsible for maintaining your EC2 instances, including patching and updating the operating system and applications.
+```
+
+##### 2. Using Fargate Launch Type
+
+```text
+- The AWS Fargate launch type is a `serverless` compute engine that lets you run docker containers without provisioning or managing servers.
+
+- With Fargate, you specify your container's resource requirements and Fargate provisions the right amount of compute, memory, and storage for your container.
+
+- Fargate then runs and manages your containers across a fleet of Amazon Elastic Compute Cloud (EC2) instances.
+
+
+Benefits
+--------
+- Serverless: Fargate is a serverless compute engine, which means that you do not need to provision or manage servers. This can save you time and money.
+
+- Scalable: Fargate is scalable, which means that you can easily scale your applications up or down based on demand. This can help you to save money by only paying for the resources that you use.
+
+- Managed: Fargate is a managed service, which means that Amazon ECS handles the provisioning, scaling, and management of the underlying infrastructure. This can save you time and effort.
+
+- Secure: Fargate is a secure service, which means that Amazon ECS handles the security of the underlying infrastructure. This can help you to protect your applications and data.
+
+
+Drawbacks
+---------
+- Limited flexibility: Fargate is a managed service, which means that you have less flexibility than if you were to provision and manage your own servers.
+
+- Not all workloads are supported: Not all workloads are supported by Fargate. If you have a workload that requires specific hardware or software configurations, you may need to use the ECS EC2 launch type.
+
+- Cost: Fargate can be more expensive than the ECS EC2 launch type for some workloads. This is because you pay for the resources that you use, even when your application is not running.
 ```
