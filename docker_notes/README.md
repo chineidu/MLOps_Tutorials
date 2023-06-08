@@ -847,4 +847,12 @@ Drawbacks
 - Not all workloads are supported: Not all workloads are supported by Fargate. If you have a workload that requires specific hardware or software configurations, you may need to use the ECS EC2 launch type.
 
 - Cost: Fargate can be more expensive than the ECS EC2 launch type for some workloads. This is because you pay for the resources that you use, even when your application is not running.
+
+NOTE
+----
+- ECS does not support using the service/container name as the IP/hostname.
+- `localhost` is used instead.
+- e.g.
+  - instead of:  url = "http://container_name:8000/users",
+  we use:  url = "http://localhost:8000/users"
 ```
