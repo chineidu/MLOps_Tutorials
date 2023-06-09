@@ -12,11 +12,13 @@ app = FastAPI()
 CONTAINER_NAME, OTHER_PORT = "cool_app", 8000
 OTHER_URL = os.getenv("OTHER_URL", f"http://{CONTAINER_NAME}:{OTHER_PORT}/users")
 
+VERSION = "1.1"
+
 
 @app.get(path='/', status_code=status.HTTP_200_OK)
 def index() -> Any:
     """This is the homepage."""
-    return {"message": "This API is working!"}
+    return {"message": "This API is working!", "api_version": VERSION}
 
 
 @app.post(path='/predict', status_code=status.HTTP_200_OK, response_model=Output)

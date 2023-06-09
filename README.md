@@ -6,7 +6,7 @@ This course was inspired by the following Udemy courses:
 
 1. **Docker**: [Docker](https://www.udemy.com/course/docker-kubernetes-the-practical-guide/learn/practice/1244330/summary#overview)
 2. **Kubernetes**: [k8s](https://www.udemy.com/course/docker-kubernetes-the-practical-guide/learn/practice/1244330/summary#overview)
-3. **ML Testing and Monitoring**: [Testing and Monitoring]()
+3. **ML Testing and Monitoring**: [Testing and Monitoring](https://www.udemy.com/course/draft/2122690/learn/lecture/17718922?start=645#overview)
 
 ## Commands Used
 

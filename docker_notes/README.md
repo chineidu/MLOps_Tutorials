@@ -58,6 +58,8 @@
       - [Using Elastic Container Service (ECS)](#using-elastic-container-service-ecs)
         - [1. Using EC2 Launch Type](#1-using-ec2-launch-type)
         - [2. Using Fargate Launch Type](#2-using-fargate-launch-type)
+      - [AWS ECR](#aws-ecr)
+      - [Update The Deployed Application On ECS Using CLI](#update-the-deployed-application-on-ecs-using-cli)
 
 ## Introduction
 
@@ -316,6 +318,7 @@ Named volumes
 Anonymous volumes
 -----------------
 - They're temporary and are not shared between containers.
+- i.e. data persists if a container is stopped and resumed, but it is lost if the container is destroyed.
 ```
 
 #### Anonymous Volume
@@ -857,7 +860,18 @@ NOTE
 - e.g.
   - instead of:  url = "http://container_name:8000/users",
   we use:  url = "http://localhost:8000/users"
+
+STEPS:
+1. Create a cluster.
+2. Create task definition(s).
+   - Inorder to add volumes to the task definition, `EFS` is used and it requires a security group with an `NFS` network type.
+3. Create a service or task(s).
+   - Create a new security group for the service/task (or use an existing security group).
+   - Remember to expose the necessary port(s) by adding `inbound rules` to the security group.
+   - If a service was created, you can add an `application` load balancer and auto scaling.
 ```
+
+#### AWS ECR
 
 - [AWS Docs](https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html)
 
@@ -884,8 +898,32 @@ aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS 
 docker images
 
 # Tag your image with the Amazon ECR registry
-docker tag ${IMAGE_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_REPOSITORY_NAME}:${TAG}
+docker tag ${IMAGE_NAME}:${TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_REPOSITORY_NAME}:${TAG}
 
 # Push the image using the docker push command
 docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_REPOSITORY_NAME}:${TAG}
+```
+
+#### Update The Deployed Application On ECS Using CLI
+
+```text
+- Once the application has been deployed on ECS (using AWS console), updates made to the source code can be pushed to the deployed cluster using AWS ECS CLI.
+```
+
+```shell
+export CLUSTER_NAME="yourECSClusterName"
+export SERVICE_NAME="yourECSServiceName"
+export TASK_DEFINITION_NAME="yourECSTaskDefinitionName"
+
+export CLUSTER_NAME="ProdCluster"
+export SERVICE_NAME="ml-service"
+export TASK_DEFINITION_NAME="ml-app"
+
+# Update the deployed app
+aws ecs update-service --cluster ${CLUSTER_NAME} --service ${SERVICE_NAME} \
+  --task-definition  ${TASK_DEFINITION_NAME} --force-new-deployment
+
+# Monitor Deployment Progress
+aws ecs describe-services --cluster ${CLUSTER_NAME} --services ${SERVICE_NAME}
+
 ```
