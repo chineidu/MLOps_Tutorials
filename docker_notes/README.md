@@ -821,6 +821,8 @@ Drawbacks
 
 ##### 2. Using Fargate Launch Type
 
+- The tutorial can be found [here](https://www.youtube.com/watch?v=esISkPlnxL0&t=1243s).
+
 ```text
 - The AWS Fargate launch type is a `serverless` compute engine that lets you run docker containers without provisioning or managing servers.
 
@@ -855,4 +857,35 @@ NOTE
 - e.g.
   - instead of:  url = "http://container_name:8000/users",
   we use:  url = "http://localhost:8000/users"
+```
+
+- [AWS Docs](https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html)
+
+```shell
+# Environment variables
+export PROFILE_NAME="yourProfileName"
+export AWS_ACCOUNT_ID="yourAccountID"
+export AWS_REPOSITORY_NAME="yourAWSRepositoryName"
+export IMAGE_NAME="yourIMAGEName"
+export TAG="yourTag"
+export AWS_REGION="yourAWSRegion"
+
+
+# Set Default AWS Profile
+aws configure --profile=${PROFILE_NAME}
+
+
+# Authenticate your Docker client to the Amazon ECR registry
+aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS \
+  --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+
+# Identify the local image to push. Run the docker images command to list the container images on your system.
+docker images
+
+# Tag your image with the Amazon ECR registry
+docker tag ${IMAGE_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_REPOSITORY_NAME}:${TAG}
+
+# Push the image using the docker push command
+docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${AWS_REPOSITORY_NAME}:${TAG}
 ```
