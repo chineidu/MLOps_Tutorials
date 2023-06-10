@@ -19,7 +19,7 @@ services:
     image: other_service:v1
     container_name: other_app
     env_file:
-      - "./envs/.env" # Location of file containing the env vars
+      - "./envs_dir/service_2.env" # Location of file containing the env vars
     ports:
       - "6060:6060"
     volumes:

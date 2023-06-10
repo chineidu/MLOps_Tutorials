@@ -927,3 +927,5 @@ aws ecs update-service --cluster ${CLUSTER_NAME} --service ${SERVICE_NAME} \
 aws ecs describe-services --cluster ${CLUSTER_NAME} --services ${SERVICE_NAME}
 
 ```
+
+- Possible [gotchas](https://github.com/aws/containers-roadmap/issues/333)
