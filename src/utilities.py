@@ -64,11 +64,21 @@ def _check_role(*, role: str) -> bool:
     return result
 
 
+def _calculate_salary(*, scaler: float, role_weight: int) -> float:
+    """This returns the estimated salary."""
+    SIZE, LOW, HIGH = 10, 100_000, 300_000
+
+    salaries = np.random.randint(low=LOW, high=HIGH, size=SIZE)
+    salary_ = (np.random.choice(a=salaries, size=1, replace=False)[0] * scaler) + role_weight
+
+    estimated_salary = np.round(salary_, 2)
+    return estimated_salary
+
+
 # pylint: disable=too-many-locals
 def _make_prediction(*, name: str, role: str, experience: Optional[float]) -> dict[str, Any]:
     """This is used to make predictions."""
-    LOW, HIGH = 100_000, 300_000
-    MAX, SIZE, CONSTANT = 5, 10, 0.02
+    MAX, CONSTANT = 5, 0.02
 
     experience = (
         CONSTANT
@@ -81,15 +91,13 @@ def _make_prediction(*, name: str, role: str, experience: Optional[float]) -> di
     experience_weight = np.random.random() * experience
 
     SCALER = MAX if experience_weight > MAX else experience_weight
-    salaries = np.random.randint(low=LOW, high=HIGH, size=SIZE)
-    salary_ = (np.random.choice(a=salaries, size=1, replace=False)[0] * SCALER) + role_weight
 
-    estimated_salary = np.round(salary_, 2)
+    estimated_salary = _calculate_salary(scaler=SCALER, role_weight=role_weight)
     result = {
         "name": name,
         "role": role,
         "experience": float(experience),
-        "predicted_salary": float(estimated_salary),
+        "predicted_salary": estimated_salary,
     }
 
     return result
