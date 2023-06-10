@@ -1,7 +1,18 @@
-"""this module contains the Pytest fixtures."""
-from typing import Any
+"""This module contains the Pytest fixtures."""
+from typing import Any, Generator
 
 import pytest
+from fastapi.testclient import TestClient
+
+from src.fast_api.main import app
+
+
+@pytest.fixture()
+def client() -> Generator:
+    """This is used to setup the test client."""
+    with TestClient(app) as _client:
+        yield _client
+        app.dependency_overrides = {}
 
 
 @pytest.fixture
