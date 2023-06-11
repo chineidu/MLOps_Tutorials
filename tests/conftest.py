@@ -1,9 +1,11 @@
 """This module contains the Pytest fixtures."""
 from typing import Any, Generator
 
+import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
 
+from src.core import DATA_FILEPATH
 from src.fast_api.main import app
 
 
@@ -59,4 +61,18 @@ def payload_2() -> dict[str, Any]:
         "department": "AGI",
         "experience": 8,
     }
+    yield data
+
+
+@pytest.fixture
+def data_v1() -> Generator:
+    """This loads the predictions from v1."""
+    data = pd.read_csv(f"{DATA_FILEPATH}/data_v1.csv")
+    yield data
+
+
+@pytest.fixture
+def data_v2() -> Generator:
+    """This loads the predictions from v2."""
+    data = pd.read_csv(f"{DATA_FILEPATH}/data_v2.csv")
     yield data

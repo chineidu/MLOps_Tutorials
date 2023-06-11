@@ -51,4 +51,7 @@ warn_unused_configs = true
 
 [tool.pytest.ini_options]
 addopts = "--strict-markers" # Ensure that the markers are defined
-markers = ["integration: Run the integration tests."]
+markers = [
+            "integration: Run the integration tests.",
+            "differential: Run the integration tests."
+            ]

@@ -2,8 +2,10 @@
 from typing import Any
 from unittest import mock
 
+import pandas as pd
 from pytest import fixture, mark
 
+from ml_testing.differential_test import compare_differences
 from src.utilities import _check_role, _make_prediction
 
 
@@ -76,3 +78,23 @@ def test_increment(n: int, expected: int):
     """This is used to test an expected failed function."""
     # Then
     assert n + 1 == expected
+
+
+@mark.xfail(reason="There are differences in the predictions")
+@mark.differential
+def test_model_prediction_differentials(data_v1: pd.DataFrame, data_v2: pd.DataFrame):
+    """This is used to perform differential testing."""
+    # Given
+    N = 10  # Number of rows
+    data_v1, data_v2 = data_v1.iloc[:N], data_v2.iloc[:N]
+
+    # When
+    pred_v1, pred_v2 = data_v1["predictions"], data_v2["predictions"]
+
+    # Then
+    compare_differences(
+        expected_predictions=pred_v2,
+        actual_predictions=pred_v1,
+        # Tolerance
+        rel_tol=0.08,
+    )
