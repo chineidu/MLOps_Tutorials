@@ -7,14 +7,16 @@
   - [Building An ML System Key Phases](#building-an-ml-system-key-phases)
   - [Reasons For Running Tests](#reasons-for-running-tests)
   - [Key Testing Principals For ML (Before Deployment)](#key-testing-principals-for-ml-before-deployment)
+    - [Unit Tests](#unit-tests)
+    - [Integration Tests](#integration-tests)
 
 ## Building An ML System Key Phases
 
 ```text
 1. Research Environment
+   - Testing different data and features.
    - Testing different algorithms.
    - Testing different hyperparameters.
-   - Testing different data and features.
 
 2. Development Environment
    - Unit tests.
@@ -57,5 +59,45 @@ Testing code and ML systems is crucial for several reasons:
 - Test the model config/hyperparams.
 - Ensure that the model training is reproducible.
 - Validate model quality.
+  - Check for sudden degredation.
+    * e.g. write tests to check the model's output and predictions using a validation dataset.
+    * create lower and upper boundaries that can be used to test the predictions.
+  - Check for gradual degredation.
 - Apply integration test to the pipeline.
+```
+
+### Unit Tests
+
+```text
+
+```
+
+### Integration Tests
+
+```text
+- An integration test in ML systems is a type of test that tests the interaction between different components of an ML system.
+
+- Integration tests are typically performed after unit tests have been completed and before system tests are performed.
+
+- Integration tests can be used to test a variety of things, such as:
+  - The ability of different components to communicate with each other.
+  - The accuracy of the results produced by the ML system.
+  - The performance of the ML system.
+  - The robustness of the ML system to changes in data or input.
+
+- An example of integration test is testing an ML prediction endpoint.
+```
+
+```shell
+# Remember to add the custome marker to the config file. (pytest.ini or pyproject.toml).
+pytest -vv -m <marker_name>
+
+# e.g
+pytest -vv -m integration
+
+# To view all the markers
+pytest --markers
+
+# To view all the fixtures
+pytest --fixtures
 ```

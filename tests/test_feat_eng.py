@@ -46,13 +46,13 @@ def test_check_role(input_: str, output_: bool) -> None:
     assert result == output_
 
 
-# ==== Test using multiple fixtures ====
+# ==== Test using multiple fixtures and parametrize====
 @mark.parametrize(
     ("input_", "output_"),
     (["role_1", True], ["role_2", False]),
 )
 def test_roles(input_: fixture, output_: fixture, request: fixture) -> None:
-    """This test uses multiple fixtures."""
+    """This test uses multiple fixtures with parametrize."""
     # Given
     print(type(input_))
 
@@ -64,3 +64,15 @@ def test_roles(input_: fixture, output_: fixture, request: fixture) -> None:
 
     # Then
     assert result == output_
+
+
+# ==== Test using multiple fixtures, parametrize and xfail====
+@mark.xfail(reason="some bug")
+@mark.parametrize(
+    ("n", "expected"),
+    [(1, 1), (1, 0)],
+)
+def test_increment(n: int, expected: int):
+    """This is used to test an expected failed function."""
+    # Then
+    assert n + 1 == expected
