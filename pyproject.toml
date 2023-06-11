@@ -50,4 +50,5 @@ disallow_untyped_defs = false
 warn_unused_configs = true
 
 [tool.pytest.ini_options]
+addopts = "--strict-markers" # Ensure that the markers are defined
 markers = ["integration: Run the integration tests."]

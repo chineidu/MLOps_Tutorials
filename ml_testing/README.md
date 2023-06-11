@@ -69,7 +69,14 @@ Testing code and ML systems is crucial for several reasons:
 ### Unit Tests
 
 ```text
+-
+A unit test in ML systems is a type of test that tests a single unit of code, such as a function or class.
 
+- When writing unit tests for ML systems, it is important to keep in mind the following principles:
+  - Isolation: Unit tests should test individual units of code in isolation. This means that they should not rely on any external dependencies, such as other functions or classes.
+  - Determinism: Unit tests should be deterministic. This means that they should always produce the same results when run with the same input.
+  - Repeatability: Unit tests should be repeatable. This means that they should be able to be run multiple times without any changes in results.
+  - Fast: Unit tests should be fast. This means that they should be able to be run quickly, so that they can be used frequently during development.
 ```
 
 ### Integration Tests
@@ -86,6 +93,23 @@ Testing code and ML systems is crucial for several reasons:
   - The robustness of the ML system to changes in data or input.
 
 - An example of integration test is testing an ML prediction endpoint.
+```
+
+```python
+@pytest.mark.integration
+def test_predict_income(client: TestClient, payload_1: dict[str, Any]) -> None:
+    """This is used to test the predict_income enpoint."""
+    # Given
+    expected = {"status_code": 200}
+    URL = "http://0.0.0.0:8000/predict"
+
+    # When
+    response = client.post(URL, json=payload_1)
+    print(response.json())
+
+    # Then
+    assert response.status_code == expected.get("status_code")
+    assert response.json().get("predicted_salary") != 0
 ```
 
 ```shell
