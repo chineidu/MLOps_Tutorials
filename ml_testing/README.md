@@ -9,6 +9,7 @@
   - [Key Testing Principals For ML (Before Deployment)](#key-testing-principals-for-ml-before-deployment)
     - [Unit Tests](#unit-tests)
     - [Integration Tests](#integration-tests)
+    - [Differential Tests](#differential-tests)
 
 ## Building An ML System Key Phases
 
@@ -124,4 +125,19 @@ pytest --markers
 
 # To view all the fixtures
 pytest --fixtures
+```
+
+### Differential Tests
+
+```text
+- Differential test is a type of testing that compares the outputs or behaviors of two different versions or configurations of the same system.
+
+- Differential tests can be used to identify problems with an ML system, such as overfitting or bias.
+
+Here are some examples of how differential tests can be used:
+- A developer might use a differential test to compare the performance of two different versions of an ML image classification system. The developer might want to see if the new version of the system is more accurate or faster than the old version.
+
+- A data scientist might use a differential test to compare the performance of an ML natural language processing system on two different sets of data. The data scientist might want to see if the system performs better on data from a particular source, such as social media or news articles.
+
+- Differential testing is particularly useful in scenarios where you have made changes to an ML model or system, such as modifying the architecture, updating the training data, or adjusting hyperparameters. By comparing the outputs of the original version (baseline) and the modified version, you can assess the impact of the changes and determine if they have introduced any unexpected or undesired effects.
 ```
