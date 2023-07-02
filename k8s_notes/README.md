@@ -6,6 +6,9 @@
   - [Table of Content](#table-of-content)
   - [Kubernetes Introduction](#kubernetes-introduction)
   - [K8s Concepts And Architecture](#k8s-concepts-and-architecture)
+  - [Installation of Kubernetes \[Locally\]](#installation-of-kubernetes-locally)
+    - [Install Kubectl](#install-kubectl)
+    - [Install Minikube](#install-minikube)
 
 ## Kubernetes Introduction
 
@@ -64,12 +67,19 @@ Volumes
 -------
 - A volume is a way to store data in Kubernetes. Volumes can be used to store data that is shared between pods or to store data that is persistent across pod restarts.
 
-Control plane
+
+
+Master Node
+-----------
+- This is a node that runs the Kubernetes control plane. The control plane is responsible for managing the cluster, including scheduling pods, managing resources, and maintaining the cluster state.
+
+Control Plane
 -------------
 - The control plane is composed of a number of components, including:
-
 1. API server: The API server is the main entry point for interacting with Kubernetes. It exposes a RESTful API that can be used to manage the cluster.
+
 2. Scheduler: The scheduler is responsible for scheduling pods onto worker nodes. It takes into account the resources available on each node and the requirements of the pods when making scheduling decisions.
+
 3. Controller manager: The controller manager is responsible for managing the lifecycle of pods and services. It ensures that pods are created and deleted as needed and that services are updated when pods are added or removed.
 
 Worker Nodes
@@ -88,4 +98,54 @@ In Kubernetes architecture, a proxy is a component that is responsible for routi
 - kube-proxy: This is the default proxy in Kubernetes. It is a network proxy that runs on each node in the cluster. kube-proxy maintains network rules on nodes that allow network communication to pods from network sessions inside or outside of the cluster.
 
 - Ingress controller: An ingress controller is a proxy that is responsible for routing traffic to pods that are exposed through an ingress resource. Ingress resources are used to expose HTTP and HTTPS services to the outside world.
+
+
+In general, `proxies` are used for more basic tasks, such as routing traffic to pods while `Services` are used for more complex tasks, such as exposing pods to the outside world and load balancing traffic across pods.
+```
+
+## Installation of Kubernetes [Locally]
+
+### Install Kubectl
+
+- Check [this](https://kubernetes.io/docs/tasks/tools/install-kubectl-macos/#install-with-homebrew-on-macos) for updated information.
+
+```bash
+# Install with Homebrew on macOS
+brew install kubectl
+
+# OR
+brew install kubernetes-cli
+
+# Test to ensure the version you installed is up-to-date:
+kubectl version --client
+
+# Verify kubectl configuration
+kubectl cluster-info
+
+# For more commands
+kubectl --help
+```
+
+### Install Minikube
+
+- Check [this](https://minikube.sigs.k8s.io/docs/start/) for updated information.
+
+```bash
+# Install with Homebrew on macOS
+brew install minikube
+
+# If which minikube fails after installation via brew, you may have to
+# remove the old minikube links and link the newly installed binary:
+brew unlink minikube
+brew link minikube
+
+# Start your cluster
+minikube start
+
+# If you already have kubectl installed, you can now use
+# it to access your new cluster:
+kubectl get po -A
+
+# For more commands
+minikube --help
 ```
