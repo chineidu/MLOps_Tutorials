@@ -9,6 +9,12 @@
   - [Installation of Kubernetes \[Locally\]](#installation-of-kubernetes-locally)
     - [Install Kubectl](#install-kubectl)
     - [Install Minikube](#install-minikube)
+  - [Objects In K8s](#objects-in-k8s)
+    - [Pod Object](#pod-object)
+    - [Deployment Object](#deployment-object)
+      - [Deployment \[Imperative Approach\]](#deployment-imperative-approach)
+      - [Expose A Deployment](#expose-a-deployment)
+      - [Scaling Deployments](#scaling-deployments)
 
 ## Kubernetes Introduction
 
@@ -146,6 +152,107 @@ minikube start
 # it to access your new cluster:
 kubectl get po -A
 
+# Launch the minikube dashboard
+minikube dashboard
+
 # For more commands
 minikube --help
+```
+
+## Objects In K8s
+
+### Pod Object
+
+```text
+- A pod is the smallest and most basic unit of deployment.
+
+- Containers within a pod share the same network namespace, allowing them to communicate with each other over the `localhost` interface. They can also share storage volumes, which are mounted into the containers' file systems.
+
+- Pods are considered to be ephemeral and disposable. If a pod fails or needs to be rescheduled due to node failures or scaling events, a new pod can be created to replace it.
+
+- It's important to note that pods are not intended to be directly exposed to external network traffic. Instead, Kubernetes introduces other higher-level abstractions, such as `services`, to provide stable network endpoints and load balancing for pods.
+```
+
+### Deployment Object
+
+```text
+- Deployment objects are a way to manage applications declaratively.
+
+- Deployment objects describe the desired state of an application and K8s takes care of the details of how to update the pods that make up the application.
+
+- Deployment objects can be used to scale applications up or down, and they can also be rolled back if an update fails.
+
+Create A K8s Deployment (Imperative Approaach)
+-----------------------
+1. Build an image and push to a Docker repository like Dockerhub.
+2. Start a K8s cluster. e.g. using minikube for local K8s deployment.
+3. Create a deployment object using `kubectl`.
+4. Expose the pod(s) to the outside world using a K8s `service`.
+
+```
+
+#### Deployment [Imperative Approach]
+
+```bash
+# 1. Build an image and push to a Docker repository like Dockerhub.
+docker build -t <image_name:tag> -f <Dockerfile> <./path_to_file>
+# e.g.
+docker build -t chineidu/other_service:v2 -f other/Dockerfile ./other/Dockerfile
+
+# 2. Start the K8s cluster.
+minikube start
+
+# 3. Create a deployment object using `kubectl`.
+kubectl create deployment <deployment_name> --image=<image_name:tag>
+# e.g.
+# Note: underscores are NOT supported.
+kubectl create deployment first-deployment --image=chineidu/other_service:v2
+
+# List all the running pods in your K8s cluster.
+kubectl get pods
+
+# List all the created deployments in your K8s cluster.
+kubectl get deployments
+
+# Delete a K8s deployment.
+kubectl delete deployment <deployment_name>
+
+# Check the status of the deployment using the dashboard
+minikube dashboard
+```
+
+#### Expose A Deployment
+
+```text
+- For the deployment to be accessed by the outside world, it has to be exposed as a `service`.
+```
+
+```bash
+# Expose a K8s resource, such as a pod, deployment, or replica set, as a service.
+# The service will be created in the default namespace, unless a different namespace is specified.
+kubectl expose <resource> [options]
+# For deployment, it'll look like this
+kubectl expose deployment <deployment_name> --type=[ClusterIP|NodePort|LoadBalancer] --port=$PORT
+kubectl expose deployment first-deployment --type=LoadBalancer --port=6060
+
+# List all the created services
+kubectl get services
+
+# To display the external IP for local setup
+minikube service <service_name>
+# e.g.
+minikube service first-deployment
+```
+
+#### Scaling Deployments
+
+```bash
+# Scale a dployment. replicas is the number of pods
+kubectl scale deployments <deployment-name> --replicas=<number_of_replicas>
+
+# e.g. Scale UP
+kubectl scale deployment first-deployment --replicas=3
+# e.g. Scale DOWN
+kubectl scale deployment first-deployment --replicas=1
+
 ```
