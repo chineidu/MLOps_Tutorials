@@ -15,6 +15,7 @@
       - [Deployment \[Imperative Approach\]](#deployment-imperative-approach)
       - [Expose A Deployment](#expose-a-deployment)
       - [Scaling Deployments](#scaling-deployments)
+      - [Updating Deployments \[With Docker Images\]](#updating-deployments-with-docker-images)
 
 ## Kubernetes Introduction
 
@@ -254,5 +255,34 @@ kubectl scale deployments <deployment-name> --replicas=<number_of_replicas>
 kubectl scale deployment first-deployment --replicas=3
 # e.g. Scale DOWN
 kubectl scale deployment first-deployment --replicas=1
+```
 
+#### Updating Deployments [With Docker Images]
+
+```text
+- This is used to update a K8s deployment when there are changes to the source code or Docker image(s).
+
+Steps
+-----
+1. Rebuild the Docker image and push the image to a Docker repository.
+2. Update the image on the K8s deployment.
+3. Check the status of the deployment.
+   - it shows the current state of the rollout, including the number of new replicas that have been created, the number of old replicas that have been terminated, and the number of available replicas.
+
+```
+
+```bash
+# Update the image on K8s
+kubectl set image deployments/<deployment-name> <container-name>=<new-image>
+kubectl set image deployments/first-deployment mlops=chineidu/mlops:v3
+
+# TO DO: Update the mlops Docker image
+
+# Check deployment status
+kubectl rollout status deployment/<deployment-name>
+# e.g.
+kubectl rollout status deployment/first-deployment
+
+# You can also `watch` the status of a rollout as it progresses.
+kubectl rollout status deployment/first-deployment --watch
 ```

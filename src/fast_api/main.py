@@ -20,7 +20,7 @@ def index() -> Any:
                 <body style='padding: 15px;'>
                     <h1>Welcome to the {API_NAME}</h1>
                     <div>
-                    Check the docs: <a href='/docs'>here</a>
+                    Check the docs: <a href='/docs'>here!!!</a>
                     </div>
                 </body>
             </html>
