@@ -248,7 +248,7 @@ minikube service first-deployment
 #### Scaling Deployments
 
 ```bash
-# Scale a dployment. replicas is the number of pods
+# Scale a deployment. replicas is the number of pods
 kubectl scale deployments <deployment-name> --replicas=<number_of_replicas>
 
 # e.g. Scale UP
@@ -273,7 +273,7 @@ Steps
 
 ```bash
 # Update the image on K8s
-kubectl set image deployments/<deployment-name> <container-name>=<new-image>
+kubectl set image deployments/<deployment-name> <container-name>=<new-image>:<tag>
 kubectl set image deployments/first-deployment mlops=chineidu/mlops:v3
 
 # TO DO: Update the mlops Docker image
