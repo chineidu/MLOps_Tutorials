@@ -10,6 +10,7 @@ from src.utilities import DB, _make_prediction, _save_database, _save_json_data,
 
 app = FastAPI()
 API_NAME = 'Sample API'
+MODEL_VERSION = "v1.0.0"
 
 
 @app.get(path='/', status_code=status.HTTP_200_OK)
@@ -41,6 +42,7 @@ def predict_income(user_input: UserInput) -> Output:
     )
     result = _make_prediction(name=name, role=role, experience=experience)
     result["department"] = department
+    result["model_version"] = MODEL_VERSION
 
     # Save data to a file
     _save_json_data(data=result)

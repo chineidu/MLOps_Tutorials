@@ -276,8 +276,6 @@ Steps
 kubectl set image deployments/<deployment-name> <container-name>=<new-image>:<tag>
 kubectl set image deployments/first-deployment mlops=chineidu/mlops:v3
 
-# TO DO: Update the mlops Docker image
-
 # Check deployment status
 kubectl rollout status deployment/<deployment-name>
 # e.g.

@@ -33,6 +33,7 @@ class Output(BaseModel):
     department: str
     experience: Optional[int]
     predicted_salary: Optional[float]
+    model_version: str
 
 
 class DBOutput(BaseModel):
