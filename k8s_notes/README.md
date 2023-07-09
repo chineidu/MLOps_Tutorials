@@ -16,6 +16,7 @@
       - [Expose A Deployment](#expose-a-deployment)
       - [Scaling Deployments](#scaling-deployments)
       - [Updating Deployments \[With Docker Images\]](#updating-deployments-with-docker-images)
+      - [Rollback Deployments](#rollback-deployments)
 
 ## Kubernetes Introduction
 
@@ -283,4 +284,25 @@ kubectl rollout status deployment/first-deployment
 
 # You can also `watch` the status of a rollout as it progresses.
 kubectl rollout status deployment/first-deployment --watch
+```
+
+#### Rollback Deployments
+
+```bash
+# Rollback to the previous deployment
+kubectl rollout undo deployment/<deployment-name>
+# e.g.
+kubectl rollout undo deployment/first-deployment
+
+# Display the deployment history
+kubectl rollout history deployment/<deployment-name>
+# e.g.
+kubectl rollout history deployment/first-deployment
+
+# View A Specific Revision
+kubectl rollout history deployment/<deployment-name> --revision=<revision_num>
+kubectl rollout history deployment/my-app --revision=2
+
+# Rollback to a specific version
+kubectl rollout undo deployment/my-app --to-revision=2
 ```
