@@ -8,6 +8,9 @@
   - [Basic Operations](#basic-operations)
     - [Create Spark Session](#create-spark-session)
     - [Load Data](#load-data)
+    - [Load Data With Schema And Delimiter](#load-data-with-schema-and-delimiter)
+    - [Create A Copy](#create-a-copy)
+    - [Select Column(s) And Return A DataFrame](#select-columns-and-return-a-dataframe)
     - [Drop Columns](#drop-columns)
     - [Add A New Column](#add-a-new-column)
     - [Regex](#regex)
@@ -16,6 +19,8 @@
     - [Check For Null/NaN Values](#check-for-nullnan-values)
     - [Filter Keyword](#filter-keyword)
     - [When Keyword](#when-keyword)
+    - [Summary Stats](#summary-stats)
+    - [Group By](#group-by)
 
 ## Install Java
 
@@ -55,17 +60,47 @@ spark = SparkSession.builder.appName("enterYourAppName").getOrCreate()
 
 ```python
 # Load data
-fp = "../data/path/to/data.csv"
+fp = "./path/to/data.csv"
 raw_data = spark.read.option("header", "true").option("inferSchema", "true").csv(fp)
 
 raw_data.printSchema()
 ```
 
-### Drop Columns
+### Load Data With Schema And Delimiter
+
+```python
+FILEPATH = "path/to/file.csv"
+DELIMITER = "|"
+SCHEMA = StructType(
+    [
+        StructField("trans_date", StringType(), nullable=True),
+        StructField("cust_id", IntegerType(), nullable=True),
+        StructField("brand_name", StringType(), nullable=True),
+        StructField("description", StringType(), nullable=True),
+        StructField("amount", FloatType(), nullable=True),
+    ]
+)
+data = spark.read.schema(SCHEMA).option("delimiter", DELIMITER).format("csv").load(FILEPATH)
+```
+
+### Create A Copy
+
+```python
+# Create a copy of the DataFrame
+df = data.alias("df")
+```
+
+### Select Column(s) And Return A DataFrame
 
 ```python
 # Drop irrelevant columns
-data = raw_data.drop("_c14", "_c15", "_c16", "_c17")
+data = data.select("_c14", "_c15", "_c16", "_c17")
+```
+
+### Drop Columns
+
+```python
+raw_data = raw_data.drop("course_name", "reviews_avg", "course_duration", "price_after_discount")
 ```
 
 ### Add A New Column
@@ -122,9 +157,6 @@ print(data.select("reviews").distinct().toPandas()["reviews"].values)
 ### Check For Null/NaN Values
 
 ```python
-# Create a copy of the DataFrame
-df = data.alias("df")
-
 df = df.select("reviews").filter(~((df["reviews"].isNull()) | (df["reviews"] == r"")))
 df.show()
 ```
@@ -135,7 +167,8 @@ df.show()
 # Create a copy of the DataFrame
 df = data.alias("df")
 
-df = df.select("reviews").filter(~((df["reviews"].isNull()) | (df["reviews"] == r"")))
+# Verify!
+df.select("num_reviews").filter(df["num_reviews].isNull()).show()
 df.show()
 ```
 
@@ -152,4 +185,28 @@ data = data.withColumn(
 )
 
 data.show()
+```
+
+### Summary Stats
+
+```python
+# Summary stats of course rating
+data.agg(
+    F.min("reviews").alias("min_review"), # min
+    F.max("reviews").alias("max_review"), # max
+    F.round(F.avg("reviews"), 2).alias("avg_review"), # mean
+    F.expr("percentile(reviews, 0.5)").alias("median_review"), # median (50% percentile)
+    F.round(F.stddev("reviews"), 2).alias("std_review"), # std
+).show()
+```
+
+### Group By
+
+```python
+(
+  data.groupBy("course_flag")
+  .agg(F.count("course_flag")
+  .alias("count"))
+  .show(truncate=False)
+)
 ```
