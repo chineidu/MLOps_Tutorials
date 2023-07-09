@@ -140,9 +140,9 @@ docker run -it -p xxxx:xxxx image_name:tag
 # e.g.
 docker run -it  -p 8000:8000 mlops:v1
 
-# Run the container in a detached and  interactive mode and publish
-# the exposed ports. Assign a name to the container and delete the
-# container once it's been stopped.
+# Run the container in a detached `-d` and interactive mode `-it` and publish
+# the exposed ports `-p`. Assign a name `--name` to the container and delete the
+# container once it's been stopped using the flag`--rm`.
 docker run -it -p xxxx:xxxx -d --rm --name container_name image_name:tag
 
 # e.g.
