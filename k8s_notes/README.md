@@ -17,6 +17,9 @@
       - [Scaling Deployments](#scaling-deployments)
       - [Updating Deployments \[With Docker Images\]](#updating-deployments-with-docker-images)
       - [Rollback Deployments](#rollback-deployments)
+    - [Imperative Object Configuration](#imperative-object-configuration)
+      - [Deployment Config File](#deployment-config-file)
+      - [Create Deployment](#create-deployment)
 
 ## Kubernetes Introduction
 
@@ -305,4 +308,66 @@ kubectl rollout history deployment/my-app --revision=2
 
 # Rollback to a specific version
 kubectl rollout undo deployment/my-app --to-revision=2
+```
+
+### Imperative Object Configuration
+
+- Check the [docs](https://kubernetes.io/docs/concepts/overview/working-with-objects/object-management/)
+- K8s API [docs](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/).
+
+```text
+- In imperative object configuration, the kubectl command specifies the operation (create, replace, etc.), optional flags and at least one file name.
+- The file specified must contain a full definition of the object in YAML or JSON format.
+```
+
+#### Deployment Config File
+
+- More examples can be found [here](https://codefresh.io/learn/software-deployment/kubernetes-deployment-yaml/).
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+```
+
+```text
+- This deployment shown above will create 3 replicas of a pod with the `nginx` image.
+- The pods will be labeled with the app: nginx label, and they will be exposed on port 80.
+
+Detailed Explanation
+--------------------
+- apiVersion: specifies the Kubernetes API version that the deployment is using.
+- kind: specifies the type of Kubernetes object that the deployment is creating.
+- metadata: contains the metadata for the deployment, such as its name and labels.
+- spec: specifies the configuration for the deployment, such as the number of replicas and the pod template.
+- selector: specifies the labels that the pods in the deployment should be labeled with.
+- template: specifies the template for the pods in the deployment.
+- containers: specifies the containers that should be included in the pods.
+```
+
+#### Create Deployment
+
+```bash
+kubectl apply if <filename.yaml>
+# e.g.
+kubectl apply -f deployment.yaml
 ```
