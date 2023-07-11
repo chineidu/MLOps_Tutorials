@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: second-app
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: second-app
@@ -13,11 +13,11 @@ spec:
         app: second-app
     spec:
       containers:
-      - name: second-app
-        image: chineidu/mlops:v3
-        resources:
-          limits:
-            memory: "256Mi"
-            cpu: "500m"
-        ports:
-        - containerPort: 8000
+        - name: second-app
+          image: chineidu/mlops:v3
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000

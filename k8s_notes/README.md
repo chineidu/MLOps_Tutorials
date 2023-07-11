@@ -13,13 +13,16 @@
     - [Pod Object](#pod-object)
     - [Deployment Object](#deployment-object)
       - [Deployment \[Imperative Approach\]](#deployment-imperative-approach)
-      - [Expose A Deployment](#expose-a-deployment)
+      - [Expose A Deployment (Create A Service)](#expose-a-deployment-create-a-service)
       - [Scaling Deployments](#scaling-deployments)
       - [Updating Deployments \[With Docker Images\]](#updating-deployments-with-docker-images)
       - [Rollback Deployments](#rollback-deployments)
     - [Imperative Object Configuration](#imperative-object-configuration)
       - [Deployment Config File](#deployment-config-file)
       - [Create Deployment](#create-deployment)
+      - [Service Config File](#service-config-file)
+      - [Updating The Config File](#updating-the-config-file)
+      - [Delete Resources In A Config File](#delete-resources-in-a-config-file)
 
 ## Kubernetes Introduction
 
@@ -226,7 +229,7 @@ kubectl delete deployment <deployment_name>
 minikube dashboard
 ```
 
-#### Expose A Deployment
+#### Expose A Deployment (Create A Service)
 
 ```text
 - For the deployment to be accessed by the outside world, it has to be exposed as a `service`.
@@ -238,6 +241,8 @@ minikube dashboard
 kubectl expose <resource> [options]
 # For deployment, it'll look like this
 kubectl expose deployment <deployment_name> --type=[ClusterIP|NodePort|LoadBalancer] --port=$PORT
+# OR
+kubectl expose deployment <deployment_name> --type [ClusterIP|NodePort|LoadBalancer] --port $PORT
 kubectl expose deployment first-deployment --type=LoadBalancer --port=6060
 
 # List all the created services
@@ -367,7 +372,58 @@ Detailed Explanation
 #### Create Deployment
 
 ```bash
-kubectl apply if <filename.yaml>
+# To create the resources specified in the config file
+kubectl apply -f <filename.yaml>
+# OR
+kubectl apply -f=<filename.yaml>
 # e.g.
 kubectl apply -f deployment.yaml
+```
+
+#### Service Config File
+
+- An example `service` object config is shown below.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: second-app
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: LoadBalancer
+
+```
+
+#### Updating The Config File
+
+```text
+- Changes can be made and updated on the config file by saving the file and running the command:
+
+$ kubectl apply -f filename.yaml
+```
+
+#### Delete Resources In A Config File
+
+```text
+Resources can be deleted using the:
+1. Imperative approach. i.e. using ONLY the CLI.
+2. Imperative object approach. i.e. using a config file
+```
+
+```bash
+# Using ONLY CLI
+kubectl delete <resource_type> <resource_name>
+# e.g.
+kubectl delete deployment my-app
+
+# Using confile file and CLI
+# Point to the fil(e) and delete all the resources in the file(s):
+kubectl delete -f <filename1.yaml> -f <filename2.yaml>
+# e.g.
+kubectl delete -f deployment.yaml
 ```
