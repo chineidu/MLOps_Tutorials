@@ -30,6 +30,9 @@
       - [Create A Service](#create-a-service)
       - [Describe A Service](#describe-a-service)
       - [List All The Resources In A K8s Cluster](#list-all-the-resources-in-a-k8s-cluster)
+      - [Node Port](#node-port)
+      - [Load Balancer](#load-balancer)
+      - [To Do](#to-do)
 
 ## Kubernetes Introduction
 
@@ -571,6 +574,81 @@ kubectl describe service backend
 
 #### List All The Resources In A K8s Cluster
 
+```text
+- This is used to list all of the resources in a Kubernetes cluster.
+- The resources can be pods, deployments, services, stateful sets, and any other type of Kubernetes resource.
+```
+
 ```bash
 kubectl get all
+```
+
+#### Node Port
+
+```text
+Node Port
+---------
+- This is a type of service that exposes a service on a specific port on each node in the cluster.
+- This allows external users to access the service without having to use a load balancer.
+- NodePorts are useful for exposing services that need to be accessed by external users, but do not need to be load balanced. e.g. you might use a NodePort to expose a web application that is only used by a small number of users.
+- NodePorts are configured in the spec.ports section of the service manifest.
+- The nodePort field specifies the port that the service will be exposed on each node. The nodePort field must be a value in the range `30000-32767`.
+```
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: second-app
+  type: NodePort # nodeport
+  ports:
+    - port: 8000
+      targetPort: 8000
+      nodePort: 30000 # nodeport
+```
+
+#### Load Balancer
+
+```text
+Load Balancer
+-------------
+- A Kubernetes load balancer is a service that distributes traffic across multiple pods.
+- This can help to improve the performance and availability of your applications.
+```
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: second-app
+  type: LoadBalancer
+  ports:
+    - port: 8000
+      targetPort: 8000
+```
+
+```bash
+# Method 1. # Expose a K8s resource, such as a pod, deployment, or replica set, as a service.
+export PORT=8000
+kubectl expose deployment <deployment_name> --type=[ClusterIP|NodePort|LoadBalancer] --port=$PORT
+kubectl expose deployment first-deployment --type=LoadBalancer --port=$PORT
+
+# Method 2.
+kubectl apply -f <filename.yaml>
+# e.g. This creates and exposes the service object in the specified yaml file.
+kubectl apply -f main_config.yaml
+```
+
+#### To Do
+
+```text
+1. Config map
+2. Env vars
+3. Ingress
 ```
