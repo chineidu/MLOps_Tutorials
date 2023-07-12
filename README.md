@@ -4,11 +4,17 @@ This course contains tutorials for Docker, K8s, Model deployment, ML Systems Tes
 
 This repo was inspired by the following Udemy courses:
 
-1. **Docker**: [Docker and k8s](https://www.udemy.com/course/docker-kubernetes-the-practical-guide/learn/practice/1244330/summary#overview)
-2. **Kubernetes**: [Docker and k8s](https://www.udemy.com/course/docker-kubernetes-the-practical-guide/learn/practice/1244330/summary#overview)
-3. **ML Testing and Monitoring**: [Testing and Monitoring](https://www.udemy.com/course/draft/2122690/learn/lecture/17718922?start=645#overview)
+1. **Docker**: [Docker notes](https://github.com/chineidu/MLOps_Tutorials/tree/main/docker_notes)
+   - Course: [Docker and k8s](https://www.udemy.com/course/docker-kubernetes-the-practical-guide/learn/practice/1244330/summary#overview)
+2. **Kubernetes**: [K8s notes](https://github.com/chineidu/MLOps_Tutorials/tree/main/k8s_notes)
+   - [Docker and k8s](https://www.udemy.com/course/docker-kubernetes-the-practical-guide/learn/practice/1244330/summary#overview)
+3. **ML Testing and Monitoring**: [ML testing notes](https://github.com/chineidu/MLOps_Tutorials/tree/main/ml_testing)
+   - [Testing and Monitoring](https://www.udemy.com/course/draft/2122690/learn/lecture/17718922?start=645#overview)
+4. **Spark**: [Spark notes](https://github.com/chineidu/MLOps_Tutorials/tree/main/spark_notes)
 
-## Commands Used
+## Using Docker Commands
+
+- The commands can get very long. [Docker compose](#docker-compose) can be used instead.
 
 ```shell
 # Service 1
@@ -27,6 +33,53 @@ docker run -itd --rm --name mongodb \
     -v data:/data/db --network api_network mongo:7.0-rc-jammy
 ```
 
+## Docker Compose
+
+```yaml
+
+version: "3.8"
+
+services:
+  service_1:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: mlops:v2
+    container_name: cool_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/opt # Bind mount
+
+  service_2:
+    build:
+      context: ./other
+      dockerfile: Dockerfile
+    image: other_service:v1
+    container_name: other_app
+    env_file:
+      - "./envs_dir/service_2.env" # Location of file containing the env vars
+    ports:
+      - "6060:6060"
+    volumes:
+      - ./other:/opt # Bind mount
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:7.0-rc
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=neidu
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - data:/data/db # Named volume
+
+# Named volumes ONLY!
+volumes:
+  data:
+```
+
 ### Mongodb String URI Format
 
 - It can be found in the [docs](https://www.mongodb.com/docs/manual/reference/connection-string/)
@@ -35,7 +88,7 @@ docker run -itd --rm --name mongodb \
 mongodb://[username:password@]host1[:port1][,...hostN[:portN]][/[defaultauthdb][?options]]
 ```
 
-### Dockerfile With Commands
+### Example Dockerfile
 
 ```Dockerfile
 # Base image

@@ -798,7 +798,5 @@ spec:
 #### To Do
 
 ```text
-1. Config map
-2. Env vars
-3. Ingress
+1. Ingress
 ```
