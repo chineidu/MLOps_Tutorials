@@ -13,25 +13,29 @@
     - [Pod Object](#pod-object)
     - [Deployment Object](#deployment-object)
       - [Deployment \[Imperative Approach\]](#deployment-imperative-approach)
+      - [Get Logs of A K8s Pod](#get-logs-of-a-k8s-pod)
+      - [Execute Commands In A Container \[kubectl exec command\]](#execute-commands-in-a-container-kubectl-exec-command)
       - [Expose A Deployment (Create A Service)](#expose-a-deployment-create-a-service)
       - [Scaling Deployments](#scaling-deployments)
       - [Updating Deployments \[With Docker Images\]](#updating-deployments-with-docker-images)
       - [Rollback Deployments](#rollback-deployments)
-    - [Imperative Object Configuration](#imperative-object-configuration)
-      - [Deployment Config File](#deployment-config-file)
-      - [Create Deployment](#create-deployment)
-      - [Service Config File](#service-config-file)
-      - [Updating The Config File](#updating-the-config-file)
-      - [Delete Resources In A Config File](#delete-resources-in-a-config-file)
-      - [Create Multiple Objects In A Single File](#create-multiple-objects-in-a-single-file)
-      - [Add Liveness Probes](#add-liveness-probes)
-      - [Image Pull Policy](#image-pull-policy)
+  - [Imperative Object Configuration \[Using Config Files\]](#imperative-object-configuration-using-config-files)
+    - [Deployment Config File](#deployment-config-file)
+    - [Create Deployment](#create-deployment)
+    - [Service Config File](#service-config-file)
+    - [Updating The Config File](#updating-the-config-file)
+    - [Delete Resources In A Config File](#delete-resources-in-a-config-file)
+    - [Create Multiple Objects In A Single File](#create-multiple-objects-in-a-single-file)
+    - [Add Liveness Probes](#add-liveness-probes)
+    - [Image Pull Policy](#image-pull-policy)
     - [Service Object](#service-object)
       - [Create A Service](#create-a-service)
       - [Describe A Service](#describe-a-service)
       - [List All The Resources In A K8s Cluster](#list-all-the-resources-in-a-k8s-cluster)
       - [Node Port](#node-port)
       - [Load Balancer](#load-balancer)
+    - [Environment Variables](#environment-variables)
+    - [Secret Config File](#secret-config-file)
       - [To Do](#to-do)
 
 ## Kubernetes Introduction
@@ -239,6 +243,55 @@ kubectl delete deployment <deployment_name>
 minikube dashboard
 ```
 
+#### Get Logs of A K8s Pod
+
+```text
+- It's used to view the logs for a Kubernetes pod. i.e. the logs can be used to troubleshoot problems with pods and to understand the behavior of applications running in pods.
+
+Some additional flags that you can use with the `kubectl logs` command:
+--follow: This flag will cause the command to follow the logs for the pod and update the output accordingly.
+--tail: This flag can be used to specify the number of lines of logs that will be displayed.
+--since: This flag can be used to specify the time since which the logs will be displayed.
+```
+
+```bash
+kubectl get logs <pod-name>
+
+# Show the last 5 logs
+kubectl logs second-app-6695467d49-bwhgg --tail=5
+
+# Show the logs within the last 10 seconds
+kubectl logs second-app-6695467d49-bwhgg --since=10s
+
+# Specify if the logs should be streamed.
+kubectl logs second-app-6695467d49-bwhgg --follow=true
+
+# For more commands:
+kubectl logs --help
+```
+
+#### Execute Commands In A Container [kubectl exec command]
+
+```text
+- The `kubectl exec` command is used to execute commands in a Kubernetes pod.
+- This can be used to troubleshoot problems with pods, to debug applications running in pods, or to perform other tasks that require access to the container's shell.
+- It can also be used to execute commands interactively using the `-it` flag.
+```
+
+```bash
+# Syntax
+kubectl exec <pod-name> -- <command>
+
+# List all the files in a pod
+kubectl exec second-app-6695467d49-bwhgg -- ls
+
+# Interactive command
+kubectl exec -it second-app-6695467d49-bwhgg -- bash
+
+# For more commands:
+kubectl exec --help
+```
+
 #### Expose A Deployment (Create A Service)
 
 ```text
@@ -325,7 +378,7 @@ kubectl rollout history deployment/my-app --revision=2
 kubectl rollout undo deployment/my-app --to-revision=2
 ```
 
-### Imperative Object Configuration
+## Imperative Object Configuration [Using Config Files]
 
 - Check the [docs](https://kubernetes.io/docs/concepts/overview/working-with-objects/object-management/)
 - K8s API [docs](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/).
@@ -335,7 +388,7 @@ kubectl rollout undo deployment/my-app --to-revision=2
 - The file specified must contain a full definition of the object in YAML or JSON format.
 ```
 
-#### Deployment Config File
+### Deployment Config File
 
 - More examples can be found [here](https://codefresh.io/learn/software-deployment/kubernetes-deployment-yaml/).
 
@@ -379,7 +432,7 @@ Detailed Explanation
 - containers: specifies the containers that should be included in the pods.
 ```
 
-#### Create Deployment
+### Create Deployment
 
 ```bash
 # To create the resources specified in the config file
@@ -390,7 +443,7 @@ kubectl apply -f=<filename.yaml>
 kubectl apply -f deployment.yaml
 ```
 
-#### Service Config File
+### Service Config File
 
 - An example `service` object config is shown below.
 
@@ -409,7 +462,7 @@ spec:
 
 ```
 
-#### Updating The Config File
+### Updating The Config File
 
 ```text
 - Changes can be made and updated on the config file by saving the file and running the command:
@@ -417,7 +470,7 @@ spec:
 $ kubectl apply -f filename.yaml
 ```
 
-#### Delete Resources In A Config File
+### Delete Resources In A Config File
 
 ```text
 Resources can be deleted using the:
@@ -442,7 +495,7 @@ kubectl delete <resource_type> -l <label_key>:<label_value>
 kubectl delete services,deployments -l app:second-app
 ```
 
-#### Create Multiple Objects In A Single File
+### Create Multiple Objects In A Single File
 
 ```text
 - Multiple objects and resources can be defined in a single file.
@@ -488,7 +541,7 @@ spec:
 
 ```
 
-#### Add Liveness Probes
+### Add Liveness Probes
 
 ```text
 - A liveness probe is a mechanism in Kubernetes that ensures that an application running in a container is alive and operational.
@@ -526,7 +579,7 @@ kind: Deployment
             initialDelaySeconds: 5
 ```
 
-#### Image Pull Policy
+### Image Pull Policy
 
 ```text
 - Kubernetes image pull policy is a configuration that specifies how Kubernetes will pull images when a pod is created or updated.
@@ -643,6 +696,103 @@ kubectl expose deployment first-deployment --type=LoadBalancer --port=$PORT
 kubectl apply -f <filename.yaml>
 # e.g. This creates and exposes the service object in the specified yaml file.
 kubectl apply -f main_config.yaml
+```
+
+### Environment Variables
+
+```yaml
+
+# Load the secrets as env vars
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: second-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app-with-db
+  template:
+    metadata:
+      labels:
+        app: app-with-db
+
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:7.0-rc
+          imagePullPolicy: IfNotPresent # default
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          ports:
+            - containerPort: 27017
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: neidu
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: password
+
+```
+
+### Secret Config File
+
+- For more info, check the [official docs](https://kubernetes.io/docs/tasks/configmap-secret/managing-secret-using-config-file/)
+- [Blog post](https://www.mirantis.com/blog/cloud-native-5-minutes-at-a-time-using-kubernetes-secrets-with-environment-variables-and-volume-mounts/)
+
+```text
+- The secret config file below defines two keys: MONGO_INITDB_ROOT_USERNAME and MONGO_INITDB_ROOT_PASSWORD.
+- The values of these keys MUST be base64-encoded strings.
+
+Usage
+-----
+- After creating the secrets file, you need to apply it with the `kubectl apply` command.
+```
+
+```bash
+# Generate base64 encoded strings
+echo -n "neidu" | base64
+# output: bmVpZHU=
+
+echo -n "password" | base64
+# output: cGFzc3dvcmQ=
+```
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-secret
+type: Opaque
+data:
+  username: bmVpZHU=
+  password: cGFzc3dvcmQ=
+
+---
+# Load the secrets as env vars
+spec:
+  containers:
+    - name: app-with-db
+      image: chineidu/other_service:v1
+      imagePullPolicy: IfNotPresent
+      resources:
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+      ports:
+        - containerPort: 6060
+      env:
+        - name: USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: my-secret # from secrets.metadata.name
+              key: username
+        - name: PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: password
 ```
 
 #### To Do
