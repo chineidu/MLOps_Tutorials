@@ -23,6 +23,7 @@
       - [Service Config File](#service-config-file)
       - [Updating The Config File](#updating-the-config-file)
       - [Delete Resources In A Config File](#delete-resources-in-a-config-file)
+      - [Create Multiple Objects In A Single File](#create-multiple-objects-in-a-single-file)
 
 ## Kubernetes Introduction
 
@@ -426,4 +427,54 @@ kubectl delete deployment my-app
 kubectl delete -f <filename1.yaml> -f <filename2.yaml>
 # e.g.
 kubectl delete -f deployment.yaml
+
+# Delete a resource using a label
+kubectl delete <resource_type> -l <label_key>:<label_value>
+kubectl delete services,deployments -l app:second-app
+```
+
+#### Create Multiple Objects In A Single File
+
+```text
+- Multiple objects and resources can be defined in a single file.
+```
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: second-app
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: LoadBalancer
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: second-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: second-app
+  template:
+    metadata:
+      labels:
+        app: second-app
+    spec:
+      containers:
+        - name: second-app
+          image: chineidu/mlops:v3
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
+
 ```
