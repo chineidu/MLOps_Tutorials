@@ -16,7 +16,7 @@ services:
     build:
       context: ./other
       dockerfile: Dockerfile
-    image: other_service:v1
+    image: chineidu/other_service:v2
     container_name: other_app
     env_file:
       - "./envs_dir/service_2.env" # Location of file containing the env vars

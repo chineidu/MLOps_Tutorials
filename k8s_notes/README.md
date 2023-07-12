@@ -13,8 +13,11 @@
     - [Pod Object](#pod-object)
     - [Deployment Object](#deployment-object)
       - [Deployment \[Imperative Approach\]](#deployment-imperative-approach)
+      - [View Pods](#view-pods)
+      - [View Specific Pod Details](#view-specific-pod-details)
       - [Get Logs of A K8s Pod](#get-logs-of-a-k8s-pod)
       - [Execute Commands In A Container \[kubectl exec command\]](#execute-commands-in-a-container-kubectl-exec-command)
+      - [Access One of The Containers In The Pod](#access-one-of-the-containers-in-the-pod)
       - [Expose A Deployment (Create A Service)](#expose-a-deployment-create-a-service)
       - [Scaling Deployments](#scaling-deployments)
       - [Updating Deployments \[With Docker Images\]](#updating-deployments-with-docker-images)
@@ -230,9 +233,6 @@ kubectl create deployment <deployment_name> --image=<image_name:tag>
 # Note: underscores are NOT supported.
 kubectl create deployment first-deployment --image=chineidu/other_service:v2
 
-# List all the running pods in your K8s cluster.
-kubectl get pods
-
 # List all the created deployments in your K8s cluster.
 kubectl get deployments
 
@@ -241,6 +241,25 @@ kubectl delete deployment <deployment_name>
 
 # Check the status of the deployment using the dashboard
 minikube dashboard
+```
+
+#### View Pods
+
+```bash
+# List all the running pods in your K8s cluster.
+kubectl get pods
+
+# List all pods and monitor live status
+kubectl get pods --watch
+```
+
+#### View Specific Pod Details
+
+```bash
+# List all the running pods in your K8s cluster.
+kubectl describe pod <pod-name>
+# e.g.
+ kubectl describe pods second-app-7d94996d68-bqqh4
 ```
 
 #### Get Logs of A K8s Pod
@@ -290,6 +309,14 @@ kubectl exec -it second-app-6695467d49-bwhgg -- bash
 
 # For more commands:
 kubectl exec --help
+```
+
+#### Access One of The Containers In The Pod
+
+```bash
+# To access one of the containers in the pod, enter the following command:
+kubectl exec -it <pod_name> -c <container_name> -- <command>
+kubectl exec -it second-app-6695467d49-bwhgg -c mongo -- bash
 ```
 
 #### Expose A Deployment (Create A Service)
@@ -798,5 +825,7 @@ spec:
 #### To Do
 
 ```text
-1. Ingress
+1. Data and volumes
+2. Networking
+3. Ingress
 ```

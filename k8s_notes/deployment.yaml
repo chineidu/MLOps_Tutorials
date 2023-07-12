@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: second-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: app-with-db
@@ -14,8 +14,8 @@ spec:
 
     spec:
       containers:
-        - name: app-with-db
-          image: chineidu/other_service:v1
+        - name: app-1
+          image: chineidu/other_service:v2
           imagePullPolicy: IfNotPresent # default
           resources:
             limits:
@@ -38,7 +38,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: my-secret
-                  key: host_name
+                  key: hostname # localhost
 
         - name: mongo
           image: mongo:7.0-rc
