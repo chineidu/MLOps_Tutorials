@@ -4,7 +4,7 @@ metadata:
   name: backend
 spec:
   selector:
-    app: second-app
+    app: first-app
   ports:
   - port: 8000
     targetPort: 8000

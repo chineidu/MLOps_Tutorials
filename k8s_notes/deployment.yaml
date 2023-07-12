@@ -1,20 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: second-app
+  name: first-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: second-app
+      app: first-app
   template:
     metadata:
       labels:
-        app: second-app
+        app: first-app
     spec:
       containers:
-        - name: second-app
+        - name: first-app
           image: chineidu/mlops:v3
+          imagePullPolicy: IfNotPresent # default
           resources:
             limits:
               memory: "256Mi"

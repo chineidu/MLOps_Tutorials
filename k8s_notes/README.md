@@ -24,6 +24,12 @@
       - [Updating The Config File](#updating-the-config-file)
       - [Delete Resources In A Config File](#delete-resources-in-a-config-file)
       - [Create Multiple Objects In A Single File](#create-multiple-objects-in-a-single-file)
+      - [Add Liveness Probes](#add-liveness-probes)
+      - [Image Pull Policy](#image-pull-policy)
+    - [Service Object](#service-object)
+      - [Create A Service](#create-a-service)
+      - [Describe A Service](#describe-a-service)
+      - [List All The Resources In A K8s Cluster](#list-all-the-resources-in-a-k8s-cluster)
 
 ## Kubernetes Introduction
 
@@ -451,8 +457,8 @@ spec:
   - port: 8000
     targetPort: 8000
   type: LoadBalancer
----
 
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -477,4 +483,94 @@ spec:
           ports:
             - containerPort: 8000
 
+```
+
+#### Add Liveness Probes
+
+```text
+- A liveness probe is a mechanism in Kubernetes that ensures that an application running in a container is alive and operational.
+- If the liveness probe detects an unhealthy state, then Kubernetes kills the container and tries to redeploy it.
+- The liveness probe is configured in the `spec.containers.livenessProbe` attribute of the pod configuration.
+
+The liveness probe is configured with a number of parameters, including:
+* initialDelaySeconds: The number of seconds to wait before the first liveness probe is executed.
+* periodSeconds: The number of seconds between liveness probes.
+* failureThreshold: The number of consecutive liveness probes that must fail before the container is killed.
+* successThreshold: The number of consecutive liveness probes that must succeed before the container is considered healthy.
+
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+... # I shortened the config file
+
+    spec:
+      containers:
+        - name: second-app
+          image: chineidu/mlops:v3
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            periodSeconds: 10
+            initialDelaySeconds: 5
+```
+
+#### Image Pull Policy
+
+```text
+- Kubernetes image pull policy is a configuration that specifies how Kubernetes will pull images when a pod is created or updated.
+
+Possible values for image pull policy:
+1. IfNotPresent: Kubernetes will only pull the image if it is not already present on the node.
+2. Always: Kubernetes will always pull the image, even if it is already present on the node.
+3. Never: Kubernetes will never pull the image, even if it is not present on the node.
+
+The default value for image pull policy is `IfNotPresent`. This means that Kubernetes will only pull the image if it's not already present on the node. If the image is already present on the node, Kubernetes will use the locally stored image.
+```
+
+### Service Object
+
+#### Create A Service
+
+```bash
+# Expose a K8s resource, such as a pod, deployment, or replica set, as a service.
+kubectl expose deployment <deployment_name> --type [ClusterIP|NodePort|LoadBalancer] --port $PORT
+# e.g.
+kubectl expose deployment first-deployment --type=LoadBalancer --port=6060
+
+# List all the created services
+kubectl get services
+
+# To display the external IP for local setup
+minikube service <service_name>
+# e.g.
+minikube service first-deployment
+```
+
+#### Describe A Service
+
+```text
+- The kubectl describe command is used to display detailed information about a Kubernetes resource. The resource can be a pod, a deployment, a service, or any other type of Kubernetes resource.
+- The kubectl describe command takes the name of the resource as an argument.
+```
+
+```bash
+# For example, the following command will display detailed information about the pod named nginx-pod:
+kubectl describe service <service-name>
+# e.g.
+kubectl describe service backend
+```
+
+#### List All The Resources In A K8s Cluster
+
+```bash
+kubectl get all
 ```

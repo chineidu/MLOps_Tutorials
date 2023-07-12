@@ -5,10 +5,10 @@ metadata:
 spec:
   selector:
     app: second-app
+  type: LoadBalancer
   ports:
     - port: 8000
       targetPort: 8000
-  type: LoadBalancer
 
 ---
 apiVersion: apps/v1
@@ -28,9 +28,16 @@ spec:
       containers:
         - name: second-app
           image: chineidu/mlops:v3
+          imagePullPolicy: IfNotPresent # default
           resources:
             limits:
               memory: "256Mi"
               cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            periodSeconds: 10
+            initialDelaySeconds: 5
           ports:
             - containerPort: 8000
