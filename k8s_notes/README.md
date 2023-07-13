@@ -39,7 +39,8 @@
       - [Load Balancer](#load-balancer)
     - [Environment Variables](#environment-variables)
     - [Secret Config File](#secret-config-file)
-      - [To Do](#to-do)
+    - [Namespace](#namespace)
+  - [Data And Volumes](#data-and-volumes)
 
 ## Kubernetes Introduction
 
@@ -825,6 +826,79 @@ spec:
               name: my-secret
               key: password
 ```
+
+### Namespace
+
+```text
+- A namespace in Kubernetes is a logical grouping of resources.
+- Namespaces help organize Kubernetes resources for various purposes, such as:
+- Isolating resources: It isolates resources, ensuring changes in one namespace don't affect others, aiding security and facilitating management of resources for different teams or projects.
+- Managing permissions: It's used to manage permissions for resources. This can be helpful for ensuring that only authorized users have access to certain resources.
+- Enforcing naming conventions: It's used to enforce naming conventions for resources. This can help to prevent naming conflicts and to make it easier to find and manage resources.
+
+Usage:
+------
+# Method 1.
+$ kubectl create namespace <namespace-name>
+
+# Method 2.
+From a config file
+```
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-db-configmap
+  namespace: my-namespace # assign a namespace
+data:
+  mysqlservice.database
+```
+
+```bash
+# View the available namespaces
+kubectl get namespaces
+
+# 1. Create namespace
+kubectl create namespace <namespace-name>
+
+# 2. Create from a file
+kubectl create -f filename.yaml
+# OR
+kubectl apply -f filename.yaml
+
+# 3. Create from a file and CLI.
+# If the config does NOT already have a namespace.
+kubectl apply -f <filename> --namespace=<namespace-name>
+# e.g.
+kubectl apply -f filename.yaml --namespace=my-namespace
+```
+
+## Data And Volumes
+
+- More info can be found in the [docs](https://kubernetes.io/docs/concepts/storage/volumes/).
+
+```text
+Volume
+------
+- A volume in Kubernetes is a directory that can be mounted into a pod.
+- Volumes are used to store data that needs to be shared between containers in a pod,
+- It's also used to store data that needs to persist even if the pod is restarted.
+
+There are many different types of volumes available in Kubernetes, including:
+1.) EmptyDir:
+- An emptyDir volume is created when a pod is assigned to a node.
+- The data in an emptyDir volume is ephemeral, meaning that it is deleted when the pod is deleted.
+
+2.) HostPath: A hostPath volume mounts a directory or file from the host node's filesystem into your pod.
+
+3.) ConfigMap:
+- A ConfigMap is a way to store configuration data in Kubernetes.
+- ConfigMaps can be mounted into pods as volumes, or they can be used to set environment variables in pods.
+
+4.) PersistentVolume:
+- A PersistentVolume is a piece of storage that is provisioned by an administrator or dynamically provisioned using Storage Classes.
+- PersistentVolumes are used to store data that needs to persist even if the pod is restarted.
 
 #### To Do
 
