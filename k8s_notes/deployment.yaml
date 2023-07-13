@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: second-app
+  namespace: development
 spec:
   replicas: 1
   selector:
@@ -49,6 +50,9 @@ spec:
               cpu: "250m"
           ports:
             - containerPort: 27017
+          volumeMounts:
+            - name: mongo-volume
+              mountPath: /data/db
           env:
             - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
@@ -60,3 +64,9 @@ spec:
                 secretKeyRef:
                   name: my-secret
                   key: mongo_initdb_root_password
+
+      volumes:
+        - name: mongo-volume
+          hostPath:
+            path: /data
+            type: DirectoryOrCreate

@@ -41,6 +41,9 @@
     - [Secret Config File](#secret-config-file)
     - [Namespace](#namespace)
   - [Data And Volumes](#data-and-volumes)
+    - [EmptyDir](#emptydir)
+    - [HostPath](#hostpath)
+      - [To Do](#to-do)
 
 ## Kubernetes Introduction
 
@@ -891,6 +894,9 @@ There are many different types of volumes available in Kubernetes, including:
 - The data in an emptyDir volume is ephemeral, meaning that it is deleted when the pod is deleted.
 
 2.) HostPath: A hostPath volume mounts a directory or file from the host node's filesystem into your pod.
+- A HostPath volume in Kubernetes is a type of volume that mounts a file or directory from the host node's filesystem into a pod.
+- This means that the data in the HostPath volume is stored on the host node, and not on a separate storage system.
+- HostPath volumes are not as reliable as other types of volumes, such as PersistentVolumes, because they are not backed by a separate storage system. If the host node fails, the data in the HostPath volume will be lost.
 
 3.) ConfigMap:
 - A ConfigMap is a way to store configuration data in Kubernetes.
@@ -899,6 +905,69 @@ There are many different types of volumes available in Kubernetes, including:
 4.) PersistentVolume:
 - A PersistentVolume is a piece of storage that is provisioned by an administrator or dynamically provisioned using Storage Classes.
 - PersistentVolumes are used to store data that needs to persist even if the pod is restarted.
+```
+
+### EmptyDir
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-container
+        image: my-image
+        volumeMounts:
+        - name: my-volume
+          mountPath: /data
+      volumes:
+      - name: my-volume
+        emptyDir: {}
+
+```
+
+### HostPath
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-container
+        image: my-image:latest
+        volumeMounts:
+        - name: data-volume
+          mountPath: /data
+      volumes:
+      - name: data-volume
+        hostPath:
+          path: /path/on/host
+          type: Directory # or DirectoryOrCreate
+
+
+kubectl get pod second-app-6494c68f48-wbnzb -n defaul -o yaml | kubectl replace --force -f -
+```
 
 #### To Do
 
