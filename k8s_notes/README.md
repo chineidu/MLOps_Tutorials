@@ -616,7 +616,9 @@ Possible values for image pull policy:
 2. Always: Kubernetes will always pull the image, even if it is already present on the node.
 3. Never: Kubernetes will never pull the image, even if it is not present on the node.
 
-The default value for image pull policy is `IfNotPresent`. This means that Kubernetes will only pull the image if it's not already present on the node. If the image is already present on the node, Kubernetes will use the locally stored image.
+- The default value for image pull policy is `IfNotPresent`.
+- This means that Kubernetes will only pull the image if it's not already present on the node.
+- If the image is already present on the node, Kubernetes will use the locally stored image.
 ```
 
 ### Service Object
@@ -641,7 +643,8 @@ minikube service first-deployment
 #### Describe A Service
 
 ```text
-- The kubectl describe command is used to display detailed information about a Kubernetes resource. The resource can be a pod, a deployment, a service, or any other type of Kubernetes resource.
+- The kubectl describe command is used to display detailed information about a Kubernetes resource.
+- The resource can be a pod, a deployment, a service, or any other type of Kubernetes resource.
 - The kubectl describe command takes the name of the resource as an argument.
 ```
 
@@ -672,7 +675,8 @@ Node Port
 - This allows external users to access the service without having to use a load balancer.
 - NodePorts are useful for exposing services that need to be accessed by external users, but do not need to be load balanced. e.g. you might use a NodePort to expose a web application that is only used by a small number of users.
 - NodePorts are configured in the spec.ports section of the service manifest.
-- The nodePort field specifies the port that the service will be exposed on each node. The nodePort field must be a value in the range `30000-32767`.
+- The nodePort field specifies the port that the service will be exposed on each node.
+- The nodePort field must be a value in the range `30000-32767`.
 ```
 
 ```yaml
@@ -769,7 +773,7 @@ spec:
 - [Blog post](https://www.mirantis.com/blog/cloud-native-5-minutes-at-a-time-using-kubernetes-secrets-with-environment-variables-and-volume-mounts/)
 
 ```text
-- The secret config file below defines two keys: MONGO_INITDB_ROOT_USERNAME and MONGO_INITDB_ROOT_PASSWORD.
+- The secret config file below defines two keys: USERNAME and PASSWORD.
 - The values of these keys MUST be base64-encoded strings.
 
 Usage
