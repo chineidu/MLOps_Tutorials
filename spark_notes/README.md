@@ -19,6 +19,7 @@
     - [Check For Null/NaN Values](#check-for-nullnan-values)
     - [Filter Keyword](#filter-keyword)
     - [When Keyword](#when-keyword)
+    - [Casting](#casting)
     - [Summary Stats](#summary-stats)
     - [Group By](#group-by)
 
@@ -181,6 +182,34 @@ data = data.withColumn(
     F.when(F.col("reviews").isNull(), REPL_VALUE)
     .when(F.col("reviews") == "", REPL_VALUE)
     .otherwise(F.col("reviews"))
+    .cast("double"),
+)
+
+data.show()
+```
+
+### Casting
+
+```text
+- Convert the column to a different data type.
+```
+
+```python
+# Course duration and lectures count
+DURATION_THRESH = 100  # hours
+DURATION_REPL_VALUE = 15  # hours
+LECTURES_COUNT_VALUE = 20
+
+# Extract the patterns and replace invalid values
+DURATION_PATTERN = r"\d{1,3}\.?\d{1,2}"
+
+data = data.withColumn(
+    "course_duration_hrs",
+    F.regexp_extract(F.col("course_duration"), pattern=DURATION_PATTERN, idx=0),
+).withColumn(
+    "course_duration_hrs",
+    F.when(F.col("course_duration_hrs") > DURATION_THRESH, DURATION_REPL_VALUE)
+    .otherwise(F.col("course_duration_hrs"))
     .cast("double"),
 )
 
