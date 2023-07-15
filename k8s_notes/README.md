@@ -43,7 +43,11 @@
   - [Data And Volumes](#data-and-volumes)
     - [EmptyDir](#emptydir)
     - [HostPath](#hostpath)
-      - [To Do](#to-do)
+  - [Networking](#networking)
+    - [Pod Internal Communication](#pod-internal-communication)
+    - [Auto Generated Environment Variables](#auto-generated-environment-variables)
+    - [DNS For Pod-Pod Communication](#dns-for-pod-pod-communication)
+    - [To Do](#to-do)
 
 ## Kubernetes Introduction
 
@@ -969,7 +973,59 @@ spec:
 kubectl get pod second-app-6494c68f48-wbnzb -n defaul -o yaml | kubectl replace --force -f -
 ```
 
-#### To Do
+## Networking
+
+```text
+Pod internal
+Pod to pod connection
+```
+
+### Pod Internal Communication
+
+```text
+- Pod internal networking in K8s is a way for containers within the same pod to communicate with each other.
+- This means that containers within the same pod can all reach each other's ports using `localhost`.
+- An example is shown below where the HOST_NAME == "localhost"
+
+Note
+----
+- You can also manually copy the IP address of the container
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: second-app
+  namespace: development
+spec:
+  ...
+
+    spec:
+      containers:
+        - name: app-1
+          image: chineidu/other_service:v2
+          imagePullPolicy: IfNotPresent # default
+          ports:
+            - containerPort: 6060
+          env:
+            - name: HOST_NAME
+              value: localhost
+```
+
+### Auto Generated Environment Variables
+
+```text
+
+```
+
+### DNS For Pod-Pod Communication
+
+```text
+
+```
+
+### To Do
 
 ```text
 1. Data and volumes
