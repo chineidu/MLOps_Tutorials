@@ -38,6 +38,7 @@
       - [Node Port](#node-port)
       - [Load Balancer](#load-balancer)
     - [Environment Variables](#environment-variables)
+      - [Retrieve Environment Variables In A Pod](#retrieve-environment-variables-in-a-pod)
     - [Secret Config File](#secret-config-file)
     - [Namespace](#namespace)
   - [Data And Volumes](#data-and-volumes)
@@ -45,9 +46,13 @@
     - [HostPath](#hostpath)
   - [Networking](#networking)
     - [Pod Internal Communication](#pod-internal-communication)
-    - [Auto Generated Environment Variables](#auto-generated-environment-variables)
-    - [DNS For Pod-Pod Communication](#dns-for-pod-pod-communication)
+      - [Multiple Containers In One Pods](#multiple-containers-in-one-pods)
+    - [Pod to pod connection](#pod-to-pod-connection)
+      - [1. Manually Copying The Cluster IP of The Pod](#1-manually-copying-the-cluster-ip-of-the-pod)
+      - [2. Auto Generated Environment Variables](#2-auto-generated-environment-variables)
+      - [3. DNS For Pod-Pod Communication](#3-dns-for-pod-pod-communication)
     - [To Do](#to-do)
+  - [Miscellaneous Commands](#miscellaneous-commands)
 
 ## Kubernetes Introduction
 
@@ -292,6 +297,9 @@ kubectl logs second-app-6695467d49-bwhgg --since=10s
 
 # Specify if the logs should be streamed.
 kubectl logs second-app-6695467d49-bwhgg --follow=true
+
+# Show the logs of a specific container
+kubectl logs <pod-name> -c <container-name> -n <namespace>
 
 # For more commands:
 kubectl logs --help
@@ -775,6 +783,19 @@ spec:
 
 ```
 
+#### Retrieve Environment Variables In A Pod
+
+```sh
+# 1. ssh into the pod
+kubectl exec -it <pod-name> -n <namespace> -- <command>
+# e.g.
+kubectl exec -it app-1-c86cf468d-89zw4 -n development -- sh
+
+# 2. Once you're in the shell of the pod, view all the env vars
+# by running the command:
+printenv
+```
+
 ### Secret Config File
 
 - For more info, check the [official docs](https://kubernetes.io/docs/tasks/configmap-secret/managing-secret-using-config-file/)
@@ -1013,13 +1034,154 @@ spec:
               value: localhost
 ```
 
-### Auto Generated Environment Variables
+#### Multiple Containers In One Pods
 
-```text
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: second-app
+  namespace: development
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-with-db
+  template:
+    metadata:
+      labels:
+        app: app-with-db
 
+    spec:
+      containers:
+        - name: app-1 # container 1
+          image: chineidu/other_service:v2
+          imagePullPolicy: IfNotPresent # default
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 6060
+          env:
+            - name: USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret # from secrets.metadata.mane
+                  key: username
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: password
+            - name: HOST_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: hostname # localhost
+
+        - name: mongo # container 2
+          image: mongo:7.0-rc
+          imagePullPolicy: IfNotPresent # default
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-volume
+              mountPath: /data/db
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: mongo_initdb_root_username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: mongo_initdb_root_password
+
+      volumes:
+        - name: mongo-volume
+          hostPath:
+            path: /data
+            type: DirectoryOrCreate
 ```
 
-### DNS For Pod-Pod Communication
+### Pod to pod connection
+
+```text
+- This involves the communication between two or more pods in K8s node.
+- To enable communication, the pods MUST be connected.
+- Ways of connecting the pods include:
+1. Manually copying the cluster ip of the pod. i.e. if pod 1 want to connect to pod 2, the IP address of pod 1 must be known/copied.
+2. Using K8s auto generated environment variables.
+3. Using DNS for pod-pod communication.
+```
+
+#### 1. Manually Copying The Cluster IP of The Pod
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: second-app
+  namespace: development
+spec:
+  ...
+
+    spec:
+      containers:
+        - name: app-1
+          image: chineidu/other_service:v2
+          imagePullPolicy: IfNotPresent # default
+          ports:
+            - containerPort: 6060
+          env:
+            - name: HOST_NAME
+              value: 10.100.147.172 # pod IP
+```
+
+```bash
+# To get the pod/cluster IP
+kubectl get service -n <namespace>
+```
+
+#### 2. Auto Generated Environment Variables
+
+```text
+- In Kubernetes, several environment variables are automatically generated and injected into containers by the Kubernetes system.
+- These environment variables provide useful information about the running environment and the associated resources.
+- Here are some commonly used auto-generated environment variables in Kubernetes:
+  POD_NAME: The name of the pod in which the container is running.
+  POD_NAMESPACE: The namespace of the pod.
+  POD_IP: The IP address assigned to the pod.
+  NODE_NAME: The name of the node where the pod is scheduled.
+  SERVICE_NAME: The name of the Kubernetes service associated with the pod.
+  SERVICE_PORT: The port number of the Kubernetes service associated with the pod.
+  HOSTNAME: The hostname of the node where the pod is running.
+  KUBERNETES_PORT: The port number of the Kubernetes API server.
+  KUBERNETES_SERVICE_HOST: The hostname or IP address of the Kubernetes API server.
+  KUBERNETES_SERVICE_PORT: The port number of the Kubernetes API server.
+```
+
+```python
+# K8s auto generated env vars
+import os
+
+# if the name of the service is `mongo-service` (in capital letters),
+# then the hostname is f"{name_of_service}_SERVICE_HOST" i.e MONG0_SERVICE_SERVICE_HOST
+# e.g
+HOST_NAME = os.getenv("MONGO_SERVICE_SERVICE_HOST)
+
+# Note:
+"I tried implementing this but I could'nt get it to work 😔"
+```
+
+#### 3. DNS For Pod-Pod Communication
 
 ```text
 
@@ -1031,4 +1193,11 @@ spec:
 1. Data and volumes
 2. Networking
 3. Ingress
+```
+
+## Miscellaneous Commands
+
+```sh
+kubectl apply -f k8s_notes/app_1_deployment.yaml -f k8s_notes/app_1_service.yaml
+kubectl apply -f k8s_notes/mongo_deployment.yaml -f k8s_notes/mongo_service.yaml
 ```

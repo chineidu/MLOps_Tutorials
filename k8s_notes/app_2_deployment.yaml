@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-2
+  namespace: development
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-2
+  template:
+    metadata:
+      labels:
+        app: app-2
+    spec:
+      containers:
+        - name: app-2
+          image: chineidu/mlops:v3
+          imagePullPolicy: IfNotPresent # default
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: my-volume
+              mountPath: /opt
+      volumes:
+        - name: my-volume
+          emptyDir: {}

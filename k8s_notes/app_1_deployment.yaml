@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-1
+  namespace: development
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-1
+  template:
+    metadata:
+      labels:
+        app: app-1
+
+    spec:
+      containers:
+        - name: app-1
+          image: chineidu/other_service:v1.0
+          imagePullPolicy: IfNotPresent # default
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 6060
+          env:
+            - name: USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret # from secrets.metadata.mane
+                  key: username
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: password
+            - name: MONGO_SERVICE_SERVICE_HOST
+              value: 10.100.111.182
+
+            # - name: HOST_NAME
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: my-secret
+            #       key: hostname # localhost

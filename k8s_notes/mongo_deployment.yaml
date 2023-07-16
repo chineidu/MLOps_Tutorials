@@ -1,46 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: second-app
+  name: mongodb-app
   namespace: development
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app-with-db
+      app: mongodb
   template:
     metadata:
       labels:
-        app: app-with-db
+        app: mongodb
 
     spec:
       containers:
-        - name: app-1
-          image: chineidu/other_service:v2
-          imagePullPolicy: IfNotPresent # default
-          resources:
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
-          ports:
-            - containerPort: 6060
-          env:
-            - name: USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: my-secret # from secrets.metadata.mane
-                  key: username
-            - name: PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: my-secret
-                  key: password
-            - name: HOST_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: my-secret
-                  key: hostname # localhost
-
         - name: mongo
           image: mongo:7.0-rc
           imagePullPolicy: IfNotPresent # default

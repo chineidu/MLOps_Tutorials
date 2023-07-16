@@ -5,6 +5,7 @@ from typing import Any
 
 import requests
 from fastapi import FastAPI, status
+from fastapi.responses import HTMLResponse
 from get_database import DB
 from schema import Output, UserInput
 
@@ -17,8 +18,18 @@ VERSION = "1.1"
 
 @app.get(path='/', status_code=status.HTTP_200_OK)
 def index() -> Any:
-    """This is the homepage."""
-    return {"message": "This API is working!", "api_version": VERSION}
+    """This is the index. It returns a basic HTML response."""
+    body = """
+            <html>
+                <body style='padding: 15px;'>
+                    <h1>API is live!!!</h1>
+                    <div>
+                    <h2>Check the docs: <a href='/docs'>here!!!</a></h2>
+                    </div>
+                </body>
+            </html>
+    """
+    return HTMLResponse(content=body)
 
 
 @app.post(path='/predict', status_code=status.HTTP_200_OK, response_model=Output)

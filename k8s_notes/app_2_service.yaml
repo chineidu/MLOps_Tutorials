@@ -5,8 +5,8 @@ metadata:
   namespace: development
 spec:
   selector:
-    app: app-with-db
-  ports:
-  - port: 6060
-    targetPort: 6060
+    app: app-2
   type: LoadBalancer
+  ports:
+  - port: 8000
+    targetPort: 8000
