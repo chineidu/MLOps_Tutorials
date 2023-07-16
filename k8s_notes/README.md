@@ -1184,6 +1184,14 @@ HOST_NAME = os.getenv("MONGO_SERVICE_SERVICE_HOST)
 #### 3. DNS For Pod-Pod Communication
 
 ```text
+- In K8s, DNS (Domain Name System) plays a crucial role in enabling pod-to-pod communication.
+- Kubernetes provides an in-cluster DNS service that allows pods to discover and communicate with each other using domain names.
+- DNS naming convention for the hostname: <service-name>.<namespace>.
+  e.g. if the name of the service is `service-1`, then the hostname is: 'service-1.default'.
+
+Note
+----
+The default namespace in K8s is `default`.
 
 ```
 

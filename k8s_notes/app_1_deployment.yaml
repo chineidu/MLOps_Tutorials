@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: app-1
-          image: chineidu/other_service:v1.0
+          image: chineidu/other_service:v1.1
           imagePullPolicy: IfNotPresent # default
           resources:
             limits:
@@ -35,11 +35,5 @@ spec:
                 secretKeyRef:
                   name: my-secret
                   key: password
-            - name: MONGO_SERVICE_SERVICE_HOST
-              value: 10.100.111.182
-
-            # - name: HOST_NAME
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: my-secret
-            #       key: hostname # localhost
+            - name: HOSTNAME
+              value: "mongo-service.development" # "service-name.namespace"

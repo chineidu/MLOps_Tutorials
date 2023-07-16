@@ -7,7 +7,7 @@ from pymongo import MongoClient
 USERNAME, PASSWORD, HOST_NAME = (
     os.getenv("USERNAME"),
     os.getenv("PASSWORD"),
-    os.getenv("HOST_NAME"),
+    os.getenv("HOSTNAME"),
 )
 
 
