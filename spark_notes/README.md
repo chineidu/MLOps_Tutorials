@@ -22,6 +22,7 @@
     - [Casting](#casting)
     - [Summary Stats](#summary-stats)
     - [Group By](#group-by)
+    - [Split Large Data](#split-large-data)
 
 ## Install Java
 
@@ -238,4 +239,58 @@ data.agg(
   .alias("count"))
   .show(truncate=False)
 )
+```
+
+### Split Large Data
+
+```python
+# filename: split_into_parts.py
+
+from argparse import ArgumentParser
+
+# PySpark Modules
+from pyspark.sql import SparkSession
+
+# Create a SparkSession
+spark = SparkSession.builder.getOrCreate()
+
+
+def split_data() -> None:
+    """This is used to split the transaction data."""
+    parser = ArgumentParser()
+    parser.add_argument("--input-path", help="This is the input filepath", type=str)
+    parser.add_argument("--output-path", help="This is the output filepath", type=str)
+
+    args = parser.parse_args()
+    input_path, output_path = args.input_path, args.output_path
+
+    # Load the dataset as a DataFrame
+    df = spark.read.csv(input_path, header=True, inferSchema=True)
+    print("================== Data has been loaded!!! ==================\n")
+
+    # Specify the number of chunks
+    NUM_CHUNKS = 3
+
+    # Generate an array of equal weights
+    WEIGHTS = [1.0 / NUM_CHUNKS] * NUM_CHUNKS
+
+    # Split the dataset into n-chunks
+    CHUNKS = df.randomSplit(WEIGHTS, seed=123)
+
+    # Split the data into chunks
+    for idx, chunk in enumerate(CHUNKS):
+        # Save the chunked data
+        chunk.write.csv(f"{output_path}_{idx+1}.csv", header=True)
+        print(f"Chunk {idx} has been saved.")
+
+    print("\n\t================== Done!!! ==================\n")
+
+
+if __name__ == "__main__":
+    split_data()
+
+# To execute on the CLI run:
+# python split_into_parts.py --input-path "data/file/path" --output-path "data/file/path"
+# OR
+# spark-submit split_into_parts.py --input-path "data/file/path" --output-path "data/file/path"
 ```
