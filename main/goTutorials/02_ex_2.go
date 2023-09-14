@@ -82,7 +82,7 @@ func maps() {
 
 func structExample() {
 	fmt.Println("\n==== Running examples on `struct` datatype")
-	// Maps: Similar to dicts/classes in Python
+	// Maps: Similar to classes in Python
 	// Create a struct
 	type Player struct {
 		firstname string
