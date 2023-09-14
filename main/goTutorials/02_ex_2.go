@@ -8,9 +8,11 @@ func RunDTypesExample() {
 	arrays()
 	slices()
 	maps()
+	structExample()
 }
 
 // Internal function for your data types example
+// It starts with lowercase.
 func arrays() {
 	fmt.Println("\n==== Running examples on `array` datatype")
 	// Arrays
@@ -43,10 +45,10 @@ func slices() {
 }
 
 func maps() {
-	fmt.Println("==== Running examples on `map` datatype")
-	// Maps: Similar to dict in Python but with uniform datatypes
+	fmt.Println("\n==== Running examples on `map` datatype")
+	// Maps: Similar to dicts in Python but with uniform datatypes
 	// Syntax: make(map[key_dtype]value_dtype)
-	var myMap = make(map[string]string)
+	var myMap = make(map[string]string, 5)
 
 	// Add key-value pairs
 	myMap["firstname"] = "Neidu"
@@ -57,4 +59,53 @@ func maps() {
 
 	fmt.Printf("This is the content of the map: %v\n", myMap)
 	fmt.Printf("This is the firstName in the map: %v\n", firstName)
+
+	// Slice of maps
+	players := make([]map[string]string, 2)
+
+	// Syntax 1
+	firstPlayer := make(map[string]string)
+	firstPlayer["firstname"] = "Nico"
+	firstPlayer["lastname"] = "Jackson"
+
+	// Syntax 2
+	secondPlayer := map[string]string{
+		"firstname": "Cole",
+		"lastname":  "Palmer",
+	}
+
+	players = append(players, firstPlayer, secondPlayer)
+
+	fmt.Printf("This is another map [players]: %v\n", players)
+	fmt.Printf("Type: %T\n", players)
+}
+
+func structExample() {
+	fmt.Println("\n==== Running examples on `struct` datatype")
+	// Maps: Similar to dicts/classes in Python
+	// Create a struct
+	type Player struct {
+		firstname string
+		lastname  string
+		age       uint
+	}
+
+	// Create a new instance of the "Player" struct
+	var player1 Player
+	player1.firstname = "Neidu"
+	player1.lastname = "Angelo"
+	player1.age = 22
+
+	// Create a new instance of the "Player" struct
+	player2 := Player{
+		firstname: "John",
+		lastname:  "Doe",
+		age:       30,
+	}
+
+	// Create a new instance of the "Player" struct
+	player3 := Player{"Enzo", "Fernandez", 22}
+
+	// Print the struct
+	fmt.Println(player1, player2, player3)
 }
