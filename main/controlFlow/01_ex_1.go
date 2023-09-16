@@ -10,6 +10,7 @@ func ControlFlowLogic() {
 	forEach()
 	// ifExample()
 	ifElseExample()
+	switchExample()
 }
 
 type Player struct {
@@ -21,9 +22,10 @@ type Player struct {
 
 func whileLoop() {
 	fmt.Println("\n==== Running examples on `while loop` example ====")
+
 	// This is the equivalent of a while loop.
 	idx := 0
-	for idx < 10 {
+	for idx < 5 {
 		// Do something
 		fmt.Printf("idx: %v\n", idx)
 		// idx++
@@ -35,6 +37,7 @@ func whileLoop() {
 
 func forEach() {
 	fmt.Println("\n==== Running examples on for each loop` example ====")
+
 	// This is the equivalent of a `for` loop in Python.
 	player1 := Player{"Nico", "Jackson", "Senegal", 23}
 	player2 := Player{"Reheem", "Sterling", "England", 28}
@@ -53,6 +56,7 @@ func forEach() {
 
 func ifExample() {
 	fmt.Println("\n==== Running examples on `if` example ====")
+
 	clubNames := []string{"Chelsea", "Brighton", "Man City", "Liverpool"}
 	var clubName string
 	fmt.Printf("Enter clubName of football club:\n")
@@ -73,6 +77,7 @@ func ifExample() {
 }
 func ifElseExample() {
 	fmt.Println("\n==== Running examples on `if-Else` example ====")
+
 	clubNames := []string{"Chelsea", "Man Utd", "Man City", "Liverpool"}
 	var clubName string
 	fmt.Printf("Enter clubName of football club:\n")
@@ -93,4 +98,30 @@ func ifElseExample() {
 		fmt.Printf("Your football club `%v` has NOT won the UCL before:\n", clubName)
 	}
 
+}
+
+func switchExample() {
+	fmt.Println("\n==== Running examples on `SWITCH` example ====")
+
+	day := "Monday"
+
+	switch day {
+	case "Monday":
+		fmt.Println("Today is Monday")
+	case "Tuesday":
+		fmt.Println("Today is Tuesday")
+	case "Wednesday":
+		fmt.Println("Today is Wednesday")
+	case "Thursday":
+		fmt.Println("Today is Thursday")
+	case "Friday":
+		fmt.Println("Today is Friday")
+	case "Saturday":
+		fmt.Println("Today is Saturday")
+	case "Sunday":
+		fmt.Println("Today is Sunday")
+	default: // else
+		fmt.Println("Invalid day!")
+
+	}
 }

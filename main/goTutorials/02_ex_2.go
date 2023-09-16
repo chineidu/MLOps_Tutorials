@@ -38,11 +38,19 @@ func slices() {
 	var clubs []string
 	// Create a slice with a dtype of uint containing only the element 87
 	ages := []uint{87}
+	anotherSlice := make([]string, 2)
+
 	// Add elements to the slice
 	clubs = append(clubs, "Chelsea")
 	ages = append(ages, 123)
+
+	anotherSlice[0] = "ChatGPT"
+	anotherSlice[1] = "Google_Bard"
+
+
 	fmt.Printf("Clubs: %v\n", clubs)
 	fmt.Printf("Ages: %v\n", ages)
+	fmt.Printf("anotherSlice: %v\n", anotherSlice)
 }
 
 func maps() {

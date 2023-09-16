@@ -20,6 +20,7 @@
     - [`If` Statement](#if-statement)
     - [`If - else` Statement](#if---else-statement)
     - [`If - else if - else` Statement](#if---else-if---else-statement)
+    - [`Switch` Statement](#switch-statement)
 
 ## Initialize Package
 
@@ -66,7 +67,8 @@ func main() {
     var numTickets uint
 
     // Method 2
-    firstName := "Michael"
+    // Go can infer the data type if you create a variable using this approach.
+    firstName := "Michael" // string data type
 
     // Printf is used to format a string
     fmt.Printf("Your name is %v.\n", name)
@@ -83,8 +85,8 @@ func main() {
 ```bash
 go run file_name.go
 
-# Run the script with all the dependencies
-go run file_name1.go file_name2.go
+# Run the script with all the dependencies: file1 to fileN
+go run file_name1.go file_name2.go [...] file_nameN.go
 
 # Run the script with all the dependencies. [Better approach]
 go run .
@@ -170,6 +172,7 @@ func slices() {
     var clubs []string
     // Create a slice with a dtype of uint containing only the element 87
     ages := []uint{87}
+    anotherSlice := make([]string, 0)
     // Add elements to the slice
     clubs = append(clubs, "Chelsea")
     ages = append(ages, 123)
@@ -360,4 +363,30 @@ if gender == "boy" {
     fmt.Println("You're a girl")
 } else{
     fmt.Println("You're NOT a boy or a girl!")
+```
+
+### `Switch` Statement
+
+```go
+day := "Monday"
+
+switch day {
+case "Monday":
+    fmt.Println("Today is Monday")
+case "Tuesday":
+  fmt.Println("Today is Tuesday")
+case "Wednesday":
+  fmt.Println("Today is Wednesday")
+case "Thursday":
+  fmt.Println("Today is Thursday")
+case "Friday":
+  fmt.Println("Today is Friday")
+case "Saturday":
+  fmt.Println("Today is Saturday")
+case "Sunday":
+  fmt.Println("Today is Sunday")
+default: // else
+  fmt.Println("Invalid day!")
+}
+
 ```
