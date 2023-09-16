@@ -14,6 +14,8 @@
     - [Arrays](#arrays)
     - [Slices](#slices)
     - [Maps](#maps)
+    - [Structs](#structs)
+      - [Modelling Data With Structs](#modelling-data-with-structs)
   - [Control Flow](#control-flow)
     - [`If` Statement](#if-statement)
     - [`If - else` Statement](#if---else-statement)
@@ -216,22 +218,146 @@ func maps() {
 }
 ```
 
+### Structs
+
+```text
+The struct data type is a composite data type that allows you to define your own custom data structures. It is similar to a class in other programming languages and provides a way to group related data fields together.
+
+A struct is defined using the `type` keyword followed by the struct name and a list of fields enclosed in curly braces. Each field has a name and a type. Here's an example of a struct definition:
+```
+
+```go
+type Person struct {
+    Name  string
+    Age   int
+    Email string
+}
+```
+
+In this example, the `Person` struct has three fields: `Name` of type `string`, `Age` of type `int`, and `Email` of type `string`.
+
+You can create instances of the struct by declaring variables of the struct type and initializing the field values. Here's an example:
+
+```go
+person := Person{
+    Name:  "John Doe",
+    Age:   25,
+    Email: "john@example.com",
+}
+```
+
+
+You can access the field values using the dot notation. For example, `person.Name` would give you the name "John Doe".
+
+#### Modelling Data With Structs
+
+```python
+class Dog:
+  def __init__(self, name, breed):
+    self.name = name
+    self.breed = breed
+
+  def bark(self):
+    print(f"{self.name} barks!")
+
+  def run(self):
+    print(f"{self.name} runs!")
+
+  def sit(self):
+    print(f"{self.name} sits!")
+
+
+if __name__ == "__main__":
+  my_dog = Dog("Lassie", "Border Collie")
+  my_dog.bark()
+  my_dog.run()
+  my_dog.sit()
+
+```
+
+```text
+Golang equivalent
+-----------------
+```
+
+```go
+package main
+
+import "fmt"
+
+type Dog struct {
+  name string
+  breed string
+}
+
+func (d *Dog) Bark() {
+  fmt.Println(d.name, "barks!")
+}
+
+func (d *Dog) Run() {
+  fmt.Println(d.name, "runs!")
+}
+
+func (d *Dog) Sit() {
+  fmt.Println(d.name, "sits!")
+}
+
+func main() {
+  myDog := Dog{
+    name: "Lassie",
+    breed: "Border Collie",
+  }
+
+  myDog.Bark()
+  myDog.Run()
+  myDog.Sit()
+}
+
+```
+
+```text
+Explanation
+
+This code is similar to the Python code, but there are some differences. In Go, the struct keyword is used to define a data structure. The Dog struct has two fields: name and breed. The *Dog pointer type is used to refer to an instance of the Dog struct. i.e. similar to `self` in Python.
+
+The Bark(), Run(), and Sit() methods are defined as methods on the Dog struct. Methods are functions that are associated with a particular type. In this case, the Bark(), Run(), and Sit() methods are associated with the Dog struct.
+
+The main() function is used to run the code when the file is executed as a script. In this case, we create a new instance of the Dog struct called myDog and then call the Bark(), Run(), and Sit() methods on it.
+```
+
 ## Control Flow
 
 ### `If` Statement
 
 ```go
+gender := "boy"
 
+if gender == "boy" {
+    fmt.Println("You're a boy!")
+}
 ```
 
 ### `If - else` Statement
 
 ```go
+gender := "boy"
 
+if gender == "boy" {
+    fmt.Println("You're a boy!")
+} else{
+    fmt.Println("You're NOT a boy!")
+}
 ```
 
 ### `If - else if - else` Statement
 
 ```go
+gender := "boy"
 
+if gender == "boy" {
+    fmt.Println("You're a boy!")
+} else if gender == "girl" {
+    fmt.Println("You're a girl")
+} else{
+    fmt.Println("You're NOT a boy or a girl!")
 ```

@@ -9,6 +9,7 @@ func RunDTypesExample() {
 	slices()
 	maps()
 	structExample()
+	anotherStructExample()
 }
 
 // Internal function for your data types example
@@ -46,7 +47,7 @@ func slices() {
 
 func maps() {
 	fmt.Println("\n==== Running examples on `map` datatype ====")
-	// Maps: Similar to dicts in Python but with uniform datatypes
+	// Maps: Similar to dicts in Python but with must have uniform datatypes.
 	// Syntax: make(map[key_dtype]value_dtype)
 	var myMap = make(map[string]string, 5)
 
@@ -81,15 +82,11 @@ func maps() {
 	fmt.Printf("Type: %T\n", players)
 }
 
+// Struct: Similar to classes in Python
+
+
 func structExample() {
 	fmt.Println("\n==== Running examples on `struct` datatype ====")
-	// Maps: Similar to classes in Python
-	// Create a struct
-	type Player struct {
-		firstname string
-		lastname  string
-		age       uint
-	}
 
 	// Create a new instance of the "Player" struct
 	var player1 Player
@@ -113,4 +110,38 @@ func structExample() {
 	// Print the struct
 	fmt.Println(player1, player2, player3)
 	fmt.Println((namePlayer1))
+}
+
+type Player struct {
+	firstname string
+	lastname  string
+	age       uint
+}
+
+func (p *Player) shoot() {
+	// This is a method in the Player struct.
+	fmt.Printf("%v just took a shot.\n", p.firstname)
+}
+
+func (p *Player) dribble() {
+	// This is a method in the Player struct.
+	fmt.Printf("%v just dribbled past an opposition.\n", p.firstname)
+}
+
+func (p *Player) tackle() {
+	// This is a method in the Player struct.
+	fmt.Printf("%v just tackled an opposition.\n", p.firstname)
+}
+
+func anotherStructExample() {
+	fmt.Println("\n==== Running examples on `anotherStruct` example ====")
+
+	playerObj := Player{
+		firstname: "Nico",
+		lastname: "Jackson",
+		age: 23,
+	}
+	playerObj.shoot()
+	playerObj.dribble()
+	playerObj.tackle()
 }
