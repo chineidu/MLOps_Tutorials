@@ -14,7 +14,7 @@ func RunDTypesExample() {
 // Internal function for your data types example
 // It starts with lowercase.
 func arrays() {
-	fmt.Println("\n==== Running examples on `array` datatype")
+	fmt.Println("\n==== Running examples on `array` datatype ====")
 	// Arrays
 	// An empty array that can take a max of [20] string elements
 	// Array syntax:
@@ -30,7 +30,7 @@ func arrays() {
 }
 
 func slices() {
-	fmt.Println("\n==== Running examples on `slice` datatype")
+	fmt.Println("\n==== Running examples on `slice` datatype ====")
 	// Slice (dynamic size)
 	// Slice syntax:
 	// var varName []dataType
@@ -45,7 +45,7 @@ func slices() {
 }
 
 func maps() {
-	fmt.Println("\n==== Running examples on `map` datatype")
+	fmt.Println("\n==== Running examples on `map` datatype ====")
 	// Maps: Similar to dicts in Python but with uniform datatypes
 	// Syntax: make(map[key_dtype]value_dtype)
 	var myMap = make(map[string]string, 5)
@@ -74,6 +74,7 @@ func maps() {
 		"lastname":  "Palmer",
 	}
 
+	// Add all the players
 	players = append(players, firstPlayer, secondPlayer)
 
 	fmt.Printf("This is another map [players]: %v\n", players)
@@ -81,7 +82,7 @@ func maps() {
 }
 
 func structExample() {
-	fmt.Println("\n==== Running examples on `struct` datatype")
+	fmt.Println("\n==== Running examples on `struct` datatype ====")
 	// Maps: Similar to classes in Python
 	// Create a struct
 	type Player struct {
@@ -106,6 +107,10 @@ func structExample() {
 	// Create a new instance of the "Player" struct
 	player3 := Player{"Enzo", "Fernandez", 22}
 
+	// Access the values
+	namePlayer1 := player1.firstname
+
 	// Print the struct
 	fmt.Println(player1, player2, player3)
+	fmt.Println((namePlayer1))
 }
