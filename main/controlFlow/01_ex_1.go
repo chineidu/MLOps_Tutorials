@@ -73,7 +73,7 @@ func ifExample() {
 }
 func ifElseExample() {
 	fmt.Println("\n==== Running examples on `if-Else` example ====")
-	clubNames := []string{"Chelsea", "Brighton", "Man City", "Liverpool"}
+	clubNames := []string{"Chelsea", "Man Utd", "Man City", "Liverpool"}
 	var clubName string
 	fmt.Printf("Enter clubName of football club:\n")
 	fmt.Scan(&clubName)
@@ -81,15 +81,15 @@ func ifElseExample() {
 	isValid := false
 	for _, n := range clubNames {
 		// if strings.ToLower(clubName) == strings.ToLower(n)
-		result := strings.EqualFold(clubName, n)
-		if result {
+		if strings.EqualFold(clubName, n) {
+			isValid = true
 			break
 		}
 	}
 
 	if isValid {
 		fmt.Printf("Your football club `%v` has won the UCL before:\n", clubName)
-	} else{
+	} else {
 		fmt.Printf("Your football club `%v` has NOT won the UCL before:\n", clubName)
 	}
 
