@@ -125,7 +125,7 @@ func main() {
 
     remainingTickets = totalTickets - numTickets
 
-    fmt.Println("=====================================================================================")
+    fmt.Println("==================================================================================")
     fmt.Printf("Thank you %v %v for purchasing %v tickets.\n", firstName, lastName, numTickets)
     fmt.Printf("You will receive a confirmation mail at %v.\n\n", email)
     fmt.Printf("The number of remaining tickets is %v\n", remainingTickets)
@@ -175,6 +175,7 @@ func slices() {
     anotherSlice := make([]string, 0)
     // Add elements to the slice
     clubs = append(clubs, "Chelsea")
+    clubs.append[1] = "Brighton"
     ages = append(ages, 123)
     fmt.Printf("Clubs: %v\n", clubs)
     fmt.Printf("Ages: %v\n", ages)
