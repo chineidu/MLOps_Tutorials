@@ -3,6 +3,7 @@ package goTutorials
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 )
 
 /* Convert this to a struct object
@@ -27,6 +28,8 @@ import (
 
 func RunExampleThree() {
 	jsonExample()
+	loadJSONExample1()
+	loadJSONExample2()
 }
 
 // "json:"tag" customizes struct-to-JSON mapping."
@@ -96,4 +99,69 @@ func jsonExample() {
 	}
 	fmt.Printf("Person: %v\n\n", string(jsonData))
 	fmt.Printf("Person: %v\n\n", string(jsonPeople))
+}
+
+func readJSONFile(filePath string) ([]byte, error) {
+	// Read the JSON file
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+type _Employee struct {
+	Name       string  `json:"name"`
+	Role       string  `json:"role"`
+	Experience float32 `json:"experience"`
+	Salary     float32 `json:"salary"`
+	Department string  `json:"department"`
+}
+type Employee struct {
+	Data []_Employee `json:"data"`
+}
+
+func loadJSONExample1() {
+	/* This is used to load a JSON file as a dict.*/
+
+	// This is assumed to be the loaded JSON data
+	sampleData := []byte(`{
+		"name": "Frank Zayn",
+		"role": "MLOps Engineer",
+		"experience": 3.0,
+		"predicted_salary": 535415.34,
+		"department": "Swaks"
+	}`)
+
+	// Empty object
+	var pData _Employee
+	// Parse the JSON
+	err := json.Unmarshal(sampleData, &pData)
+	if err != nil {
+		fmt.Printf("ERROR: %v\n\n", err)
+	}
+	// It prints out the pData struct
+	fmt.Printf("loaded JSON file: %v\n\n", pData)
+
+}
+
+func loadJSONExample2() {
+	/* This is used to load a JSON file as a dict.*/
+	jsonData, err := readJSONFile("./data/DB.json")
+	if err != nil {
+		fmt.Printf("ERROR: %v\n\n", err)
+	}
+
+	var myData Employee
+	err = json.Unmarshal(jsonData, &myData)
+	if err != nil {
+		fmt.Printf("ERROR: %v\n\n", err)
+	}
+
+	//  Access the data
+	for _, value := range myData.Data {
+		fmt.Printf("Name: %v\n", value.Name)
+		fmt.Printf("Role: %v\n", value.Role)
+	}
+
 }

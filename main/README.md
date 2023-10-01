@@ -21,6 +21,8 @@
     - [`If - else` Statement](#if---else-statement)
     - [`If - else if - else` Statement](#if---else-if---else-statement)
     - [`Switch` Statement](#switch-statement)
+  - [Working With JSON Data](#working-with-json-data)
+    - [Convert A Nested Data (JSON) To Struct](#convert-a-nested-data-json-to-struct)
 
 ## Initialize Package
 
@@ -390,4 +392,78 @@ default: // else
   fmt.Println("Invalid day!")
 }
 
+```
+
+## Working With JSON Data
+
+### Convert A Nested Data (JSON) To Struct
+
+```go
+/* Convert this to a struct object
+[
+  {
+    "name": "John Doe",
+    "age": 30,
+    "occupation": "Software Engineer",
+    "hobbies": ["Coding", "Reading", "Gaming"],
+    "address": {
+      "street": "123 Main Street",
+      "city": "San Francisco",
+      "state": "CA",
+      "zip": "94105"
+    },
+    "phoneNumber": "+15555555555",
+    "email": "john.doe@example.com",
+    "createdAt": "2023-09-18T10:59:11.000Z"
+  },
+]
+*/
+
+// "json:"tag" customizes struct-to-JSON mapping."
+type Address struct {
+  Street  string `json:"street"`
+  City    string `json:"city"`
+  State   string `json:"state"`
+  Zipcode string `json:"zipcode"`
+}
+
+type Person struct {
+  Name        string   `json:"name"`
+  Age         uint     `json:"age"`
+  Occupation  string   `json:"occupation"`
+  Hobbies     []string `json:"hobbies"`
+  Address     Address  `json:"address"`
+  PhoneNumber string   `json:"phoneNumber"`
+  Email       string   `json:"email"`
+  CreatedAt   string   `json:"createdAt"`
+}
+
+func jsonExample() {
+  // Create a person object
+  person1 := Person{
+    Name:       "John Doe",
+    Age:        30,
+    Occupation: "Software Engineer",
+    Hobbies:    []string{"Coding", "Reading", "Gaming"},
+    Address: Address{
+      Street:  "123 Main Street",
+      City:    "San Francisco",
+      State:   "CA",
+      Zipcode: "94105",
+    },
+    PhoneNumber: "+15555555555",
+    Email:       "john.doe@example.com",
+    CreatedAt:   "2023-09-18T10:59:11.000Z",
+  }
+
+  // Return the JSON encoding of person1
+  jsonData, err := json.Marshal(person1)
+
+  // Print the data in a formatted way
+  fmt.Printf("Person: %v\n\n", string(jsonData))
+
+  // Format the output nicely!
+  jsonPeople, _ := json.MarshalIndent(jsonData, "", " ")
+  fmt.Printf("Person: %v\n\n", string(jsonPeople))
+}
 ```
