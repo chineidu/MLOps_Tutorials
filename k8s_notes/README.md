@@ -287,7 +287,7 @@ Some additional flags that you can use with the `kubectl logs` command:
 ```
 
 ```bash
-kubectl get logs <pod-name>
+kubectl logs <pod-name>
 
 # Show the last 5 logs
 kubectl logs second-app-6695467d49-bwhgg --tail=5

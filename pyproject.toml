@@ -1,45 +1,6 @@
-[tool.pylint.messages_control]
-
-disable = [
-    "consider-using-sys-exit",
-    "cyclic-import",
-    "duplicate-code",
-    "missing-final-newline",
-    "missing-module-docstring",
-    "missing-timeout",
-    "no-name-in-module",
-    "no-value-for-parameter",
-    "inconsistent-return-statements",
-    "invalid-name",
-    "import-error",
-    "too-few-public-methods",
-    "line-too-long",
-    "logging-fstring-interpolation",
-    "logging-too-many-args",
-    "redefined-outer-name",
-    "unsubscriptable-object",
-    "unspecified-encoding",
-    "ungrouped-imports",
-    "redefined-builtin",
-    "global-variable-not-assigned",
-    "unused-argument",
-    "useless-import-alias"
-]
-
-[tool.black]
-line-length = 100
-target-version = ['py310']
-skip-string-normalization = true
-
-[tool.isort]
-skip = [".gitignore", ".dockerignore"]
-profile = "black"
-group_by_package = true
-multi_line_output = 3
-py_version=39
-
+# Used for pre-commit config
 [tool.mypy]
-mypy_path = ["decide"]
+mypy_path = ["fast_token_classifier"]
 python_version = "3.10"
 show_error_context = true
 ignore_missing_imports = true
@@ -49,6 +10,49 @@ disallow_any_generics = true
 disallow_untyped_defs = false
 warn_unused_configs = true
 
+[tool.ruff]
+# Set the maximum line length to 100.
+line-length = 100
+indent-width = 4
+
+# Assume Python 3.10
+target-version = "py310"
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr", ".direnv", ".dockerignore", ".eggs", ".env", ".git",
+    ".gitignore", ".git-rewrite",  ".hg", ".mypy_cache", ".nox",
+    ".pants.d", ".pytype", ".ruff_cache", ".svn", ".tox", ".venv",
+    "__pypackages__", "_build", "buck-out", "build", "dist", "env",
+    "node_modules", "venv",
+]
+
+[tool.ruff.lint]
+# Add the `line-too-long` rule to the enforced rule set.
+extend-select = ["E501"]
+select = [
+    "I001", "ANN201", "ANN202", "S107", "PIE796", "T201", "PYI009",
+    "PYI012", "PYI026", "RET505", "SIM115", "F401",
+    ]
+ignore = ["E741", "PT011", "PLR1722", "D419", "D101", "D100", "D107", "ANN401", "PLC0414"]
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Pytest
 [tool.pytest.ini_options]
 addopts = "--strict-markers" # Ensure that the markers are defined
 markers = [
