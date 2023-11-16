@@ -621,6 +621,7 @@ https://docs.docker.com/compose/compose-file/compose-file-v3/
 ```yml
 version: "3.8"
 
+services:
   my_app:
     build:
       context: ./other
