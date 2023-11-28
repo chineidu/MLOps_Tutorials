@@ -226,6 +226,8 @@ func maps() {
 
 ### Structs
 
+- More [examples](https://github.com/chineidu/MLOps_Tutorials/blob/main/main/goTutorials/04-struct-ex.go)
+
 ```text
 The struct data type is a composite data type that allows you to define your own custom data structures. It is similar to a class in other programming languages and provides a way to group related data fields together.
 
