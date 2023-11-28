@@ -254,7 +254,6 @@ person := Person{
 }
 ```
 
-
 You can access the field values using the dot notation. For example, `person.Name` would give you the name "John Doe".
 
 #### Modelling Data With Structs
