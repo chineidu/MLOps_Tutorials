@@ -53,6 +53,10 @@
       - [3. DNS For Pod-Pod Communication](#3-dns-for-pod-pod-communication)
     - [To Do](#to-do)
   - [Miscellaneous Commands](#miscellaneous-commands)
+  - [K8s Context](#k8s-context)
+    - [Get Available Contexts](#get-available-contexts)
+    - [Get Switch Contexts](#get-switch-contexts)
+    - [Verify Current Contexts](#verify-current-contexts)
 
 ## Kubernetes Introduction
 
@@ -1208,4 +1212,27 @@ The default namespace in K8s is `default`.
 ```sh
 kubectl apply -f k8s_notes/app_1_deployment.yaml -f k8s_notes/app_1_service.yaml
 kubectl apply -f k8s_notes/mongo_deployment.yaml -f k8s_notes/mongo_service.yaml
+```
+
+## K8s Context
+
+### Get Available Contexts
+
+```sh
+kubectl config get-contexts
+```
+
+### Get Switch Contexts
+
+```sh
+kubectl config use-context <context-name>
+
+# e.g
+kubectl config use-context my_local_context
+```
+
+### Verify Current Contexts
+
+```sh
+kubectl config current-context
 ```
