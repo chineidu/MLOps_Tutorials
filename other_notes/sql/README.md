@@ -100,7 +100,7 @@ SET faculty = "ICT"
 ```sql
 DELETE FROM table_name WHERE condition;
 
--- e.g,
+-- e.g.
 DELETE FROM students
   WHERE LOWER(gender) = 'm' AND LOWER(first_name) = "bola" AND LOWER(last_name) = "obi";
 ```
