@@ -48,7 +48,7 @@ class Product:
 
     @typechecked
     @classmethod
-    def set_base_price(cls, new_price: float) -> None:
+    def set_base_price(cls: Type[P], new_price: float) -> None:
         """Change the base price for all the products."""
         cls.base_price = new_price
 
