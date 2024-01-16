@@ -12,6 +12,7 @@ This repo was inspired by the following Udemy courses:
    - [Testing and Monitoring](https://www.udemy.com/course/draft/2122690/learn/lecture/17718922?start=645#overview)
 4. **Spark**: [Spark notes](https://github.com/chineidu/MLOps_Tutorials/tree/main/spark_notes)
 5. **GoLang**: [Go Lang](https://github.com/chineidu/MLOps_Tutorials/blob/main/main/README.md)
+6. **Poetry**: [Poetry](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Poetry/README.md)
 
 ## Using Docker Commands
 
