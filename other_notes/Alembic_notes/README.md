@@ -10,9 +10,10 @@
   - [Table of Content](#table-of-content)
   - [Installation](#installation)
     - [Alembic Commands](#alembic-commands)
-  - [Creating an Environment](#creating-an-environment)
-  - [Alembic Config](#alembic-config)
-    - [Adjust SQLAlchemy URL](#adjust-sqlalchemy-url)
+  - [Creating A Project](#creating-a-project)
+  - [Alembic Config (Set the `sqlalchemy.url`)](#alembic-config-set-the-sqlalchemyurl)
+    - [Method 1](#method-1)
+    - [Method 2](#method-2)
   - [Create Revison](#create-revison)
     - [Create First Revision](#create-first-revision)
   - [Operations](#operations)
@@ -37,7 +38,7 @@ poetry add alembic
 alembic -h
 ```
 
-## Creating an Environment
+## Creating A Project
 
 ```sh
 alembic init [any_name]
@@ -47,18 +48,17 @@ alembic init [any_name]
 alembic init alembic
 ```
 
-## Alembic Config
+## Alembic Config (Set the `sqlalchemy.url`)
 
-### Adjust SQLAlchemy URL
+### Method 1
 
-- Open `alembic.ini` config file.
-- If your dialect is Postgres, update the variable `sqlalchemy.url`
+1.) Update the variable `sqlalchemy.url` in the `alembic.ini` config file like so:
 
 ```ini
-sqlalchemy.url = postgresql://%(DB_USER)s:%(DB_PASS)s@%(DB_HOST)s/%(DB_NAME)s
+sqlalchemy.url = postgresql://%(DB_USER)s:%(DB_PASSWORD)s@%(DB_HOST)s/%(DB_NAME)s
 ```
 
-- Add the env variables to the `env.py` file.
+2.) Add the env variables to the `env.py` file.
 
 ```py
 # Allow interpolation vars to alembic.ini from the host env
@@ -67,6 +67,27 @@ config.set_section_option(section, "DB_USER", os.environ.get("DB_USER"))
 config.set_section_option(section, "DB_PASSWORD", os.environ.get("DB_PASSWORD"))
 config.set_section_option(section, "DB_HOST", os.environ.get("DB_HOST"))
 config.set_section_option(section, "DB_NAME", os.environ.get("DB_NAME"))
+```
+
+### Method 2
+
+1.) Update the `alembic.ini` config file by setting the variable `sqlalchemy.url` to an empty value.
+
+```ini
+sqlalchemy.url =
+```
+
+2.) Adjust the `env.py` file.
+
+```py
+# env.py
+
+
+SQLALCHEMY_DATABASE_URL: str = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+# Set the url
+config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)   # NEW!
+
 ```
 
 ## Create Revison
