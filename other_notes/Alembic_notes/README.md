@@ -136,6 +136,48 @@ alembic downgrade -1
 
 ### Create Table (Automatically)
 
+- `File 1`
+
+```py
+from datetime import datetime
+from typing import Any, Literal
+
+from sqlalchemy import DateTime, ForeignKey, String, create_engine
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship
+
+# ===== Other imports =====
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+class Customers(Base):
+    __tablename__: str = "customers"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    password: Mapped[str] = mapped_column(String(50), nullable=False)
+    billing_address: Mapped[str] = mapped_column(String(255), nullable=True)
+    shipping_address: Mapped[str] = mapped_column(String(255), nullable=False)
+    phone_number: Mapped[str] = mapped_column(String(255), nullable=True)
+
+    order: Mapped["Orders"] = relationship(back_populates="customers")
+
+    def __repr__(self) -> str:
+        return (
+            f"({self.__class__.__name__}(id={self.id!r}, name={self.name!r}, email={self.email!r}, "
+            f"shipping_address={self.shipping_address!r})"
+        )
+
+
+# ===== Other code block =====
+
+```
+
+- `File 2`
+
 ```py
 # env.py file
 
@@ -145,13 +187,13 @@ from dotenv import find_dotenv, load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context  # type: ignore
-from e_commerce_app import models
+import models  # NEW!
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-config.set_main_option("sqlalchemy.url", models.SQLALCHEMY_DATABASE_URL)
+config.set_main_option("sqlalchemy.url", models.SQLALCHEMY_DATABASE_URL)   # NEW!
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -160,7 +202,7 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-
+# Create tables  NEW!
 target_metadata = models.Base.metadata
 
 # other values from the config, defined by the needs of env.py,
