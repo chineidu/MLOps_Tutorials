@@ -1,8 +1,11 @@
-# Tutorials
+# Poetry Tutorial
+
+- [Official Docs](https://python-poetry.org/docs/)
+- [Video Tutorial](https://www.youtube.com/watch?v=0f3moPe_bhk&t=35s&ab_channel=ArjanCodes)
 
 ## Table of Content
 
-- [Tutorials](#tutorials)
+- [Poetry Tutorial](#poetry-tutorial)
   - [Table of Content](#table-of-content)
   - [Create Virtual Env \[Poetry\]](#create-virtual-env-poetry)
     - [Configure Poetry](#configure-poetry)
@@ -94,7 +97,7 @@ poetry lock "--no-update" && poetry install
 poetry remove "package-1==x.x.x" "package-2==x.x.x" "package-3==x.x.x"
 
 # e.g.
-poetry remove requests
+poetry remove requests dask
 ```
 
 ## Manage ENVs
