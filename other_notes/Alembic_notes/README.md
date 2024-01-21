@@ -20,6 +20,10 @@
     - [Create Table (Manually)](#create-table-manually)
     - [Drop Table](#drop-table)
     - [Create Table (Automatically)](#create-table-automatically)
+  - [Check History](#check-history)
+    - [Apply A Specified Revision](#apply-a-specified-revision)
+    - [Current Revision](#current-revision)
+    - [Rollback Revision](#rollback-revision)
 
 ## Installation
 
@@ -244,4 +248,40 @@ def run_migrations_offline() -> None:
 # Upgrade to (apply) a new migration automatically from the models
 alembic revision --autogenerate -m "New Migration"
 alembic upgrade head
+```
+
+## Check History
+
+- This displays all the committed revisions.
+
+```sh
+alembic history
+```
+
+### Apply A Specified Revision
+
+```sh
+alembic upgrade <revison_hash>
+
+# e.g.
+alembic upgrade 54954a5a54a5
+```
+
+### Current Revision
+
+```sh
+alembic current
+```
+
+### Rollback Revision
+
+```sh
+alembic downgrade <revision>
+
+# e.g.
+# last revision
+alembic downgrade -1
+
+# specific revision
+alembic downgrade 38954a5u64a5
 ```
