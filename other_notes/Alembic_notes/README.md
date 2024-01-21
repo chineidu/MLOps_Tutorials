@@ -16,8 +16,9 @@
   - [Create Revison](#create-revison)
     - [Create First Revision](#create-first-revision)
   - [Operations](#operations)
-    - [Create Table](#create-table)
+    - [Create Table (Manually)](#create-table-manually)
     - [Drop Table](#drop-table)
+    - [Create Table (Automatically)](#create-table-automatically)
 
 ## Installation
 
@@ -68,7 +69,6 @@ config.set_section_option(section, "DB_HOST", os.environ.get("DB_HOST"))
 config.set_section_option(section, "DB_NAME", os.environ.get("DB_NAME"))
 ```
 
-
 ## Create Revison
 
 ### Create First Revision
@@ -84,7 +84,7 @@ alembic revision -m "create user table"
 
 ## Operations
 
-### [Create Table](https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations.create_table)
+### [Create Table (Manually)](https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations.create_table)
 
 - Upgrade
 
@@ -112,6 +112,9 @@ alembic upgrade -h
 
 # Display the generated SQL command/query
 alembic upgrade head --sql
+
+# Upgrade to (apply) a new migration
+alembic upgrade head
 ```
 
 ### Drop Table
@@ -129,4 +132,59 @@ alembic downgrade revision_identifier
 
 # e.g. revert to the last migration/operation
 alembic downgrade -1
+```
+
+### Create Table (Automatically)
+
+```py
+# env.py file
+
+import os
+from logging.config import fileConfig
+
+from sqlalchemy import engine_from_config, pool
+
+from alembic import context  # type: ignore
+
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
+config = context.config
+
+# NEW!: Allow interpolation vars to alembic.ini from the host env
+section = config.config_ini_section
+config.set_section_option(section, "DB_USER", os.getenv("DB_USER"))
+config.set_section_option(section, "DB_PASSWORD", os.getenv("DB_PASSWORD"))
+config.set_section_option(section, "DB_HOST", os.getenv("DB_HOST"))
+config.set_section_option(section, "DB_NAME", os.getenv("DB_NAME"))
+
+
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
+
+# add your model's MetaData object here
+# for 'autogenerate' support
+from e_commerce_app import models  # NEW!
+
+target_metadata = models.Base.metadata  # NEW!
+
+# other values from the config, defined by the needs of env.py,
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
+
+
+def run_migrations_offline() -> None:
+    pass
+
+# ==== Other code block ====
+```
+
+- Usage
+
+```sh
+# Upgrade to (apply) a new migration automatically from the models
+alembic revision --autogenerate -m "New Migration"
+alembic upgrade head
 ```
