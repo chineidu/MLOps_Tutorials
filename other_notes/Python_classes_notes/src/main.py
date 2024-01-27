@@ -23,11 +23,11 @@ class StorySchema:
     tags: Optional[str] = None
     id: Optional[int] = None
 
-    def __repr__(self) -> str:
-        return (
-            f"Post(id={repr(self.id)}, title={repr(self.title)}, "
-            f"content={repr(self.content)}, tags={repr(self.tags)})"
-        )
+    # def __repr__(self) -> str:
+    #     return (
+    #         f"Post(id={repr(self.id)}, title={repr(self.title)}, "
+    #         f"content={repr(self.content)}, tags={repr(self.tags)})"
+    #     )
 
 
 class Repository(ABC, Generic[T]):
@@ -209,16 +209,16 @@ class StoryRepository(Repository[StorySchema]):
 if __name__ == "__main__":
     story = StoryRepository()
     # story.add(
-    #     title="UEFA CHAMPIONS",
-    #     content="Chelsea have won the UEFA Champions League!!!",
-    #     tags="#Chelsea, #UEFA, #UCL",
+    #     title="AI Dominance",
+    #     content="The battle to become the dominant for ce in AI is on",
+    #     tags="#AI, #GenAI, #DeepLearning",
     # )
 
-    story.add(
-        title="Virgin Mary",
-        content="Virgin Mary is the mother of our Lord Jesus Christ.",
-        tags="#Chelsea, #UEFA, #UCL",
-    )
+    # story.add(
+    #     title="Virgin Mary",
+    #     content="Virgin Mary is the mother of our Lord Jesus Christ.",
+    #     tags="#Catholic, #Christian, #Jesus",
+    # )
     # story.delete(id=20)
 
     console.print(story.get_all())
