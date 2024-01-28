@@ -23,12 +23,6 @@ class StorySchema:
     tags: Optional[str] = None
     id: Optional[int] = None
 
-    # def __repr__(self) -> str:
-    #     return (
-    #         f"Post(id={repr(self.id)}, title={repr(self.title)}, "
-    #         f"content={repr(self.content)}, tags={repr(self.tags)})"
-    #     )
-
 
 class Repository(ABC, Generic[T]):
     """This is a base class for interacting with the database."""
@@ -95,6 +89,7 @@ class StoryRepository(Repository[StorySchema]):
 
     @typechecked
     def __get_result(self, data: tuple[Any, Any, Any, Any]) -> StorySchema:
+        """This is a helper function for creating a StorySchema object."""
         result: StorySchema = StorySchema(id=data[0], title=data[1], content=data[2], tags=data[3])
         return result
 
