@@ -10,6 +10,7 @@
     - [Generic Types](#generic-types)
   - [Repository Design Pattern](#repository-design-pattern)
     - [A Simple Example](#a-simple-example)
+  - [Abstract Factory](#abstract-factory)
 
 ## Class Methods
 
@@ -351,5 +352,88 @@ if __name__ == "__main__":
         tags="#AI, #GenAI, #DeepLearning",
     )
     console.print(story.get_all())
+
+```
+
+## Abstract Factory
+
+- The `Abstract Factory Pattern` provides an interface for creating families of related or dependent objects without specifying their creation logic/classes.
+
+```py
+from abc import ABC, abstractmethod
+
+# Abstract Product A
+class AbstractChair(ABC):
+    @abstractmethod
+    def sit_on(self):
+        raise NotImplementedError
+
+# Concrete Product A1
+class ModernChair(AbstractChair):
+    def sit_on(self):
+        return "Sitting on a modern chair"
+
+# Concrete Product A2
+class VictorianChair(AbstractChair):
+    def sit_on(self):
+        return "Sitting on a Victorian chair"
+
+# Abstract Product B
+class AbstractTable(ABC):
+    @abstractmethod
+    def eat_on(self):
+        raise NotImplementedError
+
+# Concrete Product B1
+class ModernTable(AbstractTable):
+    def eat_on(self):
+        return "Eating on a modern table"
+
+# Concrete Product B2
+class VictorianTable(AbstractTable):
+    def eat_on(self):
+        return "Eating on a Victorian table"
+
+# Abstract Factory
+class FurnitureFactory(ABC):
+    @abstractmethod
+    def create_chair(self) -> AbstractChair:
+        raise NotImplementedError
+
+    @abstractmethod
+    def create_table(self) -> AbstractTable:
+        pass
+
+# Concrete Factory 1
+class ModernFurnitureFactory(FurnitureFactory):
+    def create_chair(self) -> AbstractChair:
+        return ModernChair()
+
+    def create_table(self) -> AbstractTable:
+        return ModernTable()
+
+# Concrete Factory 2
+class VictorianFurnitureFactory(FurnitureFactory):
+    def create_chair(self) -> AbstractChair:
+        return VictorianChair()
+
+    def create_table(self) -> AbstractTable:
+        return VictorianTable()
+
+# Client Code
+def client_code(factory: FurnitureFactory):
+    chair = factory.create_chair()
+    table = factory.create_table()
+
+    print(chair.sit_on())
+    print(table.eat_on())
+
+# Using Modern Furniture Factory
+modern_factory = ModernFurnitureFactory()
+client_code(modern_factory)
+
+# Using Victorian Furniture Factory
+victorian_factory = VictorianFurnitureFactory()
+client_code(victorian_factory)
 
 ```
