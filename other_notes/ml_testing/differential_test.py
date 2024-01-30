@@ -88,5 +88,5 @@ def compare_predictions() -> None:
         click.echo(click.style(text="DONE!", fg="green", bold=True))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     compare_predictions()
