@@ -2,10 +2,10 @@ name: Workflow 1  # name of the workflow
 
 on:  # trigger(s)
   push:
-    branches: [ $default-branch ]  # repository's default branch
+    branches: [ main ]
 
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ main ]
 
 jobs:
   build: # name of the job
