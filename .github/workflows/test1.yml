@@ -12,12 +12,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4  # action
+      - name: Checkout repo content
+        uses: actions/checkout@v4  # action
 
-      - name: Run a one-line script
-        run: echo Hello World  # script
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
       - name: Multi-line script
         run: |  # script
             echo Hello World 1
-            echo something else
+            echo "Hi 'Neidu"
+
+      - name: Example Code
+        run: |
+          echo ">>> Running ... <<<"
+          python other_notes/Python_classes_notes/src/main.py
