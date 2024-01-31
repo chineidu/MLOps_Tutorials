@@ -20,10 +20,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Multi-line script
+      - name: Install Dependencies
         run: |  # script
-            echo Hello World 1
-            echo "Hi 'Neidu"
+          echo ">>> Installing dependencies ... <<<"
+          pip install rich
 
       - name: Example Code
         run: |
