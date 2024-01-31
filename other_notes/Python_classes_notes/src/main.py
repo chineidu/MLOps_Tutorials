@@ -205,7 +205,7 @@ if __name__ == "__main__":
     story = StoryRepository()
     # story.add(
     #     title="AI Dominance",
-    #     content="The battle to become the dominant for ce in AI is on",
+    #     content="The battle to become the dominant force in AI is on.",
     #     tags="#AI, #GenAI, #DeepLearning",
     # )
 
@@ -214,6 +214,16 @@ if __name__ == "__main__":
     #     content="Virgin Mary is the mother of our Lord Jesus Christ.",
     #     tags="#Catholic, #Christian, #Jesus",
     # )
+
+    # story.add(
+    #     title="Barlays Premier League",
+    #     content=(
+    #         "Liverpool will be taking on Chelsea at Anfield today. "
+    #         "It should be a great game."
+    #     ),
+    #     tags="#LFC, #CFC, #EPL",
+    # )
+
     # story.delete(id=20)
 
     console.print(story.get_all())

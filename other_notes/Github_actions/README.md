@@ -12,6 +12,8 @@
       - [Filters](#filters)
       - [Pull Request Trigger](#pull-request-trigger)
       - [Multiple Triggers](#multiple-triggers)
+    - [GitHub Actions Marketplace](#github-actions-marketplace)
+      - [Adding Multiple Jobs](#adding-multiple-jobs)
 
 ### Key Components
 
@@ -38,29 +40,28 @@
 - [Triggers](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push)
 
 ```yaml
-name: Example Workflow  # name of the workflow
+name: Example Workflow  # Name of the workflow
 
-on:  # trigger(s)
+on:  # Trigger(s)
   push:
     branches: [ $default-branch ]  # repository's default branch
   pull_request:
     branches: [ $default-branch ]
 
 jobs:
-  build: # name of the job
+  build: # Name of the job. It can be any name
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4  # action
+      - uses: actions/checkout@v4  # Action
 
       - name: Run a one-line script
-        run: echo Hello World  # script
+        run: echo Hello World  # Script
 
       - name: Multi-line script
-        run: |  # script
+        run: |  # Script
             echo Hello World
             echo something else
-
 ```
 
 #### Filters
@@ -102,46 +103,64 @@ on:
       - 'prod'
 ```
 
-```yml
-name: run main.py
+### GitHub Actions Marketplace
 
-on:
-  schedule:
-    - cron: '0 0 * * 1' # At 00:00 on Monday
+- [Actions marketplace](https://github.com/marketplace?type=actions)
+
+#### Adding Multiple Jobs
+
+```yml
+name: Workflow 1  # name of the workflow
+
+on:  # trigger(s)
+  push:
+    branches: [ main ]
+
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build:
+  build: # Job 1
     runs-on: ubuntu-latest
+
     steps:
+      - name: Checkout repo content
+        uses: actions/checkout@v4  # action
 
-      - name: checkout repo content
-        uses: actions/checkout@v2 # checkout the repository content to github runner
-
-      - name: setup python
-        uses: actions/setup-python@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9' # install the python version needed
+          python-version: '3.11'
 
-      - name: install python packages
+      - name: Install Dependencies
+        run: |  # script
+          echo ">>> Installing dependencies ... <<<"
+          pip install rich typeguard
+
+      - name: Example Code
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          echo ">>> Running ... <<<"
+          python other_notes/Python_classes_notes/src/main.py
 
-      - name: execute py script # run main.py
-        env:
-          SOME_SECRET: ${{ secrets.SOME_SECRET }}
-        run: python main.py
+  deploy: # Job 2
+    runs-on: ubuntu-latest
 
-      - name: commit files
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add -A
-          git diff-index --quiet HEAD || (git commit -a -m "updated logs" --allow-empty)
+    steps:
+      - name: Checkout repo content
+        uses: actions/checkout@v4  # action
 
-      - name: push changes
-        uses: ad-m/github-push-action@v0.6.0
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |  # script
+          echo ">>> Installing dependencies ... <<<"
+          pip install rich typeguard
+
+      - name: Deploy
+        run: |
+          echo ">>> Deploying code to production ... <<<"
+
 ```
