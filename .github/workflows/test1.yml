@@ -23,7 +23,7 @@ jobs:
       - name: Install Dependencies
         run: |  # script
           echo ">>> Installing dependencies ... <<<"
-          pip install rich
+          pip install rich typeguard
 
       - name: Example Code
         run: |
