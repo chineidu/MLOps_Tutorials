@@ -1,0 +1,23 @@
+name: Workflow 1  # name of the workflow
+
+on:  # trigger(s)
+  push:
+    branches: [ $default-branch ]  # repository's default branch
+
+  pull_request:
+    branches: [ $default-branch ]
+
+jobs:
+  build: # name of the job
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4  # action
+
+      - name: Run a one-line script
+        run: echo Hello World  # script
+
+      - name: Multi-line script
+        run: |  # script
+            echo Hello World 1
+            echo something else

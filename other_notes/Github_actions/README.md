@@ -8,7 +8,10 @@
       - [Workflow](#workflow)
       - [Job](#job)
       - [Step](#step)
-    - [A Simple Example](#a-simple-example)
+    - [1. A Simple Example](#1-a-simple-example)
+      - [Filters](#filters)
+      - [Pull Request Trigger](#pull-request-trigger)
+      - [Multiple Triggers](#multiple-triggers)
 
 ### Key Components
 
@@ -30,7 +33,9 @@
   - A **shell script**: You write the script directly in your workflow file.
   - **An action:** A reusable piece of code written by someone else (like yourself or the GitHub community) that performs a specific task, like building your code, running tests, or deploying your application.
 
-### A Simple Example
+### 1. A Simple Example
+
+- [Triggers](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push)
 
 ```yaml
 name: Example Workflow  # name of the workflow
@@ -49,6 +54,50 @@ jobs:
       - uses: actions/checkout@v4  # action
 
       - name: Run a one-line script
-        run: echo Hello from Octo Organization  # script
+        run: echo Hello World  # script
 
+      - name: Multi-line script
+        run: |  # script
+            echo Hello World
+            echo something else
+
+```
+
+#### Filters
+
+- If you use both the `branches` filter and the `paths` filter, the workflow will only run when `both` filters are satisfied.
+- For example, the following workflow will only run when a push that includes a change to a Python (.py) file is made to a branch whose name starts with releases/:
+
+```yml
+on:
+  push:
+    branches:
+      - 'releases/**'
+    paths:
+      - '**.py'
+```
+
+#### Pull Request Trigger
+
+- This workflow is run when a pull request has been `opened` or `reopened`.
+
+```yml
+on:
+  pull_request:
+    types: [opened, reopened]
+```
+
+#### Multiple Triggers
+
+```yml
+on:
+  push:  # trigger 1
+    branches:
+      - 'dev'
+      - 'prod'
+
+  pull_request:  # trigger 2
+    branches:
+      - 'dev'
+      - 'prod'
 ```
