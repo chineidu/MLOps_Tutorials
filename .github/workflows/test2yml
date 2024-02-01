@@ -8,7 +8,7 @@ on:  # trigger(s)
     branches: [ main ]
 
 jobs:
-  deploy: # Job 2
+  deploy: # Job 1
     runs-on: ubuntu-latest
 
     steps:
