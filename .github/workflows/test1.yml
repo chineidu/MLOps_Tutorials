@@ -2,10 +2,10 @@ name: Workflow 1  # name of the workflow
 
 on:  # trigger(s)
   push:
-    branches: [ main ]
+    branches: [ dev ]
 
   pull_request:
-    branches: [ main ]
+    branches: [ dev ]
 
 jobs:
   build: # Job 1
