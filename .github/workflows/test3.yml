@@ -38,6 +38,7 @@ jobs:
           cd my-app && poetry install
           pip list
           echo "dependencies installed by ${MY_NAME}"
+          echo "${{ steps.cache-id.outputs.cache-hit }}"
       - name: Lint Code
         run: |
           cd my-app
