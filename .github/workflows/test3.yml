@@ -37,7 +37,7 @@ jobs:
       - name: Lint Code
         run: |
           cd my-app
-          poetry run mypy main.py && poetry run ruff main.py --fix
+          poetry run mypy . && poetry run ruff . --fix
       - name: Run Code
         run: |
           cd my-app && ls

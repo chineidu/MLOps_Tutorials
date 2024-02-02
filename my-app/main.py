@@ -95,7 +95,7 @@ class StoryRepository(Repository[StorySchema]):
         return result
 
     @typechecked
-    def get(self, id: int) -> Optional[StorySchema]:
+    def get(self, id: int) -> Optional[StorySchema]:  # type: ignore
         f"""This is used to fetch a story from the story table."""
         query: str = f"SELECT id, title, content, tags FROM {self.TABLE_NAME} WHERE id = ?;"
         with self.connect() as cursor:
@@ -110,7 +110,7 @@ class StoryRepository(Repository[StorySchema]):
             return result
 
     @typechecked
-    def get_all(self) -> Optional[list[StorySchema]]:
+    def get_all(self) -> Optional[list[StorySchema]]:  # type: ignore
         f"""This is used to fetch all the `stories` from the story table."""
         query: str = f"SELECT id, title, content, tags FROM {self.TABLE_NAME};"
         with self.connect() as cursor:
@@ -122,7 +122,7 @@ class StoryRepository(Repository[StorySchema]):
             return result
 
     @typechecked
-    def add(self, **kwargs) -> Optional[StorySchema]:
+    def add(self, **kwargs) -> Optional[StorySchema]:  # type: ignore
         if "title" in kwargs and "content" in kwargs and "tags" in kwargs:
             with self.connect() as cursor:
                 query: str = (
