@@ -26,8 +26,13 @@
       - [Upload Artiifacts](#upload-artiifacts)
       - [Download Artiifacts](#download-artiifacts)
       - [Job Outputs](#job-outputs)
+      - [Putting It Together (Job Output)](#putting-it-together-job-output)
       - [Dependency Caching](#dependency-caching)
         - [Poetry Caching](#poetry-caching)
+    - [Environment Variables](#environment-variables)
+      - [Workflow Level](#workflow-level)
+      - [Job Level](#job-level)
+      - [Steps Level](#steps-level)
 
 ### Key Components
 
@@ -386,14 +391,46 @@ deploy:
 - This feature is useful for passing data or results from one job to another.
 
 - **Defining Job Outputs:**
-  - Use the jobs.<job_id>.outputs property in your workflow YAML file.
-  - Specify key-value pairs, where the key is a string and the value is any supported data type (e.g., string, integer, boolean).
-  - Values are evaluated at the end of the job, allowing expressions that utilize job context or outputs from other jobs.
+  - Use the `jobs.<job_id>.outputs` property in your workflow YAML file.
+  - Specify key-value pairs, where the key is a string and the value is any supported data type (e.g., string, integer, boolean). i.e. `echo "key=value" >> "$GITHUB_OUTPUT"`
+  - e.g. `echo "result1=hello" >> "$GITHUB_OUTPUT"`
+
+```yml
+# Define the output
+job1:
+  runs-on: ubuntu-latest
+
+  # Map a step output to a job output
+  outputs:
+    output1: ${{ steps.step1.outputs.result1 }}
+    output2: ${{ steps.step2.outputs.result2 }}
+
+  steps:
+    - id: step1
+      run: echo "result1=hello" >> "$GITHUB_OUTPUT"
+
+    - id: step2
+      run: echo "result2=world" >> "$GITHUB_OUTPUT"
+```
 
 - **Accessing Job Outputs:**
   - In subsequent jobs that depend on the output-producing job, use the `needs` context to access its outputs.
   - The `needs.<job_id>.outputs.<output_key>` syntax retrieves the corresponding value defined in the previous job.
   - Use this retrieved value within your subsequent job's steps for tasks like logging, decision-making, or further processing.
+
+```yml
+# Access the output
+job2:
+  runs-on: ubuntu-latest
+  needs: job1
+  steps:
+    - env:
+        OUTPUT1: ${{ needs.job1.outputs.output1 }}
+        OUTPUT2: ${{ needs.job1.outputs.output2 }}
+      run: echo "$OUTPUT1 $OUTPUT2"
+```
+
+#### Putting It Together (Job Output)
 
 ```yml
 jobs:
@@ -458,4 +495,73 @@ steps:
     with:
       path: ~/.cache/pypoetry/virtualenvs
       key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+```
+
+### Environment Variables
+
+#### Workflow Level
+
+```yml
+name: Workflow 1  # name of the workflow
+
+on:  # trigger(s)
+  push:
+    branches: [ dev ]
+
+env: # Workflow env var
+  HOST_NAME: localhost
+
+jobs:
+  build: # Job 1
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo Content
+        uses: actions/checkout@v4
+      ...
+```
+
+#### Job Level
+
+```yml
+name: Workflow 1  # name of the workflow
+
+on:  # trigger(s)
+  push:
+    branches: [ dev ]
+
+jobs:
+  build: # Job 1
+
+    env: # Job level env var
+      HOST_NAME: localhost
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo Content
+        uses: actions/checkout@v4
+      ...
+```
+
+#### Steps Level
+
+```yml
+name: Workflow 1  # name of the workflow
+
+on:  # trigger(s)
+  push:
+    branches: [ dev ]
+
+jobs:
+  build: # Job 1
+    runs-on: ubuntu-latest
+
+    steps:
+      env: # Steps Level env var
+        HOST_NAME: localhost
+
+      - name: Checkout Repo Content
+        uses: actions/checkout@v4
+      ...
 ```

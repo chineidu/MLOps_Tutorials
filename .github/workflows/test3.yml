@@ -2,13 +2,20 @@ name: Setup Poetry
 
 on:  # trigger(s)
   push:
-    branches: [ dev ]
+    branches: [ main ]
 
   pull_request:
-    branches: [ dev ]
+    branches: [ main ]
+
+env: # Workflow level
+  DB_PATH: test.db
 
 jobs:
   build:  # Job 1
+
+    env:
+      MY_NAME: Neidu
+
     runs-on: ubuntu-latest
 
     outputs:
@@ -35,6 +42,7 @@ jobs:
         run: |
           cd my-app && poetry install
           pip list
+          echo "dependencies installed by ${MY_NAME}"
 
       - name: Run Code
         run: |

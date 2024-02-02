@@ -1,4 +1,5 @@
 import contextlib
+import os
 import sqlite3
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -9,9 +10,9 @@ from rich.console import Console
 from typeguard import typechecked
 
 console = Console()
-
-
 T = TypeVar("T")
+
+DB_PATH: Path = Path(os.getenv("DB_PATH", "story.db"))
 
 
 @dataclass
@@ -202,7 +203,7 @@ class StoryRepository(Repository[StorySchema]):
 
 
 if __name__ == "__main__":
-    story = StoryRepository()
+    story = StoryRepository(db_path=DB_PATH)
     # story.add(
     #     title="AI Dominance",
     #     content="The battle to become the dominant force in AI is on.",
