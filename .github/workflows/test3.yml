@@ -54,10 +54,10 @@ jobs:
         with:
           python-version: "3.11"
       - name: Access Previous Job Output
-        env:  # Step level
-          TEXT: Done
         run:
           echo "${{ needs.build.outputs.result1 }}"
       - name: Deploy Code
+        env:  # Step level
+          TEXT: Done
         run: |
           echo "Deploying ${TEXT} ... "
