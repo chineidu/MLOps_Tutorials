@@ -30,7 +30,7 @@ jobs:
       - name: Install Dependencies
         run: |
           cd my-app && poetry install
-          pip list
+          pip list | grep rich
 
       - name: Run Code
         run: |
