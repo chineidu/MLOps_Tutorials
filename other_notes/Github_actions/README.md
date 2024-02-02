@@ -30,9 +30,11 @@
       - [Dependency Caching](#dependency-caching)
         - [Poetry Caching](#poetry-caching)
     - [Environment Variables](#environment-variables)
+      - [Access The Environment Variable(s)](#access-the-environment-variables)
       - [Workflow Level](#workflow-level)
       - [Job Level](#job-level)
       - [Steps Level](#steps-level)
+    - [Repository Secrets](#repository-secrets)
 
 ### Key Components
 
@@ -499,6 +501,11 @@ steps:
 
 ### Environment Variables
 
+#### Access The Environment Variable(s)
+
+- Linux syntax: `${MY_ENV}`
+- GitHub Actions: `${{ env.MY_ENV }}`
+
 #### Workflow Level
 
 ```yml
@@ -541,6 +548,9 @@ jobs:
     steps:
       - name: Checkout Repo Content
         uses: actions/checkout@v4
+      - name: Access Env Var
+        run:
+          echo ${HOST_NAME}
       ...
 ```
 
@@ -558,10 +568,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      env: # Steps Level env var
-        HOST_NAME: localhost
+      - name: Use Env Var
+        env: # Steps Level env var
+          HOST_NAME: localhost
+        run:
+          echo ${HOST_NAME}
 
       - name: Checkout Repo Content
         uses: actions/checkout@v4
       ...
 ```
+
+### Repository Secrets
