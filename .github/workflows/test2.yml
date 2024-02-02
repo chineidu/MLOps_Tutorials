@@ -10,6 +10,10 @@ on:  # trigger(s)
 jobs:
   build:  # Job 1
     runs-on: ubuntu-latest
+
+    outputs:
+      result1: ${{ steps.step1.outputs.result1 }}
+
     steps:
       - name: Repo Checkout
         uses: actions/checkout@v4
@@ -37,6 +41,11 @@ jobs:
           cd my-app
           poetry run python main.py
 
+      - name: Output A Filename
+        id: step1
+        run: |
+          find *.py -type f -execdir echo 'result1={}' ';' >> "$GITHUB_OUTPUT"
+
 
   deploy: # Job 2
     runs-on: ubuntu-latest
@@ -49,6 +58,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Access Previous Job Output
+        run:
+          echo "${{ needs.build.outputs.result1 }}""
+
 
       - name: Deploy Code
         run: |
