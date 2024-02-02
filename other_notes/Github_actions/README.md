@@ -35,8 +35,11 @@
       - [Job Level](#job-level)
       - [Steps Level](#steps-level)
     - [Repository Secrets](#repository-secrets)
-      - [Create Repo Secrets](#create-repo-secrets)
-      - [Access Repo Secrets](#access-repo-secrets)
+      - [Create Repository Secrets](#create-repository-secrets)
+      - [Access Repository Secrets](#access-repository-secrets)
+    - [Repository Environments](#repository-environments)
+      - [Create Repository Environments](#create-repository-environments)
+      - [Access Repository Environments](#access-repository-environments)
 
 ### Key Components
 
@@ -585,17 +588,17 @@ jobs:
 
 - [Docs](https://docs.github.com/en/codespaces/managing-codespaces-for-your-organization/managing-development-environment-secrets-for-your-repository-or-organization)
 
-#### Create Repo Secrets
+#### Create Repository Secrets
 
 - Follow the instructions shown below:
 
 [![image.png](https://i.postimg.cc/8CZFwDYG/image.png)](https://postimg.cc/gw6k29dt)
 
-- I created a secret with:
+- I created a `secret` with:
   - `key`: **DB_PATH**
   - `value`: **test.db**
 
-#### Access Repo Secrets
+#### Access Repository Secrets
 
 ```yml
 name: Setup Poetry
@@ -607,4 +610,32 @@ on:  # trigger(s)
     branches: [ main ]
 env: # Access the secret
   DB_PATH: ${{ secrets.DB_PATH }}
+```
+
+### Repository Environments
+
+- [Docs](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment)
+
+- Environments are used to **`describe a general deployment target`** like `production`, `staging`, or `development`.
+- These environments can include `settings`, `secrets`, and `variables` specific to each environment, enabling you to tailor your deployment process to different stages such as `development`, `staging`, and `production`.
+- I can `only` be set within a `job`.
+
+#### Create Repository Environments
+
+[![image.png](https://i.postimg.cc/t47147Cx/image.png)](https://postimg.cc/5Xd9P4z4)
+
+- I created an environment named: `testing` wtih a `secret` variable shown below:
+  - `key`: **DB_PATH**
+  - `value`: **test.db**
+
+#### Access Repository Environments
+
+```yml
+jobs:
+  build:  # Job 1
+    # Set the environment
+    environment: testing
+    env:  # Job level
+      MY_NAME: ${{ secrets.MY_NAME}}
+    runs-on: ubuntu-latest
 ```

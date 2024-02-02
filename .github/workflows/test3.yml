@@ -10,6 +10,8 @@ env: # Workflow level
 
 jobs:
   build:  # Job 1
+    # Set the environment
+    environment: testing
     env:  # Job level
       MY_NAME: Neidu
     runs-on: ubuntu-latest
