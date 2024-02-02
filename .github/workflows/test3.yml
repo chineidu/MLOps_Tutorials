@@ -25,11 +25,15 @@ jobs:
           python-version: "3.11"
       - uses: Gr1N/setup-poetry@v8
       - name: Poetry Cache Setup
+        id: cache-id
         uses: actions/cache@v4
         with:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
       - name: Install Dependencies
+        # If the cache was not used. The output of this action is a bool.
+        # It ONLY runs this step if the cached file has changed.
+        if: steps.cache-id.outputs.cache-hit != true
         run: |
           cd my-app && poetry install
           pip list

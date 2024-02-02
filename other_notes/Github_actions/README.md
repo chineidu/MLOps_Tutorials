@@ -47,6 +47,7 @@
     - [Controlling Workflow And Job Execution](#controlling-workflow-and-job-execution)
       - [If \[Steps Level\]](#if-steps-level)
       - [Conditional Jobs](#conditional-jobs)
+      - [More If Examples](#more-if-examples)
 
 ### Expressions
 
@@ -744,4 +745,56 @@ jobs:
           TEXT: Done
         run: |
           echo "Deploying ${TEXT} ... "
+```
+
+#### More If Examples
+
+- `actions/cache/vx` docs is shown below:
+
+[![image.png](https://i.postimg.cc/tJpJHBJY/image.png)](https://postimg.cc/sQHsY9pr)
+
+- Configure a step to run if cache was found/used. This is shown below:
+
+```yml
+jobs:
+  build:  # Job 1
+    # Set the environment
+    environment: testing
+    env: # Workflow level
+      DB_PATH: ${{ secrets.DB_PATH }}
+    runs-on: ubuntu-latest
+    outputs:
+      result1: ${{ steps.step1.outputs.result1 }}
+
+    steps:
+      - name: Repo Checkout
+        uses: actions/checkout@v4
+      - name: Python Setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: Gr1N/setup-poetry@v8
+      - name: Poetry Cache Setup
+        id: cache-id
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install Dependencies
+        # If the cache was not used. The output of this action is a bool.
+        # It ONLY runs this step if the cached file has changed.
+        if: steps.cache-id.outputs.cache-hit != "true"
+        run: |
+          cd my-app && poetry install
+          pip list
+          echo "dependencies installed by ${MY_NAME}"
+      - name: Lint Code
+        run: |
+          cd my-app
+          poetry run mypy . && poetry run ruff . --fix
+      - name: Run Code
+        run: |
+          cd my-app && ls
+          poetry run python main.py
+          echo DB_PATH: ${{ env.DB_PATH }}
 ```
