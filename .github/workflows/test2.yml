@@ -26,7 +26,10 @@ jobs:
         with:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-      - run: poetry --version
+
+      - name: Verify Poetry Setup
+        run: pip list
+
       - name: Run Code
         run: |
           cd my-app
