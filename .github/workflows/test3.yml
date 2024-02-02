@@ -34,9 +34,13 @@ jobs:
           cd my-app && poetry install
           pip list
           echo "dependencies installed by ${MY_NAME}"
-      - name: Run Code
+      - name: Lint Code
         run: |
           cd my-app
+          poetry run mypy main.py && poetry run ruff main.py --fix
+      - name: Run Code
+        run: |
+          cd my-app && ls
           poetry run python main.py
           echo DB_PATH: ${{ env.DB_PATH }}
 

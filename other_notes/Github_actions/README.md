@@ -1,5 +1,7 @@
 # GitHub Actions
 
+- The course can be found on [Udemy](https://www.udemy.com/course/github-actions-the-complete-guide).
+
 ## Table of Content
 
 - [GitHub Actions](#github-actions)
@@ -40,6 +42,7 @@
     - [Repository Environments](#repository-environments)
       - [Create Repository Environments](#create-repository-environments)
       - [Access Repository Environments](#access-repository-environments)
+    - [Controlling Workflow And Job Execution](#controlling-workflow-and-job-execution)
 
 ### Key Components
 
@@ -639,3 +642,8 @@ jobs:
       MY_NAME: ${{ secrets.MY_NAME}}
     runs-on: ubuntu-latest
 ```
+
+### Controlling Workflow And Job Execution
+
+- For `jobs`, the execution can be controlled using an `if` statement.
+- For `steps`, the execution can be controlled using an `if`  or `continue-on-error` statement.
