@@ -5,18 +5,17 @@ on:  # trigger(s)
     branches: [ main ]
   pull_request:
     branches: [ main ]
-env: # Workflow level
-  DB_PATH: ${{ secrets.DB_PATH }}
 
 jobs:
   build:  # Job 1
     # Set the environment
     environment: testing
-    env:  # Job level
-      MY_NAME: Neidu
+    env: # Workflow level
+      DB_PATH: ${{ secrets.DB_PATH }}
     runs-on: ubuntu-latest
     outputs:
       result1: ${{ steps.step1.outputs.result1 }}
+
     steps:
       - name: Repo Checkout
         uses: actions/checkout@v4
