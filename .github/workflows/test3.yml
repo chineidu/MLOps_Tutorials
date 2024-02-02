@@ -35,6 +35,8 @@ jobs:
           pip list
           echo "dependencies installed by ${MY_NAME}"
       - name: Lint Code
+        # Run the step if the prev. step fails.
+        if: ${{ failure() }} && steps.install-dependencies.outcome == "failure"
         run: |
           cd my-app
           poetry run mypy . && poetry run ruff . --fix

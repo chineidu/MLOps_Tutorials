@@ -46,6 +46,7 @@
       - [Access Repository Environments](#access-repository-environments)
     - [Controlling Workflow And Job Execution](#controlling-workflow-and-job-execution)
       - [If \[Steps Level\]](#if-steps-level)
+      - [Conditional Jobs](#conditional-jobs)
 
 ### Expressions
 
@@ -693,7 +694,7 @@ jobs:
           lss # (intentional typo to cause an error!)
       - name: Lint Code
       # Run the step if the prev. step fails.
-        if: failure() && steps.install-dependencies.outcome == "failure"
+        if: ${{ failure() }} && steps.install-dependencies.outcome == "failure"
         run: |
           cd my-app
           poetry run mypy . && poetry run ruff . --fix
@@ -726,5 +727,10 @@ jobs:
           TEXT: Done
         run: |
           echo "Deploying ${TEXT} ... "
+```
+
+#### Conditional Jobs
+
+```yml
 
 ```
