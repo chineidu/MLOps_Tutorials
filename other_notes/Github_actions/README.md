@@ -691,7 +691,8 @@ jobs:
         id: install-dependencies
         run: |
           cd my-app && poetry install
-          lss # (intentional typo to cause an error!)
+          # intentional typo to cause an error!
+          lss
       - name: Lint Code
       # Run the step if the prev. step fails.
         if: ${{ failure() }} && steps.install-dependencies.outcome == "failure"
