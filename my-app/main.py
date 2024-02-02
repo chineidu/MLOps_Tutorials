@@ -203,17 +203,17 @@ class StoryRepository(Repository[StorySchema]):
 
 if __name__ == "__main__":
     story = StoryRepository()
-    story.add(
-        title="AI Dominance",
-        content="The battle to become the dominant force in AI is on.",
-        tags="#AI, #GenAI, #DeepLearning",
-    )
+    # story.add(
+    #     title="AI Dominance",
+    #     content="The battle to become the dominant force in AI is on.",
+    #     tags="#AI, #GenAI, #DeepLearning",
+    # )
 
-    story.add(
-        title="Virgin Mary",
-        content="Virgin Mary is the mother of our Lord Jesus Christ.",
-        tags="#Catholic, #Christian, #Jesus",
-    )
+    # story.add(
+    #     title="Virgin Mary",
+    #     content="Virgin Mary is the mother of our Lord Jesus Christ.",
+    #     tags="#Catholic, #Christian, #Jesus",
+    # )
 
     # story.add(
     #     title="Barlays Premier League",
