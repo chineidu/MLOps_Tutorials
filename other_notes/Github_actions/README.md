@@ -35,6 +35,8 @@
       - [Job Level](#job-level)
       - [Steps Level](#steps-level)
     - [Repository Secrets](#repository-secrets)
+      - [Create Repo Secrets](#create-repo-secrets)
+      - [Access Repo Secrets](#access-repo-secrets)
 
 ### Key Components
 
@@ -580,3 +582,29 @@ jobs:
 ```
 
 ### Repository Secrets
+
+- [Docs](https://docs.github.com/en/codespaces/managing-codespaces-for-your-organization/managing-development-environment-secrets-for-your-repository-or-organization)
+
+#### Create Repo Secrets
+
+- Follow the instructions shown below:
+
+[![image.png](https://i.postimg.cc/8CZFwDYG/image.png)](https://postimg.cc/gw6k29dt)
+
+- I created a secret with:
+  - `key`: **DB_PATH**
+  - `value`: **test.db**
+
+#### Access Repo Secrets
+
+```yml
+name: Setup Poetry
+
+on:  # trigger(s)
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+env: # Access the secret
+  DB_PATH: ${{ secrets.DB_PATH }}
+```

@@ -1,4 +1,4 @@
-name: Setup Poetry
+name: Workflow 2
 
 on:  # trigger(s)
   push:
@@ -6,7 +6,7 @@ on:  # trigger(s)
   pull_request:
     branches: [ main ]
 env: # Workflow level
-  DB_PATH: test.db
+  DB_PATH: ${{ secrets.DB_PATH }}
 
 jobs:
   build:  # Job 1
@@ -37,6 +37,7 @@ jobs:
         run: |
           cd my-app
           poetry run python main.py
+          echo DB_PATH: ${{ env.DB_PATH }}
 
       - name: Output A Filename
         id: step1
