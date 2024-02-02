@@ -44,6 +44,7 @@ jobs:
       - name: Output A Filename
         id: step1
         run: |
+          cd my-app
           find *.py -type f -execdir echo 'result1={}' ';' >> "$GITHUB_OUTPUT"
 
 
@@ -61,7 +62,7 @@ jobs:
 
       - name: Access Previous Job Output
         run:
-          echo "${{ needs.build.outputs.result1 }}""
+          echo "${{ needs.build.outputs.result1 }}"
 
 
       - name: Deploy Code
