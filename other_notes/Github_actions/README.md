@@ -6,6 +6,8 @@
 
 - [GitHub Actions](#github-actions)
   - [Table of Content](#table-of-content)
+    - [Expressions](#expressions)
+      - [Operators](#operators)
     - [Key Components](#key-components)
       - [Workflow](#workflow)
       - [Job](#job)
@@ -43,6 +45,17 @@
       - [Create Repository Environments](#create-repository-environments)
       - [Access Repository Environments](#access-repository-environments)
     - [Controlling Workflow And Job Execution](#controlling-workflow-and-job-execution)
+      - [If \[Steps Level\]](#if-steps-level)
+
+### Expressions
+
+- [Docs](https://docs.github.com/en/actions/learn-github-actions/expressions)
+
+#### Operators
+
+- [Docs](https://docs.github.com/en/actions/learn-github-actions/expressions#operators)
+
+[![image.png](https://i.postimg.cc/597FzDKv/image.png)](https://postimg.cc/4ncdk2gN)
 
 ### Key Components
 
@@ -647,3 +660,71 @@ jobs:
 
 - For `jobs`, the execution can be controlled using an `if` statement.
 - For `steps`, the execution can be controlled using an `if`  or `continue-on-error` statement.
+
+#### If [Steps Level]
+
+- [Steps context docs](https://docs.github.com/en/actions/learn-github-actions/contexts#steps-context)
+
+[![Screenshot-2024-02-02-at-5-50-04-PM.png](https://i.postimg.cc/3NyVnPXN/Screenshot-2024-02-02-at-5-50-04-PM.png)](https://postimg.cc/9whLfgNH)
+
+- Check if the previous step(s) failed:
+  - `if: failure() && steps.step_id.outcome == "failure"`
+
+```yml
+jobs:
+  build:
+    steps:
+      - name: Repo Checkout
+        uses: actions/checkout@v4
+      - name: Python Setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: Gr1N/setup-poetry@v8
+      - name: Poetry Cache Setup
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install Dependencies
+        id: install-dependencies
+        run: |
+          cd my-app && poetry install
+          lss # (intentional typo to cause an error!)
+      - name: Lint Code
+      # Run the step if the prev. step fails.
+        if: failure() && steps.install-dependencies.outcome == "failure"
+        run: |
+          cd my-app
+          poetry run mypy . && poetry run ruff . --fix
+      - name: Run Code
+        run: |
+          cd my-app && ls
+          poetry run python main.py
+          echo DB_PATH: ${{ env.DB_PATH }}
+
+      - name: Output A Filename
+        id: step1
+        run: |
+          cd my-app
+          find *.py -type f -execdir echo 'result1={}' ';' >> "$GITHUB_OUTPUT"
+
+  deploy: # Job 2
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pytbon Setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Access Previous Job Output
+        run:
+          echo "${{ needs.build.outputs.result1 }}"
+      - name: Deploy Code
+        env:  # Step level
+          TEXT: Done
+        run: |
+          echo "Deploying ${TEXT} ... "
+
+```
