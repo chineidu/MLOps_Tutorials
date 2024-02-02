@@ -14,17 +14,6 @@ jobs:
       - name: Repo Checkout
         uses: actions/checkout@v4
 
-      - name: Build Code
-        run: |
-          echo "Building Code"
-          echo "Building done ..."
-
-  deploy: # Job 2
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
       - name: Pytbon Setup
         uses: actions/setup-python@v5
         with:
@@ -38,3 +27,22 @@ jobs:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
       - run: poetry --version
+      - name: Run Code
+        run: |
+          poetry run python other_notes/Python_classes_notes/src/main.py
+
+
+  deploy: # Job 2
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pytbon Setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Deploy Code
+        run: |
+          echo "Deploying ... "
