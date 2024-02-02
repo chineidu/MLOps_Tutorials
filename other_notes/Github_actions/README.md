@@ -27,6 +27,7 @@
       - [Download Artiifacts](#download-artiifacts)
       - [Job Outputs](#job-outputs)
       - [Dependency Caching](#dependency-caching)
+        - [Poetry Caching](#poetry-caching)
 
 ### Key Components
 
@@ -433,4 +434,28 @@ steps:
     python-version: '3.9'
     cache: 'poetry' # caching poetry dependencies
 - run: poetry install
+```
+
+##### Poetry Caching
+
+- [Poetry caching](https://github.com/Gr1N/setup-poetry)
+
+```yml
+steps:
+  - name: Repo Checkout
+    uses: actions/checkout@v4
+
+  - name: Python Setup
+    uses: actions/setup-python@v5
+    with:
+      python-version: "3.11"
+
+  - name: Poetry Setup
+    uses: Gr1N/setup-poetry@v8
+
+  - name: Poetry Cache Setup
+    uses: actions/cache@v4
+    with:
+      path: ~/.cache/pypoetry/virtualenvs
+      key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
 ```
