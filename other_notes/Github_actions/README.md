@@ -694,7 +694,7 @@ jobs:
           # intentional typo to cause an error!
           lss
       - name: Lint Code
-      # Run the step if the prev. step fails.
+        # Run the step if the prev. step fails.
         if: ${{ failure() }} && steps.install-dependencies.outcome == "failure"
         run: |
           cd my-app
@@ -704,34 +704,44 @@ jobs:
           cd my-app && ls
           poetry run python main.py
           echo DB_PATH: ${{ env.DB_PATH }}
+```
 
-      - name: Output A Filename
-        id: step1
-        run: |
-          cd my-app
-          find *.py -type f -execdir echo 'result1={}' ';' >> "$GITHUB_OUTPUT"
+#### Conditional Jobs
+
+- For `job2` to run if `job1` failed, `job2` MUST **`depend`** on `job1`.
+- It also requires the special `failure()` function.
+- i.e. use:
+  - `needs`
+  - `${{ failure() }}`
+
+```yml
+jobs:
+  build: # Job 1
+    steps:
+      - name: Repo Checkout
+        uses: actions/checkout@v4
+      - name: Python Setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
   deploy: # Job 2
     runs-on: ubuntu-latest
+
     needs: build
+
+    # Run the `deploy` job if the `build` job fails.
+    if: ${{ failure() }}
+
     steps:
       - uses: actions/checkout@v4
       - name: Pytbon Setup
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Access Previous Job Output
-        run:
-          echo "${{ needs.build.outputs.result1 }}"
       - name: Deploy Code
         env:  # Step level
           TEXT: Done
         run: |
           echo "Deploying ${TEXT} ... "
-```
-
-#### Conditional Jobs
-
-```yml
-
 ```
