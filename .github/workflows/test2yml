@@ -1,40 +1,33 @@
 name: Setup Poetry
-
-on:  # trigger(s)
+on:
   push:
-    branches: [ main ]
-
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
-
+    branches:
+      - main
 jobs:
-  build:  # Job 1
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Repo Checkout
         uses: actions/checkout@v4
-
       - name: Build Code
         run: |
           echo "Building Code"
           echo "Building done ..."
-
-  deploy: # Job 2
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Pytbon Setup
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-
+          python-version: '3.11'
       - uses: Gr1N/setup-poetry@v8
-
       - name: Poetry Setup
         uses: actions/cache@v2
         with:
           path: ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+          key: '${{ runner.os }}-poetry-${{ hashFiles(''poetry.lock'') }}'
       - run: poetry --version
