@@ -33,7 +33,7 @@ jobs:
       - name: Install Dependencies
         # If the cache was not used. The output of this action is a bool.
         # It ONLY runs this step if the cached file has changed.
-        if: steps.cache-id.outputs.cache-hit != true
+        if: steps.cache-id.outputs.cache-hit != 'true'
         run: |
           cd my-app && poetry install
           pip list
