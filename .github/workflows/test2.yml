@@ -29,7 +29,8 @@ jobs:
       - run: poetry --version
       - name: Run Code
         run: |
-          poetry run python other_notes/Python_classes_notes/src/main.py
+          cd my-app
+          poetry run python main.py
 
 
   deploy: # Job 2
