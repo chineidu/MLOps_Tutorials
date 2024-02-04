@@ -52,6 +52,9 @@
       - [Matrix Strategies](#matrix-strategies)
         - [Include](#include)
         - [Exclude](#exclude)
+      - [Reusable Workflow](#reusable-workflow)
+        - [Create Reusable Workflow](#create-reusable-workflow)
+      - [Call The Resuable Workflow](#call-the-resuable-workflow)
 
 ### Expressions
 
@@ -902,4 +905,61 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.version }}
+```
+
+#### Reusable Workflow
+
+- Instead of copying and pasting from one workflow to another, you can make workflows reusable. You and anyone with access to the reusable workflow can then call the reusable workflow from another workflow.
+- Reusing workflows avoids duplication.
+- Workflow reuse also promotes best practice by helping you to use workflows that are well designed, have already been tested, and have been proven to be effective.
+
+##### Create Reusable Workflow
+
+- [Docs](https://docs.github.com/en/actions/using-workflows/reusing-workflows#creating-a-reusable-workflow).
+- For a workflow to be reusable, the values for on `must` include **`workflow_call`**.
+
+```yml
+name: Reusable Workflow
+on:
+  workflow_call:
+
+jobs:
+  deploy:
+      runs-on: ubuntu-latest
+      steps:
+          - name: Output Information
+            run: |
+              echo "Deploying to prod ..."
+```
+
+#### Call The Resuable Workflow
+
+```yml
+name: Workflow 2
+
+on:  # trigger(s)
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:  # Job 1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repo Checkout
+        uses: actions/checkout@v4
+      - name: Python Setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Dependencies
+        run: |
+          cd my-app && poetry install
+          pip list
+          echo "dependencies installed by ${MY_NAME}"
+
+  deploy: # Reusable workflow!
+    needs: build
+    uses: ./.github/workflows/deploy.yml
 ```

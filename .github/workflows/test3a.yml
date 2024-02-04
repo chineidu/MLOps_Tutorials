@@ -2,9 +2,9 @@ name: Workflow 2
 
 on:  # trigger(s)
   push:
-    branches: [ prod ]
+    branches: [ main ]
   pull_request:
-    branches: [ prod ]
+    branches: [ main ]
 
 jobs:
   build:  # Job 1
@@ -42,7 +42,7 @@ jobs:
       - name: Run Code
         run: |
           cd my-app && ls
-          poetry run python prod.py
+          poetry run python main.py
           echo DB_PATH: ${{ env.DB_PATH }}
 
       - name: Output A Filename
@@ -51,20 +51,6 @@ jobs:
           cd my-app
           find *.py -type f -execdir echo 'result1={}' ';' >> "$GITHUB_OUTPUT"
 
-  deploy: # Job 2
-    runs-on: ubuntu-latest
+  deploy: # Reusable workflow!
     needs: build
-    steps:
-      - uses: actions/checkout@v4
-      - name: Python Setup
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Access Previous Job Output
-        run:
-          echo "${{ needs.build.outputs.result1 }}"
-      - name: Deploy Code
-        env:  # Step level
-          TEXT: Done
-        run: |
-          echo "Deploying ${TEXT} ... "
+    uses: ./.github/workflows/deploy.yml
