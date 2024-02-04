@@ -48,6 +48,7 @@
       - [If \[Steps Level\]](#if-steps-level)
       - [Conditional Jobs](#conditional-jobs)
       - [More If Examples](#more-if-examples)
+      - [Ignore Errors (Continue-on-error)](#ignore-errors-continue-on-error)
 
 ### Expressions
 
@@ -797,4 +798,35 @@ jobs:
           cd my-app && ls
           poetry run python main.py
           echo DB_PATH: ${{ env.DB_PATH }}
+```
+
+#### Ignore Errors (Continue-on-error)
+
+- `continue-on-error` is a property that controls a job's behavior in the face of errors within its steps.
+- By default, a job stops execution as soon as any step fails. This is aimed at preventing further errors or unexpected outcomes.
+- With `continue-on-error: true`, a job will continue running even if a step fails, allowing subsequent steps to execute.
+
+```yml
+jobs:
+  build:  # Job 1
+    # Set the environment
+    environment: testing
+    env: # Workflow level
+      DB_PATH: ${{ secrets.DB_PATH }}
+    runs-on: ubuntu-latest
+    outputs:
+      result1: ${{ steps.step1.outputs.result1 }}
+
+    steps:
+      # A step that might fail!
+      - name: Step 1
+        runs: |
+          echo "Do something interesting"
+
+      - name: Step 2
+        # This step runs and the entire workflow does NOT fail!
+        continue-on-error: true
+        runs: |
+          echo "Do something cool"
+          echo "Do something super cool"
 ```
