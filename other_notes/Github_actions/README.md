@@ -49,6 +49,9 @@
       - [Conditional Jobs](#conditional-jobs)
       - [More If Examples](#more-if-examples)
       - [Ignore Errors (Continue-on-error)](#ignore-errors-continue-on-error)
+      - [Matrix Strategies](#matrix-strategies)
+        - [Include](#include)
+        - [Exclude](#exclude)
 
 ### Expressions
 
@@ -829,4 +832,74 @@ jobs:
         runs: |
           echo "Do something cool"
           echo "Do something super cool"
+```
+
+#### Matrix Strategies
+
+- [Docs](https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#specifying-a-python-version).
+- The `matrix strategy` in GitHub Actions allows you to use variables in a single job definition to automatically create multiple job runs based on the combinations of the variables.
+- This is particularly useful when you want to run the `same job` with `different configurations`, such as different versions of software, different operating systems, or other parameters.
+
+```yml
+jobs:
+  example_matrix:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-20.04]
+        python-version: ['3.9', '3.10', '3.11']
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.version }}
+```
+
+##### Include
+
+- [Docs](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs#expanding-or-adding-matrix-configurations).
+- The `include` key is used to expand existing matrix configurations or to add new ones.
+- It allows you to dynamically adjust the matrix based on the workflow context.
+- The `value` of include is a `list of objects`, and for each object in the include list, a new job run is created with the specified matrix configuration.
+
+```yml
+jobs:
+  example_matrix:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-20.04]
+        python-version: ['3.9', '3.10', '3.11']
+        include:
+          - python-version: '3.12'
+            os: 'windows-latest'
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.version }}
+```
+
+##### Exclude
+
+- The `exclude` key is used to exclude specific matrix configurations from the job runs.
+- It allows you to specify which matrix configurations should `not` be included in the job runs.
+- The exclude key is particularly useful when you want to `exclude certain combinations of matrix variables` from being executed as part of the workflow.
+
+```yml
+jobs:
+  example_matrix:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-20.04]
+        python-version: ['3.9', '3.10', '3.11']
+        exclude:
+          - python-version: '3.9'
+            os: 'ubuntu-22.04'
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.version }}
 ```
