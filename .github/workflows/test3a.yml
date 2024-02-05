@@ -57,3 +57,5 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with: # Add additional params!
       username: Neidu
+    secrets:
+      DB_NAME: ${{ secrets.DB_NAME }}

@@ -53,11 +53,13 @@
         - [Include](#include)
         - [Exclude](#exclude)
       - [Reusable Workflow](#reusable-workflow)
-        - [Linitations](#linitations)
+        - [Limitations](#limitations)
         - [Create Reusable Workflow](#create-reusable-workflow)
         - [Call The Resuable Workflow](#call-the-resuable-workflow)
         - [Add Inputs To Resusable Workflow](#add-inputs-to-resusable-workflow)
         - [Add Inputs To Workflow Calling The Resusable Workflow](#add-inputs-to-workflow-calling-the-resusable-workflow)
+        - [Add Secrets To Resusable Workflow](#add-secrets-to-resusable-workflow)
+        - [Add Secrets To Workflow Calling The Resusable Workflow](#add-secrets-to-workflow-calling-the-resusable-workflow)
 
 ### Expressions
 
@@ -916,7 +918,7 @@ jobs:
 - Reusing workflows avoids duplication.
 - Workflow reuse also promotes best practice by helping you to use workflows that are well designed, have already been tested, and have been proven to be effective.
 
-##### Linitations
+##### Limitations
 
 - [Docs](https://docs.github.com/en/actions/using-workflows/reusing-workflows#limitations)
 
@@ -999,6 +1001,8 @@ jobs:
 
 ##### Add Inputs To Workflow Calling The Resusable Workflow
 
+- Using `with` context.
+
 ```yml
 deploy: # Reusable workflow!
   needs: build
@@ -1006,4 +1010,36 @@ deploy: # Reusable workflow!
   uses: ./.github/workflows/deploy.yml
   with: # Add additional params!
     username: Neidu
+```
+
+##### Add Secrets To Resusable Workflow
+
+```yml
+on:
+  workflow_call:
+    secrets:
+      some-secret:
+        required: false
+
+jobs:
+  print-username:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print the input name to STDOUT
+        # Print the username passed from the caller workflow
+        run: echo The username is ${{ inputs.username }}
+```
+
+##### Add Secrets To Workflow Calling The Resusable Workflow
+
+- Using `secrets` keyword.
+
+```yml
+deploy: # Reusable workflow!
+  needs: build
+
+  uses: ./.github/workflows/deploy.yml
+  secrets: # Add secrets!
+    some-secret: ${{ secrets.SOME_SECRETS}}
 ```
