@@ -60,6 +60,9 @@
         - [Add Inputs To Workflow Calling The Resusable Workflow](#add-inputs-to-workflow-calling-the-resusable-workflow)
         - [Add Secrets To Resusable Workflow](#add-secrets-to-resusable-workflow)
         - [Add Secrets To Workflow Calling The Resusable Workflow](#add-secrets-to-workflow-calling-the-resusable-workflow)
+        - [Add Outputs To Resusable Workflow](#add-outputs-to-resusable-workflow)
+        - [Use The Outputs In The Workflow Calling The Resusable Workflow](#use-the-outputs-in-the-workflow-calling-the-resusable-workflow)
+        - [Using A Matrix Strategy With A Reusable Workflow](#using-a-matrix-strategy-with-a-reusable-workflow)
 
 ### Expressions
 
@@ -1033,6 +1036,8 @@ jobs:
 
 ##### Add Secrets To Workflow Calling The Resusable Workflow
 
+- [Docs](https://docs.github.com/en/actions/using-workflows/reusing-workflows#using-inputs-and-secrets-in-a-reusable-workflow)
+
 - Using `secrets` keyword.
 
 ```yml
@@ -1042,4 +1047,68 @@ deploy: # Reusable workflow!
   uses: ./.github/workflows/deploy.yml
   secrets: # Add secrets!
     some-secret: ${{ secrets.SOME_SECRETS}}
+```
+
+##### Add Outputs To Resusable Workflow
+
+- [Docs](https://docs.github.com/en/actions/using-workflows/reusing-workflows#using-outputs-from-a-reusable-workflow)
+
+```yml
+name: Reusable workflow
+
+on:
+  workflow_call:
+    # Map the workflow outputs to job outputs
+    outputs:
+      result1:
+        description: "The first output string"
+        value: ${{ jobs.deploy.outputs.output1 }}
+      result2:
+        description: "The second output string"
+        value: ${{ jobs.deploy.outputs.output2 }}
+
+jobs:
+  deploy:
+    name: Generate output
+    runs-on: ubuntu-latest
+    # Map the job outputs to step outputs
+    outputs:
+      output1: ${{ steps.step1.outputs.result1 }}
+      output2: ${{ steps.step2.outputs.result2 }}
+    steps:
+      - id: step1
+        run: echo "result1=hello" >> $GITHUB_OUTPUT
+      - id: step2
+        run: echo "result2=world" >> $GITHUB_OUTPUT
+
+```
+
+##### Use The Outputs In The Workflow Calling The Resusable Workflow
+
+- Using `needs` keyword.
+
+```yml
+print-result: # Reusable workflow!
+  needs: deploy
+
+  uses: ./.github/workflows/deploy.yml
+  steps:
+    - name: Print Deploy output
+      run: echo "${{ needs.deploy.outputs.result1 }}"
+```
+
+##### Using A Matrix Strategy With A Reusable Workflow
+
+- [Docs](https://docs.github.com/en/actions/using-workflows/reusing-workflows#using-a-matrix-strategy-with-a-reusable-workflow)
+
+```yml
+jobs:
+  ReuseableMatrixJobForDeployment:
+    strategy:
+      matrix:
+        target: [dev, stage, prod]
+    uses: octocat/octo-repo/.github/workflows/deployment.yml@main
+    with:
+      target: ${{ matrix.target }}
+
 ```

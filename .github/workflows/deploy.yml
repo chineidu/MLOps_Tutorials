@@ -20,5 +20,5 @@ jobs:
           - name: Output Information
             run: |
               echo "developer: ${{ inputs.username}}"
-              echo "developer: ${{ secrets.DB_NAME}}"
+              echo "db_name: ${{ secrets.DB_NAME}}"
               echo "Deploying to prod ..."
