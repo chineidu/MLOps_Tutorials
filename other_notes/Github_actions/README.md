@@ -53,8 +53,11 @@
         - [Include](#include)
         - [Exclude](#exclude)
       - [Reusable Workflow](#reusable-workflow)
+        - [Linitations](#linitations)
         - [Create Reusable Workflow](#create-reusable-workflow)
-      - [Call The Resuable Workflow](#call-the-resuable-workflow)
+        - [Call The Resuable Workflow](#call-the-resuable-workflow)
+        - [Add Inputs To Resusable Workflow](#add-inputs-to-resusable-workflow)
+        - [Add Inputs To Workflow Calling The Resusable Workflow](#add-inputs-to-workflow-calling-the-resusable-workflow)
 
 ### Expressions
 
@@ -913,6 +916,10 @@ jobs:
 - Reusing workflows avoids duplication.
 - Workflow reuse also promotes best practice by helping you to use workflows that are well designed, have already been tested, and have been proven to be effective.
 
+##### Linitations
+
+- [Docs](https://docs.github.com/en/actions/using-workflows/reusing-workflows#limitations)
+
 ##### Create Reusable Workflow
 
 - [Docs](https://docs.github.com/en/actions/using-workflows/reusing-workflows#creating-a-reusable-workflow).
@@ -932,7 +939,7 @@ jobs:
               echo "Deploying to prod ..."
 ```
 
-#### Call The Resuable Workflow
+##### Call The Resuable Workflow
 
 ```yml
 name: Workflow 2
@@ -962,4 +969,41 @@ jobs:
   deploy: # Reusable workflow!
     needs: build
     uses: ./.github/workflows/deploy.yml
+```
+
+##### Add Inputs To Resusable Workflow
+
+- [Docs](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onworkflow_callinputs)
+- Access Input Variable(s): inputs.key. e.g.
+  - `${{ inputs.username }}`
+
+```yml
+on:
+  workflow_call:
+    inputs:
+      username:
+        description: 'A username passed from the caller workflow'
+        default: 'john-doe'
+        required: false
+        type: string
+
+jobs:
+  print-username:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print the input name to STDOUT
+        # Print the username passed from the caller workflow
+        run: echo The username is ${{ inputs.username }}
+```
+
+##### Add Inputs To Workflow Calling The Resusable Workflow
+
+```yml
+deploy: # Reusable workflow!
+  needs: build
+
+  uses: ./.github/workflows/deploy.yml
+  with: # Add additional params!
+    username: Neidu
 ```
