@@ -13,7 +13,7 @@
   - [Creating A Project](#creating-a-project)
   - [Alembic Config (Set the `sqlalchemy.url`)](#alembic-config-set-the-sqlalchemyurl)
     - [Method 1](#method-1)
-    - [Method 2](#method-2)
+    - [Method 2 (Preferred)](#method-2-preferred)
   - [Create Revison](#create-revison)
     - [Create First Revision](#create-first-revision)
   - [Operations](#operations)
@@ -73,7 +73,7 @@ config.set_section_option(section, "DB_HOST", os.environ.get("DB_HOST"))
 config.set_section_option(section, "DB_NAME", os.environ.get("DB_NAME"))
 ```
 
-### Method 2
+### Method 2 (Preferred)
 
 1.) Update the `alembic.ini` config file by setting the variable `sqlalchemy.url` to an empty value.
 
