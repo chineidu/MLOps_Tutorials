@@ -11,6 +11,7 @@ func main() {
 	// goTutorials.RunDTypesExample()
 	// controlFlow.ControlFlowLogic()
 	// goTutorials.RunExampleThree()
-	goTutorials.SlicesExamples()
+	// goTutorials.SlicesExamples()
+	goTutorials.ArrayExamples()
 	// goTutorials.Basics()
 }
