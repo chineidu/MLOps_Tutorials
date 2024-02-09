@@ -7,6 +7,8 @@ func SlicesExamples() {
 	createSimpleSlice1()
 	createSimpleSlice2()
 	createSimpleSlice3()
+	createSimpleSlice4()
+	createSimpleSlice5()
 }
 
 // Internal functions
@@ -38,16 +40,51 @@ func createSimpleSlice2() {
 }
 
 func createSimpleSlice3() {
-	// Method 2
-	languages := []string{"Python", "SQL", "Go"}
+	// Method 3: Using make
+	names := make([]string, 0) // make(type, size)
+
+	// Add more values
+	names = append(names, "Neidu", "Grace", "Michael", "Ayo")
+
+	// Print result
+	fmt.Printf("Names: %v\n", names)
+}
+
+func createSimpleSlice4() {
+	packages := []string{"Flask", "Pandas", "LangChain"}
 	pythonPackages := []string{"NumPy", "Polars", "Sci-kit Learn", "FastAPI", "PyTorch"}
 
 	// Add more values
-	languages = append(languages, "Rust")
+	packages = append(packages, "Rust")
 
 	// Add an unpacked slice to a slice
-	languages = append(languages, pythonPackages...)
+	packages = append(packages, pythonPackages...)
 
 	// Print result
-	fmt.Printf("Programming languages OR Python packages: %v\n", languages)
+	fmt.Printf("Python packages: %v\n", packages)
+}
+
+// Helper function for calculating the mean
+func CalculateMean(inputArray []float32) float32 {
+	var result float32
+	var _sum float32
+
+	for _, val := range inputArray {
+		_sum += val
+	}
+	result = _sum / float32(len(inputArray))
+	return result
+}
+
+func createSimpleSlice5() {
+	salary := []float32{500_000, 550_000}
+
+	// Add values
+	salary = append(salary, 625_000.55)
+
+	// Calculate mean
+	averageSalary := CalculateMean(salary)
+
+	// Print result
+	fmt.Printf("Average salary: %v\n", averageSalary)
 }
