@@ -12,6 +12,7 @@ func main() {
 	// controlFlow.ControlFlowLogic()
 	// goTutorials.RunExampleThree()
 	// goTutorials.SlicesExamples()
-	goTutorials.ArrayExamples()
+	// goTutorials.ArrayExamples()
+	goTutorials.MapExamples()
 	// goTutorials.Basics()
 }

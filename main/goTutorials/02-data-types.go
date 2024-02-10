@@ -56,7 +56,7 @@ func slices() {
 func maps() {
 	fmt.Println("\n==== Running examples on `map` datatype ====")
 	// Maps: Similar to dicts in Python but with must have uniform datatypes.
-	// Syntax: make(map[key_dtype]value_dtype)
+	// Syntax: make(map[key_dtype]value_dtype, size)
 	var myMap = make(map[string]string, 5)
 
 	// Add key-value pairs
