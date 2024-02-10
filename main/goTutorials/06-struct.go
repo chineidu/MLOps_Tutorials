@@ -94,7 +94,7 @@ func jsonExample() {
 	fmt.Printf("Person: %v\n\n", person1)
 	fmt.Printf("Person: %v\n\n", person2)
 	fmt.Printf("People: %v\n\n", people)
-	if err != nil {
+	if err == nil {
 		fmt.Printf("ERROR: %v\n\n", err)
 	}
 	fmt.Printf("Person: %v\n\n", string(jsonData))

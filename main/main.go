@@ -11,6 +11,7 @@ func main() {
 	// goTutorials.SlicesExamples()
 	// goTutorials.ArrayExamples()
 	// goTutorials.MapExamples()
+	// goTutorials.RunExampleThree()
 	goTutorials.StructExamples()
 	// goTutorials.Basics()
 }
