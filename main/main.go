@@ -8,11 +8,9 @@ import (
 func main() {
 	// Call the RunDTypesExample function from the goTutorials package
 
-	// goTutorials.RunDTypesExample()
-	// controlFlow.ControlFlowLogic()
-	// goTutorials.RunExampleThree()
 	// goTutorials.SlicesExamples()
 	// goTutorials.ArrayExamples()
-	goTutorials.MapExamples()
+	// goTutorials.MapExamples()
+	goTutorials.StructExamples()
 	// goTutorials.Basics()
 }
