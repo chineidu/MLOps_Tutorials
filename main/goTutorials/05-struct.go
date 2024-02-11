@@ -9,6 +9,7 @@ import (
 func StructExamples() {
 	structExample1()
 	structExample2()
+	structExample3()
 }
 
 type PersonDetails struct {
@@ -50,6 +51,7 @@ type AddressJSON struct {
 	State   string `json:"state"`
 	Zipcode string `json:"zipcode"`
 }
+
 // Create JSON data. structs with JSON tags
 type PersonJSON struct {
 	Firstname  string  `json:"firstname"`
@@ -79,4 +81,40 @@ func structExample2() string {
 	fmt.Printf("[INFO]: Showing info of employee1: %v\n", string(jsonData))
 
 	return string(jsonData)
+}
+
+func structExample3() {
+	var employeesList []PersonJSON
+
+	emp1 := PersonJSON{
+		Firstname:  "Samuel",
+		Lastname:   "Aderopo",
+		Department: "Products",
+		Role:       "Senior Products Manager",
+		Address: AddressJSON{
+			Street:  "12, Ozumba Mbadiwe",
+			City:    "Lagos",
+			State:   "Lagos",
+			Zipcode: "101241",
+		},
+	}
+	emp2 := PersonJSON{
+		Firstname:  "Chioma",
+		Lastname:   "Okafor",
+		Department: "Sales",
+		Role:       "Head of Sales",
+		Address: AddressJSON{
+			Street:  "5a Admiral way",
+			City:    "Ikeja",
+			State:   "Lagos",
+			Zipcode: "100001",
+		},
+	}
+	employeesList = append(employeesList, emp1, emp2)
+
+	fmt.Println("\tEmployees")
+	fmt.Println("\t=========")
+	for _id, emp := range employeesList {
+		fmt.Printf("Employee id: %v Fullname: %v %v\n", _id+1, emp.Firstname, emp.Lastname)
+	}
 }

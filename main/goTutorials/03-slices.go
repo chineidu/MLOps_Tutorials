@@ -4,7 +4,7 @@ import "fmt"
 
 // Maps: Similar to lists in Python but with must have uniform datatypes.
 // Syntax: make([]dtype, size) `size` is optional.
-// []string{"Python", "SQL", "Go"}
+
 
 // Public functions
 func SlicesExamples() {
