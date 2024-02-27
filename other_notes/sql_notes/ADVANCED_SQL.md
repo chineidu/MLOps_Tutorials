@@ -10,6 +10,10 @@
       - [CREATE A Table](#create-a-table)
       - [INSERT Statement](#insert-statement)
       - [SELECT Statement](#select-statement)
+    - [Filtering](#filtering)
+      - [WHERE CLAUSE](#where-clause)
+      - [UPDATE Statement](#update-statement)
+      - [DELETE Statement](#delete-statement)
 
 ## Database Design
 
@@ -38,9 +42,18 @@ CREATE TABLE [IF NOT EXISTS] table_name (
     column_name_N datatype
 );
 
--- e.g.
+-- e.g. SQLite
 CREATE TABLE IF NOT EXISTS cities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(100),
+    country VARCHAR(100),
+    population INTEGER,
+    area INTEGER
+);
+
+-- e.g. Postgres
+CREATE TABLE IF NOT EXISTS cities (
+    id SERIAL PRIMARY KEY, -- autoincrement
     name VARCHAR(100),
     country VARCHAR(100),
     population INTEGER,
@@ -71,4 +84,50 @@ SELECT * FROM table_name;
 -- e.g.
 SELECT * FROM cities;
 SELECT name, population FROM cities;
+
+-- Alias
+SELECT name, country, (population / area) AS "population_density" FROM cities;
+-- OR
+SELECT name, country, (population / area) "population_density" FROM cities;
+```
+
+### Filtering
+
+#### WHERE CLAUSE
+
+- It is used to filter a condition.
+- The order of execution is shown below:
+
+[![image.png](https://i.postimg.cc/cHdhSgVm/image.png)](https://postimg.cc/1gYw0tRn)
+
+```sql
+SELECT * FROM table_name
+WHERE condition(s);
+
+-- e.g.
+SELECT name, population, area FROM cities
+  WHERE area > 4000;
+```
+
+#### UPDATE Statement
+
+```sql
+UPDATE table_name
+SET column1 = value1, column2 = value2, ...
+  WHERE condition(s);
+
+-- e.g.
+UPDATE cities
+SET population = 26500000
+  WHERE name = "Shanghai";
+```
+
+#### DELETE Statement
+
+```sql
+DELETE FROM table_name WHERE condition;
+
+-- e.g.
+DELETE FROM cities
+  WHERE name = 'Shanghai' AND country = "China";
 ```
