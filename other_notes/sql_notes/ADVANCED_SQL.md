@@ -29,6 +29,9 @@
       - [Grouping](#grouping)
       - [Aggregates](#aggregates)
     - [HAVING Clause](#having-clause)
+    - [Sorting Records](#sorting-records)
+      - [LIMIT](#limit)
+      - [OFFSET](#offset)
 
 ## Database Design
 
@@ -338,3 +341,46 @@ HAVING COUNT(*) > 100;
 ```
 
 **Note**: The `HAVING` clause cannot be used without a prior GROUP BY clause in the same SELECT statement. It operates on the aggregate values calculated after grouping.
+
+### Sorting Records
+
+- `Sorting` refers to the process of arranging the retrieved rows from a query in a specific order.
+- This order is determined by one or more columns or expressions specified within the `ORDER BY clause` of a `SELECT` statement.
+- Here's a breakdown of the key points:
+  - **ORDER BY clause**: This clause is used to define the sorting criteria within a SELECT statement.
+  - **Sort expressions**: These can be column names, aliases, or even expressions involving multiple columns.
+  - **Ascending vs. Descending order**: By default, sorting happens in ascending order, meaning smaller values come first. You can use the DESC keyword to achieve descending order.
+  - **Sorting by multiple columns**: You can specify multiple sort expressions separated by commas. The query will first sort based on the leftmost expression, and then use the subsequent expressions to break ties within groups formed by the previous sort.
+  - **NULL handling**: By default, NULL values are treated as larger than any non-NULL value. You can use the NULLS FIRST or NULLS LAST keywords to explicitly control their position in the sorted result.
+
+```sql
+SELECT name, age
+FROM customers
+ORDER BY age DESC, name ASC;
+```
+
+- This query selects the `name` and `age` columns from the customers table.
+- The results will be sorted first by `age` in `descending order` (oldest first), and then by `name` in `ascending order` (alphabetically).
+
+#### LIMIT
+
+- It restricts the maximum number of rows returned by the query.
+- Syntax: LIMIT <number_of_rows>
+- Example: This retrieves only the first 10 rows from the products table.
+
+```sql
+SELECT *
+FROM products LIMIT 10;
+```
+
+#### OFFSET
+
+- I skips a specific number of rows before returning the remaining results.
+- Syntax: OFFSET <number_of_rows_to_skip>
+- Example: This skips the first 50 rows from the orders table and then retrieves the next 25 rows.
+
+```sql
+SELECT *
+FROM orders
+OFFSET 50 LIMIT 25;
+```
