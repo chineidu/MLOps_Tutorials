@@ -21,12 +21,14 @@
       - [Primary Key](#primary-key)
       - [Foreign Key](#foreign-key)
     - [Relating Records With Joins](#relating-records-with-joins)
-      - [Joins](#joins)
       - [Inner Join](#inner-join)
-      - [Left Join](#left-join)
-      - [Right Join](#right-join)
+      - [Left Outer Join](#left-outer-join)
+      - [Right Outer Join](#right-outer-join)
       - [Full Join](#full-join)
     - [Aggregations](#aggregations)
+      - [Grouping](#grouping)
+      - [Aggregates](#aggregates)
+    - [HAVING Clause](#having-clause)
 
 ## Database Design
 
@@ -218,10 +220,10 @@ CREATE TABLE photos (
 
 ### Relating Records With Joins
 
-#### Joins
-
 - It produces values by merging together different related tables.
 - Use a `join` when you're asked to find data that involves multiple resources/tables.
+
+[![image.png](https://i.postimg.cc/zXCgwhvC/image.png)](https://postimg.cc/CzK5Szj5)
 
 #### Inner Join
 
@@ -238,9 +240,9 @@ SELECT * FROM orders o
 JOIN customers c ON o.customer_id = c.id;
 ```
 
-#### Left Join
+#### Left Outer Join
 
-- Returns all records from the left table (specified first) and matching records from the right table based on the join condition.
+- Returns all records from the `left table` (specified first) and matching records from the right table based on the join condition.
 - If there's no match in the right table, it fills the corresponding columns with `null` values.
 
 ```sql
@@ -248,9 +250,9 @@ SELECT * FROM orders o
 LEFT JOIN products p ON o.product_id = p.id;
 ```
 
-#### Right Join
+#### Right Outer Join
 
-- Similar to left join, but reverses the behavior. It returns all records from the right table (specified first) and matching records from the left table based on the join condition.
+- Similar to left join, but reverses the behavior. It returns all records from the `right table` (specified first) and matching records from the left table based on the join condition.
 - Unmatched records in the left table will have null values in their corresponding columns.
 
 ```sql
@@ -272,3 +274,67 @@ FULL JOIN customers c ON o.customer_id = c.id;
 
 - It looks at many rows and calculates a single value.
 - Words like `most`, `average`, `least` are a sign that you need to use an aggregation.
+- `Grouping` and `aggregates` are often used together to analyze and summarize data at different levels of detail. You can group data by multiple columns and apply various aggregate functions to gain deeper insights from your data.
+
+#### Grouping
+
+- **Concept:** Grouping involves categorizing rows in a table based on shared values in one or more columns. This creates groups of related data, enabling you to analyze and summarize these groups effectively.
+- **Implementation:** You use the GROUP BY clause in your SELECT statement to specify the column(s) used for grouping.
+
+```sql
+SELECT country, COUNT(*) AS total_customers
+FROM customers
+GROUP BY country;
+```
+
+- This query groups the customers table by the country column and calculates the total number of customers for each country using the COUNT(*) aggregate function.
+
+#### Aggregates
+
+- Concept: Aggregates are functions that compute a single value (summary statistic) based on a group of rows. These functions operate on the entire group or specific columns within the group.
+
+- Common Aggregate Functions:
+  - `COUNT(*)`: Counts the number of rows in a group.
+  - `SUM(column)`: Calculates the sum of values in a specified column across the group.
+  - `AVG(column)`: Computes the average value in a specified column within the group.
+  - `MIN(column)`: Finds the minimum value in a specified column within the group.
+  - `MAX(column)`: Finds the maximum value in a specified column within the group.
+
+```sql
+SELECT genre, AVG(rating) AS average_rating
+FROM movies
+GROUP BY genre;
+```
+
+- This query groups the `movies` table by the genre column and calculates the average rating `(AVG(rating)` for each genre.
+
+### HAVING Clause
+
+- The `HAVING` clause provides a way to filter groups created with the `GROUP BY` clause.
+- It allows you to specify conditions that must be met for a group to be included in the final result set.
+- Here's how it works:
+  - **Grouping**: Your SELECT statement uses `GROUP BY` to categorize rows based on shared values in specific columns, creating groups.
+  - **Aggregation**: You apply aggregate functions like `COUNT`, `SUM`, `AVG`, etc., to calculate summary statistics for each group.
+  - **Filtering**: The `HAVING` clause specifies a condition that must be true for the aggregate values of a group. Only groups that satisfy this condition are included in the final result set.
+
+```sql
+SELECT column1, aggregate_function(column2) AS alias
+FROM table_name
+GROUP BY column1
+HAVING condition_on_aggregate;
+
+-- ex 1
+SELECT genre, AVG(rating) AS average_rating
+FROM movies
+GROUP BY genre
+HAVING AVG(rating) > 4;
+
+
+-- ex 2
+SELECT country, COUNT(*) AS total_customers
+FROM customers
+GROUP BY country
+HAVING COUNT(*) > 100;
+```
+
+**Note**: The `HAVING` clause cannot be used without a prior GROUP BY clause in the same SELECT statement. It operates on the aggregate values calculated after grouping.
