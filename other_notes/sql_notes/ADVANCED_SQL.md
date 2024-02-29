@@ -39,6 +39,7 @@
       - [Scalar Subqueries](#scalar-subqueries)
       - [Single-row Subqueries](#single-row-subqueries)
       - [Multiple-row Subqueries](#multiple-row-subqueries)
+      - [View Subquery (Derived Table)](#view-subquery-derived-table)
       - [Correlated Subqueries](#correlated-subqueries)
 
 ## Database Design
@@ -474,6 +475,17 @@ WHERE column2 = (SELECT column2 FROM table2 WHERE condition);
 SELECT column1
 FROM table1
 WHERE column2 IN (SELECT column2 FROM table2 WHERE condition);
+```
+
+#### View Subquery (Derived Table)
+
+- A subquery used in the `FROM` clause to create a virtual table, also known as an `inline view` or derived table.
+- The result of the subquery is treated as a temporary table that can be used in the outer query.
+- Whenever you use a subquery in the `FROM` clause, an `alias` **MUST** be used!
+
+```sql
+SELECT *
+FROM (SELECT column1, column2 FROM table1) AS temp_table;
 ```
 
 #### Correlated Subqueries
