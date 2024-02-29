@@ -32,6 +32,14 @@
     - [Sorting Records](#sorting-records)
       - [LIMIT](#limit)
       - [OFFSET](#offset)
+      - [UNION](#union)
+      - [UNION ALL](#union-all)
+      - [EXCEPT](#except)
+    - [Subqueries](#subqueries)
+      - [Scalar Subqueries](#scalar-subqueries)
+      - [Single-row Subqueries](#single-row-subqueries)
+      - [Multiple-row Subqueries](#multiple-row-subqueries)
+      - [Correlated Subqueries](#correlated-subqueries)
 
 ## Database Design
 
@@ -383,4 +391,100 @@ FROM products LIMIT 10;
 SELECT *
 FROM orders
 OFFSET 50 LIMIT 25;
+```
+
+#### UNION
+
+- the `UNION` operator combines the results of two or more SELECT statements into a single result set.
+- It's a powerful tool for combining data from different tables or queries.
+- By default, UNION removes duplicate rows from the combined result set.
+
+#### UNION ALL
+
+- It's very similar to `UNION` with the only difference being that it includes all rows, `even duplicates`, from the combined results.
+
+```sql
+-- Get customers with orders
+SELECT id, name, city
+FROM customers
+INNER JOIN orders ON customers.id = orders.customer_id
+
+UNION ALL
+
+-- Get customers without orders
+SELECT id, name, city
+FROM customers
+WHERE id NOT IN (SELECT customer_id FROM orders);
+```
+
+Note:
+
+- The columns in the SELECT statements used with UNION must be compatible in data type and order.
+- `UNION` is useful for combining data from different sources or performing complex data manipulations.
+- Remember to use `UNION ALL` explicitly if you want to include all duplicates in the combined result set.
+
+#### EXCEPT
+
+- The `EXCEPT` operator is used to identify and retrieve `distinct` rows present in the first SELECT statement's result set but not present in the second SELECT statement's result set.
+- It essentially finds the difference between two sets of data.
+
+```sql
+-- Get all products
+SELECT id, name, category
+FROM products
+
+EXCEPT
+
+-- Get currently discounted products
+SELECT id
+FROM discounted_products;
+```
+
+### Subqueries
+
+- Subqueries, also known as `inner queries` or `nested queries`, are SELECT statements embedded within another SELECT statement.
+- They act as mini-queries within the main query, providing data for the outer query to perform operations on.
+
+#### Scalar Subqueries
+
+- These subqueries return exactly one row and one column as a result. They are often used in comparison expressions within the outer query's WHERE clause.
+
+```sql
+SELECT column1, (SELECT MAX(column2) FROM table2) AS max_value
+FROM table1;
+```
+
+#### Single-row Subqueries
+
+- It returns a single row of results. It's typically used in situations where a single value is expected, such as comparisons using `=`, `>`, `<`, etc.
+- It can have multiple columns.
+
+```sql
+SELECT column1
+FROM table1
+WHERE column2 = (SELECT column2 FROM table2 WHERE condition);
+```
+
+#### Multiple-row Subqueries
+
+- These subqueries return more than one row and are often used in conjunction with set operators like `IN`, `ANY`, `ALL`, or `EXISTS` within the outer query.
+- It can have multiple columns.
+
+```sql
+SELECT column1
+FROM table1
+WHERE column2 IN (SELECT column2 FROM table2 WHERE condition);
+```
+
+#### Correlated Subqueries
+
+- These are subqueries that reference columns from the outer query within the subquery.
+- Useful for iterating through the outer query's results and performing calculations based on each row.
+
+```sql
+SELECT column1
+  FROM table1 t1
+WHERE column2 = (
+                  SELECT MAX(column2) FROM table2 WHERE t1.column3 = table2.column3
+                );
 ```
