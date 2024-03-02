@@ -51,6 +51,10 @@
     - [SQL Schema Design](#sql-schema-design)
       - [SQL Schema Design Tools](#sql-schema-design-tools)
       - [UNIQUE](#unique)
+      - [LIKE System In A Social Media App](#like-system-in-a-social-media-app)
+        - [Q1. Number of Likes In A Specific Post?](#q1-number-of-likes-in-a-specific-post)
+        - [Q2. Number of Users That Liked A Specific Post?](#q2-number-of-users-that-liked-a-specific-post)
+        - [Q3. Top 5 Most Liked Posts?](#q3-top-5-most-liked-posts)
 
 ## Database Design
 
@@ -614,4 +618,61 @@ CREATE TABLE likes (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   UNIQUE (user_id, post_id)  -- Enforce unique like per user-post combination
 );
+```
+
+#### LIKE System In A Social Media App
+
+[![image.png](https://i.postimg.cc/VLR1nVmX/image.png)](https://postimg.cc/HVVfC3JL)
+
+- Create tables:
+
+```sql
+-- Users table
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(50) NOT NULL,
+  email VARCHAR(200) NOT NULL UNIQUE,
+  password VARCHAR(50) NOT NULL
+);
+
+-- Posts table
+CREATE TABLE posts (
+  id SERIAL PRIMARY KEY,
+  content VARCHAR(255) NOT NULL,
+  user_id INT NOT NULL REFERENCE user(id)
+);
+
+-- Likes table
+CREATE TABLE likes (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL REFERENCE user(id),
+  post_id INT NOT NULL REFERENCE posts(id),
+  UNIQUE (user_id, post_id) -- `user_id` and `post_id` must be unique
+);
+```
+
+##### Q1. Number of Likes In A Specific Post?
+
+```sql
+SELECT COUNT(*) AS number_likes
+FROM likes WHERE post_id = <specified_id>;
+```
+
+##### Q2. Number of Users That Liked A Specific Post?
+
+```sql
+SELECT username
+FROM users
+WHERE id IN (SELECT user_id
+     FROM likes WHERE post_id = <specified_id>)
+ORDER BY username;
+```
+
+##### Q3. Top 5 Most Liked Posts?
+
+```sql
+SELECT post_id, COUNT(post_id) like_count
+FROM likes
+GROUP BY post_id
+ORDER BY like_count;
 ```
