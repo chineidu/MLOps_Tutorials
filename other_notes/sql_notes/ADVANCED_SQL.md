@@ -41,6 +41,16 @@
       - [Multiple-row Subqueries](#multiple-row-subqueries)
       - [View Subquery (Derived Table)](#view-subquery-derived-table)
       - [Correlated Subqueries](#correlated-subqueries)
+    - [CTE (Common Table Expression)](#cte-common-table-expression)
+      - [DISTINCT](#distinct)
+      - [LEAST](#least)
+      - [GREATEST](#greatest)
+    - [Casting](#casting)
+      - [Cast Function](#cast-function)
+      - [Type Casting Operator (::)](#type-casting-operator-)
+    - [SQL Schema Design](#sql-schema-design)
+      - [SQL Schema Design Tools](#sql-schema-design-tools)
+      - [UNIQUE](#unique)
 
 ## Database Design
 
@@ -499,4 +509,109 @@ SELECT column1
 WHERE column2 = (
                   SELECT MAX(column2) FROM table2 WHERE t1.column3 = table2.column3
                 );
+```
+
+### CTE (Common Table Expression)
+
+- `CTE` is a powerful feature that allows you to define temporary named result sets within a larger query.
+- These named result sets can be referenced multiple times within the same query, making your code more `readable`, `modular`, and easier to `maintain`.
+
+```sql
+WITH high_spending_customers AS (
+  SELECT customer_id
+  FROM orders
+  GROUP BY customer_id
+  HAVING SUM(amount) > 1000
+)
+SELECT c.name, c.city
+FROM customers c
+INNER JOIN high_spending_customers h ON c.id = h.customer_id;
+```
+
+#### DISTINCT
+
+- The `DISTINCT` keyword is used to remove duplicate rows from the results of a SELECT statement.
+- It ensures that each row in the result set is unique based on the specified columns.
+
+```sql
+SELECT DISTINCT name
+FROM customers;
+```
+
+#### LEAST
+
+- It's used to identify the `smallest` values from a list of expressions or arguments provided to the function.
+
+```sql
+-- Find the minimum value among three numbers
+SELECT LEAST(10, 20, 5);
+```
+
+#### GREATEST
+
+- It's used to identify the largest values from a list of expressions or arguments provided to the function.
+
+```sql
+-- Find the latest date among two dates
+SELECT GREATEST('2023-11-21', '2024-02-29');
+```
+
+Note:
+
+- `LEAST` and `GREATEST` are `non-aggregate` functions.
+- These functions are more flexible in terms of data type handling. i.e. they can accept a mix of data types (numbers, strings, dates) and attempt to implicitly convert them to a common type for comparison.
+
+### Casting
+
+- PostgreSQL and SQL generally offers several methods for casting data types, allowing you to convert values from one data type to another.
+
+#### Cast Function
+
+```sql
+-- Convert string to integer
+SELECT CAST('123' AS INTEGER);
+
+-- Convert string to date
+SELECT CAST('2023-03-02' AS DATE);
+
+-- Convert integer to string
+SELECT CAST(10.5 AS VARCHAR);
+```
+
+#### Type Casting Operator (::)
+
+- The type casting operator (colon colon, ::) is a shorthand notation for the CAST function.
+- It's concise and commonly used for simple conversions.
+
+```sql
+-- Convert string to integer (same as CAST)
+SELECT '123'::INTEGER;
+
+-- Convert date to string
+SELECT current_date::VARCHAR;
+```
+
+### SQL Schema Design
+
+#### SQL Schema Design Tools
+
+- [draw.io](https://app.diagrams.net/)
+- [drawsql.app](https://drawsql.app/)
+- [ondras.zarovi.cz](https://sql.toad.cz/?)
+
+#### UNIQUE
+
+- The `UNIQUE` constraint is used to enforce data integrity by ensuring that certain columns within a table always contain distinct values.
+- This helps prevent duplicate entries based on the specified columns.
+
+- Example of `UNIQUE` constraint used to create a `like` system in a social media app.:
+
+```sql
+CREATE TABLE likes (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id),  -- Foreign key to users table
+  post_id INTEGER NOT NULL REFERENCES posts(id),  -- Foreign key to posts table
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (user_id, post_id)  -- Enforce unique like per user-post combination
+);
 ```
