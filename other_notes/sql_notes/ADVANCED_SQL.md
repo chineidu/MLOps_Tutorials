@@ -671,8 +671,10 @@ ORDER BY username;
 ##### Q3. Top 5 Most Liked Posts?
 
 ```sql
-SELECT post_id, COUNT(post_id) like_count
-FROM likes
-GROUP BY post_id
-ORDER BY like_count;
+WITH top_likes AS (SELECT post_id, COUNT(post_id) AS number_of_likes
+    FROM likes
+    GROUP BY post_id LIMIT 5) SELECT p.content AS post, t.number_of_likes
+FROM top_likes t
+JOIN posts p ON p.id = t.post_id
+ORDER BY number_of_likes DESC;
 ```
