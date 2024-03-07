@@ -11,6 +11,7 @@
   - [Repository Design Pattern](#repository-design-pattern)
     - [A Simple Example](#a-simple-example)
   - [Abstract Factory](#abstract-factory)
+  - [PyDantic BaseSettings (For Configurations)](#pydantic-basesettings-for-configurations)
 
 ## Class Methods
 
@@ -436,4 +437,41 @@ client_code(modern_factory)
 victorian_factory = VictorianFurnitureFactory()
 client_code(victorian_factory)
 
+```
+
+## PyDantic BaseSettings (For Configurations)
+
+```.env
+# Contents of `.my_env`
+
+name="Neidu"
+url="localhost"
+```
+
+```py
+from pydantic import BaseSettings
+from dotenv import load_dotenv, find_dotenv
+
+# Load env variables
+load_dotenv(dotenv_path=find_dotenv(filename=".my_env"))
+
+
+class MySettings(BaseSettings):
+    name: str  # Optional i.e. MUST be defined as env vars or during init
+    url: str  # Optional
+    port: int = 5000
+
+    class Config:
+        env_file = ".my_env"
+
+
+# Usage
+# Approach 1: Must have loaded variables from an env file called `.my_env`
+settings_1 = MySettings()
+print(settings_1)
+
+
+# Approach 2: Manually initialize the config variables
+settings_2 = MySettings(name="my app name", url="http://www.myapp.com")
+print(settings_2)
 ```
