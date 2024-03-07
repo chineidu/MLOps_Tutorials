@@ -13,7 +13,7 @@ This repo was inspired by the following Udemy courses:
 4. **Spark**: [Spark notes](https://github.com/chineidu/MLOps_Tutorials/tree/main/spark_notes)
 5. **GoLang**: [Go Lang](https://github.com/chineidu/MLOps_Tutorials/blob/main/main/README.md)
 6. **Poetry**: [Poetry](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Poetry/README.md)
-7. **Terraform**: [Terraform](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/ML_Algorithms/README.md)
+7. **Terraform**: [Terraform](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/IaC/Terraform/README.md)
 
 ## Using Docker Commands
 
