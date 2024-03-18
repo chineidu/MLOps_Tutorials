@@ -219,13 +219,13 @@ Enhance Creativity: Spark the LLM's imagination to produce creative text formats
 
 - **Prompt Combining**: Merging multiple prompts for a comprehensive instruction.
 - **Chain-of-Thought Prompting**: Breaking down complex tasks into a sequence of prompts for improved reasoning.
-Meta-Prompting: Experimentally developing a universal prompt adaptable to various tasks.
+- **Meta-Prompting**: Experimentally developing a universal prompt adaptable to various tasks.
 
 #### Specialized Techniques
 
 - **ReAct (Reasoning and Acting)**: Combining reasoning steps with actions within the prompt for analyses and proposed actions.
 - **Symbolic Reasoning and PAL (Program-Aided LLMs)**: Integrating symbolic reasoning into prompts for enhanced problem-solving abilities.
-- **RAG (Retrieval-Augmented Generation):** t's a technique that enhances the accuracy and reliability of large language models (LLMs) by incorporating information retrieval from external sources.
+- **RAG (Retrieval-Augmented Generation):** It's a technique that enhances the accuracy and reliability of large language models (LLMs) by incorporating information retrieval from external sources.
 
 ### RAG (Retrieval-Augmented Generation)
 
@@ -239,3 +239,5 @@ Meta-Prompting: Experimentally developing a universal prompt adaptable to variou
 - **Augmentation**: The retrieved information is used to supplement the LLM's internal knowledge during the generation process.
 
 - **Generation**: The LLM leverages its internal knowledge and the retrieved information to generate a response to your prompt. This response can be an answer to your question, a creative text format, or any other task the LLM is suited for.
+
+[Back to Top](#table-of-content)
