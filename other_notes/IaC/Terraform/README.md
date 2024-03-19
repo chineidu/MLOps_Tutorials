@@ -13,6 +13,13 @@
     - [IaC Providers](#iac-providers)
     - [Benefits of Iac](#benefits-of-iac)
   - [Terraform (IaC)](#terraform-iac)
+    - [Basics Commands](#basics-commands)
+      - [Verify Terraform Installation And Version](#verify-terraform-installation-and-version)
+      - [Terraform Init](#terraform-init)
+      - [Validating a Configuration](#validating-a-configuration)
+      - [Genenerating a Terraform Plan](#genenerating-a-terraform-plan)
+      - [Applying a Terraform Plan](#applying-a-terraform-plan)
+      - [Terraform Destroy](#terraform-destroy)
 
 ## Infrastructure as Code (IaC)
 
@@ -45,3 +52,81 @@
 - Terraform is an open-source infrastructure as code (IaC) tool developed by HashiCorp.
 - It allows you to define and manage infrastructure for both cloud and on-premise environments using human-readable configuration files.
 - These files are written in HashiCorp Configuration Language (HCL) or optionally JSON.
+
+### Basics Commands
+
+- There are a handful of basic terraform commands, including:
+
+- `terraform init`
+- `terraform validate`
+- `terraform plan`
+- `terraform apply`
+- `terraform destroy`
+
+#### Verify Terraform Installation And Version
+
+- You can get the version of Terraform running on your machine with the following command:
+
+```bash
+terraform -version
+```
+
+- If you need to recall a specific subcommand, you can get a list of available commands and arguments with the help argument.
+
+```bash
+terraform -help
+```
+
+#### Terraform Init
+
+- Initializing your workspace is used to initialize a working directory containing Terraform configuration files.
+
+Once saved, you can return to your shell and run the init command shown below. This tells Terraform to scan your code and download anything it needs locally.
+
+```bash
+terraform init
+```
+
+Once your Terraform workspace has been initialized you are ready to begin planning and provisioning your resources.
+
+#### Validating a Configuration
+
+- The terraform validate command validates the configuration files in your working directory.
+- To validate there are no syntax problems with our terraform configuration file run:
+
+```bash
+terraform validate
+```
+
+`output:`
+
+```bash
+Success! The configuration is valid.
+```
+
+#### Genenerating a Terraform Plan
+
+- Terraform has a dry run mode where you can preview what Terraform will change without making any actual changes to your infrastructure.
+- This dry run is performed by running a `terraform plan`.
+
+```bash
+terraform plan
+```
+
+#### Applying a Terraform Plan
+
+- Run the command below to build the resources within your plan file.
+
+```bash
+terraform apply
+```
+
+#### Terraform Destroy
+
+- The `terraform destroy` command is a convenient way to destroy all remote objects managed by a particular Terraform configuration.
+- It does not delete your configuration file(s), `main.tf`, etc. It destroys the resources built from your Terraform code.
+- Run the command as shown below to run a planned destroy:
+
+```bash
+terraform destroy
+```
