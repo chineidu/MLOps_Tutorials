@@ -164,3 +164,4 @@ data
 notepad.py
 *.json
 *.pem
+**/*.terraform
