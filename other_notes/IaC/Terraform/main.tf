@@ -115,3 +115,53 @@ resource "aws_nat_gateway" "nat_gateway" {
     Name = "demo_nat_gateway"
   }
 }
+
+resource "aws_security_group" "sg_1" {
+  name        = "example-security-group"
+  description = "Example Security Group"
+
+  vpc_id = aws_vpc.vpc.id # Specify the VPC ID where the security group will be created
+
+  # Define ingress rules for inbound traffic
+  ingress {
+    from_port   = var.ingress_port_1
+    to_port     = var.ingress_port_1
+    protocol    = "tcp"
+    cidr_blocks = var.cidr_blocks
+  }
+
+  ingress {
+    from_port   = var.ingress_port_2
+    to_port     = var.ingress_port_2
+    protocol    = "tcp"
+    cidr_blocks = var.cidr_blocks
+  }
+
+  # Define egress rules for outbound traffic
+  egress {
+    from_port   = var.egress_port
+    to_port     = var.egress_port
+    protocol    = "-1" # Allow all outbound traffic
+    cidr_blocks = var.cidr_blocks
+  }
+
+  tags = {
+    Name = "example-security-group"
+  }
+}
+
+
+resource "aws_instance" "web" {
+  ami           = "ami-0d7a109bf30624c99"
+  instance_type = var.instance_type
+
+  subnet_id              = aws_subnet.public_subnets["public_subnet_1"].id
+  vpc_security_group_ids = [aws_security_group.sg_1.id]
+
+
+
+  tags = {
+    Name      = "web"
+    Terraform = "true"
+  }
+}

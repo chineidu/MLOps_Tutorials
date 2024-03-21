@@ -3,6 +3,11 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
+variable "instance_type" {
+  type    = string
+  default = "t2.micro"
+}
+
 variable "vpc_name" {
   type    = string
   default = "demo_vpc"
@@ -27,4 +32,28 @@ variable "public_subnets" {
     "public_subnet_2" = 2
     "public_subnet_3" = 3
   }
+}
+
+variable "ingress_port_1" {
+  type        = number
+  description = "First ingress port (default allows HTTP traffic)"
+  default     = 80
+}
+
+variable "ingress_port_2" {
+  type        = number
+  description = "Second ingress port (default allows HTTPS traffic)"
+  default     = 443
+}
+
+variable "egress_port" {
+  type        = number
+  description = "Egress port (default allows HTTPS traffic)"
+  default     = 0
+}
+
+variable "cidr_blocks" {
+  type        = list(string)
+  description = "Allowed ingress/egress CIDR blocks (default allows all outbound traffic)"
+  default     = ["0.0.0.0/0"] # Allowing traffic from any IP address
 }

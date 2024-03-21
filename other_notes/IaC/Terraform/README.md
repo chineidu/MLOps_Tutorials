@@ -3,8 +3,6 @@
 - [Official docs](https://www.terraform.io/)
 - [Terraform Udemy Course](https://www.udemy.com/course/terraform-hands-on-labs/?couponCode=ST12MT030524)
 
-[![image.png](https://i.postimg.cc/MKPB14j9/image.png)](https://postimg.cc/2VW3D0GW)
-
 ## Table of Content
 
 - [Terraform](#terraform)
@@ -16,6 +14,7 @@
     - [Basics Commands](#basics-commands)
       - [Verify Terraform Installation And Version](#verify-terraform-installation-and-version)
       - [Terraform Init](#terraform-init)
+      - [Format HCL Files](#format-hcl-files)
       - [Validating a Configuration](#validating-a-configuration)
       - [Genenerating a Terraform Plan](#genenerating-a-terraform-plan)
       - [Applying a Terraform Plan](#applying-a-terraform-plan)
@@ -94,6 +93,12 @@ terraform init
 ```
 
 Once your Terraform workspace has been initialized you are ready to begin planning and provisioning your resources.
+
+#### Format HCL Files
+
+```sh
+terraform fmt
+```
 
 #### Validating a Configuration
 
@@ -346,3 +351,5 @@ terraform apply -auto-approve
 ```sh
 terraform destroy -auto-approve
 ```
+
+aws_subnet.public_subnets["public_subnet_1"].id
