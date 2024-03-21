@@ -20,6 +20,12 @@
       - [Genenerating a Terraform Plan](#genenerating-a-terraform-plan)
       - [Applying a Terraform Plan](#applying-a-terraform-plan)
       - [Terraform Destroy](#terraform-destroy)
+    - [Hashicorp Configuration Language (HCL)](#hashicorp-configuration-language-hcl)
+    - [Terraform Resource Block](#terraform-resource-block)
+    - [Terraform Input Variable Block](#terraform-input-variable-block)
+    - [Terraform Data Block](#terraform-data-block)
+    - [Terraform Provider Block](#terraform-provider-block)
+    - [Example Terraform Usage](#example-terraform-usage)
 
 ## Infrastructure as Code (IaC)
 
@@ -129,4 +135,214 @@ terraform apply
 
 ```bash
 terraform destroy
+```
+
+### Hashicorp Configuration Language (HCL)
+
+```hcl
+# Template
+<BLOCK TYPE> "<BLOCK LABEL>" "<BLOCK IDENTIFIER>" {
+
+ # Block body
+<IDENTIFIER> = <EXPRESSION> # Argument
+}
+
+# AWS EC2 Example (Resource Block)
+resource "aws_instance" "web_server" { # BLOCK
+  ami = "ami-04d29b6f966df1537" # Argument 1
+  instance_type = var.instance_type # Argument 2
+}
+```
+
+- The `IDENTIFIER` has to be unique. i.e. web_server_1, web_server_2, etc.
+
+- Terraform Code Configuration block types include:
+  - Terraform Settings Block
+  - Terraform Provider Block
+  - Terraform Resource Block
+  - Terraform Data Block
+  - Terraform Input Variables Block
+  - Terraform Local Variables Block
+  - Terraform Output Values Block
+  - Terraform Modules Block
+
+### Terraform Resource Block
+
+```hcl
+# AWS EC2 Example (Resource Block)
+resource "aws_instance" "web_server" { # BLOCK
+  ami = "ami-04d29b6f966df1537" # Argument 1
+  instance_type = var.instance_type # Argument 2
+}
+```
+
+### Terraform Input Variable Block
+
+```hcl
+# Define input variables (variables.tf)
+variable "instance_type" {
+  type = string
+  description = "Type of instance to launch (e.g., t2.micro)"
+  default = "t2.micro"
+}
+
+variable "ami" {
+  type = string
+  description = "ID of the AMI image to use for the instance"
+  default = "ami-0c55b159cbfafe1f0"
+}
+
+# === Access The variables
+# Resource using the input variables
+resource "aws_instance" "web_server" {
+  ami           = var.ami
+  instance_type = var.instance_type
+}
+```
+
+### Terraform Data Block
+
+```hcl
+data "aws_s3_bucket" "example_bucket" {
+  bucket = "my-existing-bucket-name"
+}
+```
+
+### Terraform Provider Block
+
+```hcl
+# Configure the AWS provider
+provider "aws" {
+  region = "us-east-1"  # Specify the AWS region
+
+  # Optional configuration options
+  # alias = "east"  # Assign an alias for this provider configuration (optional)
+  # source  = "hashicorp/aws"  # Explicitly define the provider source (usually inferred)
+}
+
+# Resource using the AWS provider
+resource "aws_instance" "web_server" {
+  ami           = "ami-0f782182b15e348b2"  # AMI ID for the web server image
+  instance_type = "t2.micro"             # Instance type for the web server
+}
+```
+
+### Example Terraform Usage
+
+- Export your creds.
+
+```sh
+export AWS_ACCESS_KEY_ID="<YOUR ACCESS KEY>"
+export AWS_SECRET_ACCESS_KEY="<YOUR SECRET KEY>"
+```
+
+```hcl
+# === main.tf ===
+# Configure the AWS Provider
+provider "aws" {
+  region = "us-east-1"
+}
+
+# Retrieve the list of AZs in the current AWS region
+data "aws_availability_zones" "available" {}
+data "aws_region" "current" {}
+
+# Define the VPC
+resource "aws_vpc" "vpc" {
+  cidr_block = var.vpc_cidr
+
+  tags = {
+    Name        = var.vpc_name
+    Environment = "demo_environment"
+    Terraform   = "true"
+  }
+}
+
+# Deploy the private subnets
+resource "aws_subnet" "private_subnets" {
+  for_each          = var.private_subnets
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, each.value)
+  availability_zone = tolist(data.aws_availability_zones.available.names)[each.value]
+
+  tags = {
+    Name      = each.key
+    Terraform = "true"
+  }
+}
+
+# Deploy the public subnets
+resource "aws_subnet" "public_subnets" {
+  for_each                = var.public_subnets
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = cidrsubnet(var.vpc_cidr, 8, each.value + 100)
+  availability_zone       = tolist(data.aws_availability_zones.available.names)[each.value]
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name      = each.key
+    Terraform = "true"
+  }
+}
+
+# Create route tables for public and private subnets
+# Other config goes here ...
+
+
+# === variables.tf ===
+variable "aws_region" {
+  type    = string
+  default = "us-east-1"
+}
+
+variable "vpc_name" {
+  type    = string
+  default = "demo_vpc"
+}
+
+variable "vpc_cidr" {
+  type    = string
+  default = "10.0.0.0/16"
+}
+
+variable "private_subnets" {
+  default = {
+    "private_subnet_1" = 1
+    "private_subnet_2" = 2
+    "private_subnet_3" = 3
+  }
+}
+
+variable "public_subnets" {
+  default = {
+    "public_subnet_1" = 1
+    "public_subnet_2" = 2
+    "public_subnet_3" = 3
+  }
+}
+
+```
+
+- The first step to using Terraform is initializing the working directory. Run the following command:
+
+```sh
+terraform init
+```
+
+- To preview the changes , run the following command:
+
+```sh
+terraform plan
+```
+
+- Create the AWS resources defined in the configuration file(s) by running:
+
+```sh
+terraform apply -auto-approve
+```
+
+- To destroy the resources, run the following command:
+
+```sh
+terraform destroy -auto-approve
 ```
