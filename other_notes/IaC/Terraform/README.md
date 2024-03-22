@@ -30,12 +30,24 @@
       - [View The Required Providers](#view-the-required-providers)
     - [Configure AWS Provider](#configure-aws-provider)
       - [Configure Terraform AWS Provider](#configure-terraform-aws-provider)
-      - [Configure AWS Credentials for Terraform provider](#configure-aws-credentials-for-terraform-provider)
-        - [Static credentials](#static-credentials)
-        - [Environment variables](#environment-variables)
-        - [Shared credentials/configuration file](#shared-credentialsconfiguration-file)
-    - [Terraform Resource Blocks](#terraform-resource-blocks)
-      - [Add a new resource to deploy an Amazon S3 bucket](#add-a-new-resource-to-deploy-an-amazon-s3-bucket)
+      - [Configure AWS Credentials for Terraform Provider](#configure-aws-credentials-for-terraform-provider)
+        - [Static Credentials](#static-credentials)
+        - [Environment Variables](#environment-variables)
+        - [Shared Credentials/Configuration File](#shared-credentialsconfiguration-file)
+  - [Terraform Resource Blocks](#terraform-resource-blocks)
+      - [Add A New Resource To Deploy An Amazon S3 Bucket](#add-a-new-resource-to-deploy-an-amazon-s3-bucket)
+      - [Configure A Resource From The Random Provider](#configure-a-resource-from-the-random-provider)
+    - [Introduction To The Terraform Variables Block](#introduction-to-the-terraform-variables-block)
+      - [Variables Template](#variables-template)
+      - [Task: Add A New VPC Resource Block By Adding Defaults](#task-add-a-new-vpc-resource-block-by-adding-defaults)
+    - [Introduction To The Terraform Locals Block](#introduction-to-the-terraform-locals-block)
+      - [Locals Block Template](#locals-block-template)
+      - [Access Local Variables](#access-local-variables)
+    - [Introduction to the Terraform Data Block](#introduction-to-the-terraform-data-block)
+      - [Data Block Template](#data-block-template)
+      - [Task: Add A New Data Source To Query The Current AWS Region Being Used](#task-add-a-new-data-source-to-query-the-current-aws-region-being-used)
+      - [Syntax For Accessing Data In A Data Block](#syntax-for-accessing-data-in-a-data-block)
+      - [Task: Add A New Data Source For Querying A Different Ubuntu Image](#task-add-a-new-data-source-for-querying-a-different-ubuntu-image)
 
 ## Infrastructure as Code (IaC)
 
@@ -419,12 +431,12 @@ provider "aws" {
 }
 ```
 
-#### Configure AWS Credentials for Terraform provider
+#### Configure AWS Credentials for Terraform Provider
 
 - The AWS Terraform provider offers a flexible means of providing credentials for authentication.
 - The following methods are supported:
 
-##### Static credentials
+##### Static Credentials
 
 - Static credentials can be provided by adding an access_key and secret_key in-line in the AWS provider block:
 
@@ -436,7 +448,7 @@ provider "aws" {
 }
 ```
 
-##### Environment variables
+##### Environment Variables
 
 - You can provide your credentials via the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, environment variables, representing your AWS Access Key and AWS Secret Key, respectively.
 
@@ -451,7 +463,7 @@ export AWS_SECRET_ACCESS_KEY="asecretkey"
 export AWS_DEFAULT_REGION="us-east-1"
 ```
 
-##### Shared credentials/configuration file
+##### Shared Credentials/Configuration File
 
 - You can use an AWS credentials or configuration file to specify your credentials.
 - The default location is `$HOME/.aws/credentials` on Linux and macOS, or `"%USERPROFILE%\.aws\credentials"` on Windows.
@@ -466,7 +478,7 @@ provider "aws" {
 }
 ```
 
-### Terraform Resource Blocks
+## Terraform Resource Blocks
 
 - Terraform uses resource blocks to manage infrastructure, such as virtual networks, compute instances, or higher-level components such as DNS records.
 - Resource blocks represent one or more infrastructure objects in your Terraform configuration.
@@ -511,7 +523,7 @@ resource "aws_route_table" "public_route_table" {
 
 > Note: Your resource blocks must have a unique resource id (combination of resource type along with resource name). In our example, our resource id is `aws_route_table.public_route_table`, which is the combination of our `resource type` aws_route_table and `resource name` public_route_table. This naming and interpolation nomenclature is powerful part of HCL that allows us to reference arguments from other resource blocks.
 
-#### Add a new resource to deploy an Amazon S3 bucket
+#### Add A New Resource To Deploy An Amazon S3 Bucket
 
 - [Docs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls)
 
@@ -529,6 +541,221 @@ resource "aws_s3_bucket_ownership_controls" "my_new_bucket_acl" {
   bucket = aws_s3_bucket.my-new-S3-bucket.id
   rule {
     object_ownership = "BucketOwnerPreferred"
+  }
+}
+```
+
+#### Configure A Resource From The Random Provider
+
+- Terraform supports many resources that don't interact with any other services.
+- It's a provider that can be used to create random data to be used in your Terraform.
+- e.g. add a new resource block to Terraform using the random provider in `main.tf` file and add the following resource block:
+
+```hcl
+resource "random_id" "randomness" {
+  byte_length = 16
+}
+
+# Reference the random ID
+resource "aws_s3_bucket" "my-new-S3-bucket" {
+  bucket = "my-new-tf-test-bucket-${random_id.randomness.hex}"
+
+  tags = {
+    Name    = "My S3 Bucket"
+    Purpose = "Intro to Resource Blocks Lab"
+  }
+}
+```
+
+### Introduction To The Terraform Variables Block
+
+- **Variable Declaration and Organization**:
+  - Variables are typically declared in a separate file named `variables.tf`, although this is not mandatory.
+  - Organizing variable declarations in one file streamlines management and enhances clarity.
+  - Each variable is declared within a variable block, containing essential information such as the `variable name`, `type`, `description`, `default value`, and `additional options`.
+
+- **Focus on Reusability and DRY Development**:
+  - Terraform templates benefit from a focus on reusability and DRY (Don't Repeat Yourself) development practices.
+  - Utilizing variables is key to simplifying and enhancing the usability of Terraform configurations.
+
+- **Input Variables for Customization**:
+  - Input variables, often referred to simply as "variables," enable customization of aspects within a module or configuration without modifying its source code directly.
+  - This flexibility facilitates sharing modules across different configurations.
+
+#### Variables Template
+
+```hcl
+variable “<VARIABLE_NAME>” {
+  # Block body
+  type = <VARIABLE_TYPE>
+  description = <DESCRIPTION>
+  default = <EXPRESSION>
+  sensitive = <BOOLEAN>
+  validation = <RULES>
+}
+
+# e.g.
+variable "aws_region" {
+  type        = string
+  description = "region used to deploy workloads"
+  default     = "us-east-1"
+  validation {
+    condition     = can(regex("^us-", var.aws_region))
+    error_message = "The aws_region value must be a valid region in the
+    USA, starting with \"us-\"."
+  }
+}
+```
+
+#### Task: Add A New VPC Resource Block By Adding Defaults
+
+```hcl
+# filename: variables.tf
+variable "variables_sub_cidr" {
+  description = "CIDR Block for the Variables Subnet"
+  type        = string
+  default     = "10.0.250.0/24"
+}
+
+variable "variables_sub_az" {
+  description = "Availability Zone used Variables Subnet"
+  type        = string
+  default     = "us-east-1a"
+}
+
+variable "variables_sub_auto_ip" {
+  description = "Set Automatic IP Assigment for Variables Subnet"
+  type        = bool
+  default     = "true"
+
+}
+```
+
+- Access the variables
+
+```hcl
+# filename: main.tf
+resource "aws_subnet" "variables-subnet" {
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = var.variables_sub_cidr
+  availability_zone       = var.variables_sub_az
+  map_public_ip_on_launch = var.variables_sub_auto_ip
+
+  tags = {
+    Name      = "sub-variables-${ var.variables_sub_az }"
+    Terraform = "true"
+  }
+}
+```
+
+### Introduction To The Terraform Locals Block
+
+- Locals blocks (often referred to as locals) are defined values in Terraform that are used to reduce repetitive references to expressions or values.
+- Locals are very similar to traditional input variables and can be referred to throughout your Terraform configuration.
+
+#### Locals Block Template
+
+```hcl
+locals {
+  # Block body
+  local_variable_name = <EXPRESSION OR VALUE>
+  local_variable_name = <EXPRESSION OR VALUE>
+}
+
+# e.g.
+locals {
+  team = "api_mgmt_dev"
+  application = "corp_api"
+  server_name = "ec2-${var.environment}-api-${var.variables_sub_az}"
+}
+```
+
+- Note: `environment` and `variables_sub_az` are input variables located in `variables.tf`.
+
+#### Access Local Variables
+
+```hcl
+resource "aws_instance" "web_server" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+  subnet_id     = aws_subnet.public_subnets["public_subnet_1"].id
+  tags = {
+    Name = local.server_name
+    Owner = local.team
+    App = local.application
+  }
+}
+```
+
+### Introduction to the Terraform Data Block
+
+- Data sources are used in Terraform to load or query data from APIs or other Terraform workspaces.
+- You can use this data to make your project's configuration more flexible, and to connect workspaces that manage different parts of your infrastructure.
+- You can also use data sources to connect and share data between workspaces in Terraform Cloud and Terraform Enterprise.
+- Data Blocks within Terraform HCL are comprised of the following components:
+  - **Data Block**: "resource" is a top-level keyword like "for" and "while" in other programming languages.
+  - **Data Type**: The next value is the type of the resource. Resources types are always prefixed with their provider (aws in this case). There can be multiple resources of the same type in a Terraform configuration.
+  - **Data Local Name**: The next value is the name of the resource. The resource type and name together form the resource identifier, or ID. In this lab, one of the resource IDs is aws_instance.web. The resource ID must be unique for a given configuration, even if multiple files are used.
+  - **Data Arguments**: Most of the arguments within the body of a resource block are specific to the selected resource type. The resource type's documentation lists which arguments are available and how their values should be formatted.
+
+#### Data Block Template
+
+```hcl
+data “<DATA TYPE>” “<DATA LOCAL NAME>”   {
+  # Block body
+  <IDENTIFIER> = <EXPRESSION> # Argument
+}
+```
+
+#### Task: Add A New Data Source To Query The Current AWS Region Being Used
+
+```hcl
+# Retrieve the list of AZs in the current AWS region
+data "aws_availability_zones" "available" {}
+
+# === Access the data ===
+# Deploy the private subnets
+resource "aws_subnet" "private_subnets" {
+  for_each          = var.private_subnets
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = cidrsubnet(var.vpc_cidr, 8, each.value)
+  availability_zone = tolist(data.aws_availability_zones.available.names)[each.value]
+
+  tags = {
+    Name      = each.key
+    Terraform = "true"
+  }
+}
+```
+
+#### Syntax For Accessing Data In A Data Block
+
+- `data.<type>.<name>.<attribute>`. e.g. `data.aws_availability_zones.available.names`
+
+#### Task: Add A New Data Source For Querying A Different Ubuntu Image
+
+```hcl
+# Terraform Data Block - Lookup Ubuntu 22.04
+data "aws_ami" "ubuntu_22_04" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+
+  owners = ["099720109477"]
+}
+
+# Modify the aws_instance so it uses the returned AMI
+resource "aws_instance" "web_server" {
+  ami                         = data.aws_ami.ubuntu_22_04.id
+  instance_type               = "t2.micro"
+  subnet_id                   = aws_subnet.public_subnets["public_subnet_1"].id
+  security_groups             = [aws_security_group.vpc-ping.id]
+  associate_public_ip_address = true
+  tags = {
+    Name = "Web EC2 Server"
   }
 }
 ```
