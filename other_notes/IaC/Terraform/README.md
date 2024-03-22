@@ -25,6 +25,15 @@
     - [Terraform Data Block](#terraform-data-block)
     - [Terraform Provider Block](#terraform-provider-block)
     - [Example Terraform Usage](#example-terraform-usage)
+    - [Terraform Plug-in Based Architecture](#terraform-plug-in-based-architecture)
+      - [Install The Official Terraform AWS Provider](#install-the-official-terraform-aws-provider)
+      - [View The Required Providers](#view-the-required-providers)
+    - [Configure AWS Provider](#configure-aws-provider)
+      - [Configure Terraform AWS Provider](#configure-terraform-aws-provider)
+      - [Configure AWS Credentials for Terraform provider](#configure-aws-credentials-for-terraform-provider)
+        - [Static credentials](#static-credentials)
+        - [Environment variables](#environment-variables)
+        - [Shared credentials/configuration file](#shared-credentialsconfiguration-file)
 
 ## Infrastructure as Code (IaC)
 
@@ -352,4 +361,105 @@ terraform apply -auto-approve
 terraform destroy -auto-approve
 ```
 
-aws_subnet.public_subnets["public_subnet_1"].id
+### Terraform Plug-in Based Architecture
+
+- Terraform relies on plugins called "providers" to interact with remote systems and expand functionality.
+- Terraform configurations must declare which providers they require so that Terraform can install and use them. This is performed within a Terraform configuration block.
+- List of the official Terraform providers can be found [here](https://registry.terraform.io/).
+
+#### Install The Official Terraform AWS Provider
+
+```hcl
+# filename: terraform.tf
+
+terraform {
+  required_version = ">= 1.0.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "5.41.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
+  }
+}
+```
+
+- To install the provider(s), run:
+
+```sh
+terraform init
+```
+
+#### View The Required Providers
+
+- If you ever would like to know which providers are installed in your working directory and those required by the configuration, you can issue a terraform version and terraform providers command.
+
+```sh
+terraform version
+```
+
+### [Configure AWS Provider](https://github.com/btkrausen/hashicorp/blob/master/terraform/Hands-On%20Labs/Section%2004%20-%20Understand%20Terraform%20Basics/04%20-%20Intro_to_the_Terraform_Provider_Block.md)
+
+#### Configure Terraform AWS Provider
+
+- Edit the provider block within the main.tf to configure the Terraform AWS provider.
+- This informs Terraform that it will deploy services into the `us-east-1 region` within AWS.
+
+```hcl
+# filename: terraform.tf
+
+# Configure the AWS Provider
+provider "aws" {
+  region = "us-east-1"
+}
+```
+
+#### Configure AWS Credentials for Terraform provider
+
+- The AWS Terraform provider offers a flexible means of providing credentials for authentication.
+- The following methods are supported:
+
+##### Static credentials
+
+- Static credentials can be provided by adding an access_key and secret_key in-line in the AWS provider block:
+
+```hcl
+provider "aws" {
+  region     = "us-east-1"
+  access_key = "my-access-key"
+  secret_key = "my-secret-key"
+}
+```
+
+##### Environment variables
+
+- You can provide your credentials via the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, environment variables, representing your AWS Access Key and AWS Secret Key, respectively.
+
+```hcl
+provider "aws" {
+}
+```
+
+```sh
+export AWS_ACCESS_KEY_ID="anaccesskey"
+export AWS_SECRET_ACCESS_KEY="asecretkey"
+export AWS_DEFAULT_REGION="us-east-1"
+```
+
+##### Shared credentials/configuration file
+
+- You can use an AWS credentials or configuration file to specify your credentials.
+- The default location is `$HOME/.aws/credentials` on Linux and macOS, or `"%USERPROFILE%\.aws\credentials"` on Windows.
+- You can optionally specify a different location in the Terraform configuration by providing the `shared_credentials_file` argument or using the `AWS_SHARED_CREDENTIALS_FILE` environment variable.
+- This method also supports a profile configuration and matching AWS_PROFILE environment variable.
+
+```hcl
+provider "aws" {
+  region                  = "us-east-1"
+  shared_credentials_file = "/Users/tf_user/.aws/creds"
+  profile                 = "customprofile"
+}
+```
