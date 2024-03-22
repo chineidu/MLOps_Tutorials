@@ -20,10 +20,10 @@
       - [Applying a Terraform Plan](#applying-a-terraform-plan)
       - [Terraform Destroy](#terraform-destroy)
     - [Hashicorp Configuration Language (HCL)](#hashicorp-configuration-language-hcl)
-    - [Terraform Resource Block](#terraform-resource-block)
-    - [Terraform Input Variable Block](#terraform-input-variable-block)
-    - [Terraform Data Block](#terraform-data-block)
-    - [Terraform Provider Block](#terraform-provider-block)
+      - [Terraform Resource Block](#terraform-resource-block)
+      - [Terraform Input Variable Block](#terraform-input-variable-block)
+      - [Terraform Data Block](#terraform-data-block)
+      - [Terraform Provider Block](#terraform-provider-block)
     - [Example Terraform Usage](#example-terraform-usage)
     - [Terraform Plug-in Based Architecture](#terraform-plug-in-based-architecture)
       - [Install The Official Terraform AWS Provider](#install-the-official-terraform-aws-provider)
@@ -34,6 +34,8 @@
         - [Static credentials](#static-credentials)
         - [Environment variables](#environment-variables)
         - [Shared credentials/configuration file](#shared-credentialsconfiguration-file)
+    - [Terraform Resource Blocks](#terraform-resource-blocks)
+      - [Add a new resource to deploy an Amazon S3 bucket](#add-a-new-resource-to-deploy-an-amazon-s3-bucket)
 
 ## Infrastructure as Code (IaC)
 
@@ -180,7 +182,7 @@ resource "aws_instance" "web_server" { # BLOCK
   - Terraform Output Values Block
   - Terraform Modules Block
 
-### Terraform Resource Block
+#### Terraform Resource Block
 
 ```hcl
 # AWS EC2 Example (Resource Block)
@@ -190,7 +192,7 @@ resource "aws_instance" "web_server" { # BLOCK
 }
 ```
 
-### Terraform Input Variable Block
+#### Terraform Input Variable Block
 
 ```hcl
 # Define input variables (variables.tf)
@@ -206,7 +208,7 @@ variable "ami" {
   default = "ami-0c55b159cbfafe1f0"
 }
 
-# === Access The variables
+# === Access The variables ===
 # Resource using the input variables
 resource "aws_instance" "web_server" {
   ami           = var.ami
@@ -214,7 +216,7 @@ resource "aws_instance" "web_server" {
 }
 ```
 
-### Terraform Data Block
+#### Terraform Data Block
 
 ```hcl
 data "aws_s3_bucket" "example_bucket" {
@@ -222,7 +224,7 @@ data "aws_s3_bucket" "example_bucket" {
 }
 ```
 
-### Terraform Provider Block
+#### Terraform Provider Block
 
 ```hcl
 # Configure the AWS provider
@@ -461,5 +463,72 @@ provider "aws" {
   region                  = "us-east-1"
   shared_credentials_file = "/Users/tf_user/.aws/creds"
   profile                 = "customprofile"
+}
+```
+
+### Terraform Resource Blocks
+
+- Terraform uses resource blocks to manage infrastructure, such as virtual networks, compute instances, or higher-level components such as DNS records.
+- Resource blocks represent one or more infrastructure objects in your Terraform configuration.
+- Most Terraform providers have a number of different resources that map to the appropriate APIs to manage that particular infrastructure type.
+
+```hcl
+# Template
+<BLOCK TYPE> "<BLOCK LABEL>" "<BLOCK LABEL>" {
+
+  # Block body
+  <IDENTIFIER> = <EXPRESSION> # Argument
+}
+```
+
+| Resource   | AWS Provider       | AWS Infrastructure |
+| ---------- | ------------------ | ------------------ |
+| Resource 1 | aws_instance       | EC2 Instance       |
+| Resource 2 | aws_security_group | Security Group     |
+| Resource 3 | aws_s3_bucket      | AWS S3 Bucket      |
+| Resource 4 | aws_key_pair       | AWS Key Pair       |
+
+- When working with a specific provider, like AWS, Azure, or GCP, the resources are defined in the provider documentation.
+- Each resource is fully documented in regards to the valid and required arguments required for each individual resource.
+- For example, the `aws_key_pair` resource has a "Required" argument of `public_key` but optional arguments like `key_name` and `tags`.
+- You'll need to look at the provider documentation to understand what the supported resources are and how to define them in your Terraform configuration.
+
+```hcl
+resource "aws_route_table" "public_route_table" {
+  vpc_id = aws_vpc.vpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    gateway_id     = aws_internet_gateway.internet_gateway.id
+  }
+
+  tags = {
+    Name      = "demo_public_rtb"
+    Terraform = "true"
+  }
+}
+```
+
+> Note: Your resource blocks must have a unique resource id (combination of resource type along with resource name). In our example, our resource id is `aws_route_table.public_route_table`, which is the combination of our `resource type` aws_route_table and `resource name` public_route_table. This naming and interpolation nomenclature is powerful part of HCL that allows us to reference arguments from other resource blocks.
+
+#### Add a new resource to deploy an Amazon S3 bucket
+
+- [Docs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls)
+
+```hcl
+resource "aws_s3_bucket" "my-new-S3-bucket" {
+  bucket = "my-new-tf-test-bucket-bryan"
+
+  tags = {
+    Name = "My S3 Bucket"
+    Purpose = "Intro to Resource Blocks Lab"
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "my_new_bucket_acl" {
+  bucket = aws_s3_bucket.my-new-S3-bucket.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
 }
 ```
