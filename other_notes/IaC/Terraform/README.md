@@ -18,6 +18,7 @@
       - [Validating a Configuration](#validating-a-configuration)
       - [Genenerating a Terraform Plan](#genenerating-a-terraform-plan)
       - [Applying a Terraform Plan](#applying-a-terraform-plan)
+      - [List All The Currently Managed Resources By Terraform](#list-all-the-currently-managed-resources-by-terraform)
       - [Terraform Destroy](#terraform-destroy)
     - [Hashicorp Configuration Language (HCL)](#hashicorp-configuration-language-hcl)
       - [Terraform Resource Block](#terraform-resource-block)
@@ -35,6 +36,7 @@
         - [Environment Variables](#environment-variables)
         - [Shared Credentials/Configuration File](#shared-credentialsconfiguration-file)
   - [Terraform Resource Blocks](#terraform-resource-blocks)
+    - [Resource Blocks Examples](#resource-blocks-examples)
       - [Add A New Resource To Deploy An Amazon S3 Bucket](#add-a-new-resource-to-deploy-an-amazon-s3-bucket)
       - [Configure A Resource From The Random Provider](#configure-a-resource-from-the-random-provider)
     - [Introduction To The Terraform Variables Block](#introduction-to-the-terraform-variables-block)
@@ -48,6 +50,15 @@
       - [Task: Add A New Data Source To Query The Current AWS Region Being Used](#task-add-a-new-data-source-to-query-the-current-aws-region-being-used)
       - [Syntax For Accessing Data In A Data Block](#syntax-for-accessing-data-in-a-data-block)
       - [Task: Add A New Data Source For Querying A Different Ubuntu Image](#task-add-a-new-data-source-for-querying-a-different-ubuntu-image)
+    - [Terraform Import](#terraform-import)
+      - [Import An AWS EC2 Instance](#import-an-aws-ec2-instance)
+    - [Terraform Workspaces - OSS](#terraform-workspaces---oss)
+      - [Terraform Workspaces Use Cases](#terraform-workspaces-use-cases)
+      - [Show All The Terraform Workspaces](#show-all-the-terraform-workspaces)
+      - [Check The Current Terraform Workspace](#check-the-current-terraform-workspace)
+      - [Create New Workspace](#create-new-workspace)
+      - [Select Workspace](#select-workspace)
+    - [Terraform State Commands](#terraform-state-commands)
 
 ## Infrastructure as Code (IaC)
 
@@ -87,8 +98,10 @@
 
 - `terraform init`
 - `terraform validate`
+- `terraform fmt`
 - `terraform plan`
 - `terraform apply`
+- `terraform state list`
 - `terraform destroy`
 
 #### Verify Terraform Installation And Version
@@ -153,6 +166,14 @@ terraform plan
 
 ```bash
 terraform apply
+```
+
+#### List All The Currently Managed Resources By Terraform
+
+- Run the command:
+
+```bash
+terraform state list
 ```
 
 #### Terraform Destroy
@@ -523,6 +544,8 @@ resource "aws_route_table" "public_route_table" {
 
 > Note: Your resource blocks must have a unique resource id (combination of resource type along with resource name). In our example, our resource id is `aws_route_table.public_route_table`, which is the combination of our `resource type` aws_route_table and `resource name` public_route_table. This naming and interpolation nomenclature is powerful part of HCL that allows us to reference arguments from other resource blocks.
 
+### Resource Blocks Examples
+
 #### Add A New Resource To Deploy An Amazon S3 Bucket
 
 - [Docs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls)
@@ -759,3 +782,100 @@ resource "aws_instance" "web_server" {
   }
 }
 ```
+
+### Terraform Import
+
+- Terraform import is a functionality that allows you to bring existing infrastructure resources under Terraform's management.
+- It essentially imports the configuration of these pre-existing resources into your Terraform state file.
+
+#### Import An AWS EC2 Instance
+
+- Assuming an AWS EC2 instance has manually been created (using AWS Console), you need to copy the resource id of the EC2 instance. e.g. id = `1-03db5c21e61154d36`
+- Add the resource to the `main.tf` file.
+
+```hcl
+# Add manually created resource
+resource "aws_instance" "your_instance_name" {}
+```
+
+- On the CLI, enter the command:
+
+```sh
+# Get help
+terraform import -help
+
+terraform import aws_instance.your_instance_name <instance_id>
+
+# e.g.
+terraform import aws_instance.demo_server i-0c0505eacad53de2c
+
+```
+
+- Running this throws an expected error because the resource block is missing required arguments.
+
+```sh
+terraform plan
+
+# Get the resource properties
+terraform state show aws_instance.demo_server
+```
+
+- Update the config file.
+
+```hcl
+# Add manually created resource
+resource "aws_instance" "your_instance_name" {
+  ami             = "ami-080e1f13689e07408"
+  instance_type   = "t2.micro"
+}
+```
+
+### Terraform Workspaces - OSS
+
+- Terraform workspaces are a mechanism to manage different environments or deployments of your infrastructure using the same Terraform configuration.
+- They achieve this by isolating the state files associated with each environment.
+
+#### Terraform Workspaces Use Cases
+
+- Managing separate deployments for `development`, `staging`, and `production` environments.
+- Testing infrastructure changes in a dedicated environment before applying them to production.
+- Providing different infrastructure configurations for different teams or projects.
+
+#### Show All The Terraform Workspaces
+
+- You can show all the Terraform workspaces with the command:
+
+```sh
+terraform workspace list
+
+# Get help
+terraform workspace -help
+```
+
+#### Check The Current Terraform Workspace
+
+- You can check the current Terraform workspace you are in with the terraform workspace command:
+
+```sh
+terraform workspace show
+```
+
+#### Create New Workspace
+
+```sh
+terraform workspace new <workspace_name>
+
+# e.g.
+terraform workspace new development
+```
+
+#### Select Workspace
+
+```sh
+terraform workspace select <workspace_name>
+
+# e.g.
+terraform workspace select default
+```
+
+### Terraform State Commands

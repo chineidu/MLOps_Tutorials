@@ -165,3 +165,16 @@ resource "aws_instance" "web" {
     Terraform = "true"
   }
 }
+
+
+# === Add manually created resource (via import) ===
+# resource "aws_instance" "demo_server" {
+#   ami           = "ami-080e1f13689e07408"
+#   instance_type = "t2.micro"
+
+#   tags = {
+#     Name      = demo_server
+#     Terraform = "true"
+#   }
+
+# }
