@@ -10,8 +10,8 @@
     - [Disadvantages of Hard Voting](#disadvantages-of-hard-voting)
     - [Hard Voting Code](#hard-voting-code)
     - [Soft Voting](#soft-voting)
-    - [Advantages of Soft Voting:](#advantages-of-soft-voting)
-    - [Disadvantages of Soft Voting:](#disadvantages-of-soft-voting)
+    - [Advantages of Soft Voting](#advantages-of-soft-voting)
+    - [Disadvantages of Soft Voting](#disadvantages-of-soft-voting)
     - [Soft Voting Code](#soft-voting-code)
 
 ## Hard Vs Soft Voting In ML
@@ -77,12 +77,12 @@ print(accuracy_score(y_test, y_pred))
   - **Weighted voting**: Each model's prediction is weighted by its respective confidence score. This means that models with higher confidence scores have a greater influence on the final prediction.
   - **Sum and choose**: The weighted predictions for each class are summed. The class with the highest sum of weighted scores is chosen as the final prediction of the ensemble.
 
-### Advantages of Soft Voting:
+### Advantages of Soft Voting
 
 - everages confidence scores: It utilizes the confidence information from individual models, potentially leading to a more accurate final prediction.
 - Can be more robust: By considering confidence, it may be less susceptible to noisy predictions from individual models.
 
-### Disadvantages of Soft Voting:
+### Disadvantages of Soft Voting
 
 - Requires confidence scores: Not all models naturally output confidence scores. Additional processing might be needed to obtain them.
 - Potentially complex: Depending on the weighting scheme used, soft voting can be more intricate to implement compared to hard voting.
