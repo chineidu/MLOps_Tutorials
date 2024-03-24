@@ -1,5 +1,5 @@
 # ==========================================================
-# Provider Block(s)
+# Resource Block(s)
 # ==========================================================
 # Configure the AWS Provider
 provider "aws" {
@@ -25,6 +25,8 @@ resource "aws_vpc" "vpc" {
     Environment = "demo_environment"
     Terraform   = "true"
   }
+
+  enable_dns_hostnames = true
 }
 
 # Deploy the private subnets
@@ -61,7 +63,7 @@ resource "aws_route_table" "public_route_table" {
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.internet_gateway.id
-    # nat_gateway_id = aws_nat_gateway.nat_gateway.id
+    #nat_gateway_id = aws_nat_gateway.nat_gateway.id
   }
   tags = {
     Name      = "demo_public_rtb"
@@ -74,7 +76,7 @@ resource "aws_route_table" "private_route_table" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    #  gateway_id     = aws_internet_gateway.internet_gateway.id
+    # gateway_id     = aws_internet_gateway.internet_gateway.id
     nat_gateway_id = aws_nat_gateway.nat_gateway.id
   }
   tags = {
@@ -125,62 +127,210 @@ resource "aws_nat_gateway" "nat_gateway" {
   }
 }
 
-resource "aws_security_group" "sg_1" {
-  name        = "example-security-group"
-  description = "Example Security Group"
 
-  vpc_id = aws_vpc.vpc.id # Specify the VPC ID where the security group will be created
+resource "random_string" "random" {
+  length = 10
+}
 
-  # Define ingress rules for inbound traffic
-  ingress {
-    from_port   = var.ingress_port_1
-    to_port     = var.ingress_port_1
-    protocol    = "tcp"
-    cidr_blocks = var.cidr_blocks
+# ==========================================================
+# Data Block(s)
+# ==========================================================
+# Terraform Data Block - To Lookup Latest Ubuntu 20.04 AMI Image
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
   }
 
-  ingress {
-    from_port   = var.ingress_port_2
-    to_port     = var.ingress_port_2
-    protocol    = "tcp"
-    cidr_blocks = var.cidr_blocks
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
   }
 
-  # Define egress rules for outbound traffic
+  owners = ["099720109477"]
+}
+
+# ==========================================================
+# Resource Block(s)
+# ==========================================================
+# Terraform Resource Block - To Build EC2 instance in Public Subnet
+resource "aws_instance" "ubuntu_server" {
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = "t2.micro"
+  subnet_id                   = aws_subnet.public_subnets["public_subnet_1"].id
+  security_groups             = [aws_security_group.vpc-ping.id, aws_security_group.ingress-ssh.id, aws_security_group.vpc-web.id]
+  associate_public_ip_address = true
+  key_name                    = aws_key_pair.generated.key_name
+  connection {
+    user        = "ubuntu"
+    private_key = tls_private_key.generated.private_key_pem
+    host        = self.public_ip
+  }
+
+  # Leave the first part of the block unchanged and create our `local-exec` provisioner
+  provisioner "local-exec" {
+    command = "chmod 600 ${local_file.private_key_pem.filename}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo rm -rf /tmp",
+      "sudo git clone https://github.com/hashicorp/demo-terraform-101 /tmp",
+      "sudo sh /tmp/assets/setup-web.sh",
+    ]
+  }
+
+  tags = {
+    Name = "Ubuntu EC2 Server"
+  }
+
+  lifecycle {
+    ignore_changes = [security_groups]
+  }
+
+
+}
+
+# Terraform Resource Block - Security Group to Allow Ping Traffic
+resource "aws_security_group" "vpc-ping" {
+  name        = "vpc-ping"
+  vpc_id      = aws_vpc.vpc.id
+  description = "ICMP for Ping Access"
+  ingress {
+    description = "Allow ICMP Traffic"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   egress {
-    from_port   = var.egress_port
-    to_port     = var.egress_port
-    protocol    = "-1" # Allow all outbound traffic
-    cidr_blocks = var.cidr_blocks
-  }
-
-  tags = {
-    Name = "example-security-group"
+    description = "Allow all ip and ports outboun"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-resource "aws_instance" "web" {
-  ami           = "ami-0d7a109bf30624c99"
-  instance_type = var.instance_type
+resource "tls_private_key" "generated" {
+  algorithm = "RSA"
+}
 
-  subnet_id              = aws_subnet.public_subnets["public_subnet_1"].id
-  vpc_security_group_ids = [aws_security_group.sg_1.id]
+resource "local_file" "private_key_pem" {
+  content  = tls_private_key.generated.private_key_pem
+  filename = "MyAWSKey.pem"
+}
 
-  tags = {
-    Name      = "web"
-    Terraform = "true"
+resource "aws_key_pair" "generated" {
+  key_name   = "MyAWSKey"
+  public_key = tls_private_key.generated.public_key_openssh
+}
+
+resource "aws_security_group" "ingress-ssh" {
+  name   = "allow-all-ssh"
+  vpc_id = aws_vpc.vpc.id
+  ingress {
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+  }
+  // Terraform removes the default rule
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
+resource "aws_security_group" "vpc-web" {
+  name        = "vpc-web-${terraform.workspace}"
+  vpc_id      = aws_vpc.vpc.id
+  description = "Web Traffic"
+  ingress {
+    description = "Allow Port 80"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-# === Add manually created resource (via import) ===
-# resource "aws_instance" "demo_server" {
-#   ami           = "ami-080e1f13689e07408"
-#   instance_type = "t2.micro"
+  ingress {
+    description = "Allow Port 443"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-#   tags = {
-#     Name      = demo_server
-#     Terraform = "true"
-#   }
+  egress {
+    description = "Allow all ip and ports outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
-# }
+# Terraform Resource Block - To Build Web Server in Public Subnet
+resource "aws_instance" "web_server" {
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = "t2.micro"
+  subnet_id                   = aws_subnet.public_subnets["public_subnet_1"].id
+  security_groups             = [aws_security_group.vpc-ping.id, aws_security_group.ingress-ssh.id, aws_security_group.vpc-web.id]
+  associate_public_ip_address = true
+  key_name                    = aws_key_pair.generated.key_name
+  connection {
+    user        = "ubuntu"
+    private_key = tls_private_key.generated.private_key_pem
+    host        = self.public_ip
+  }
+
+  # Leave the first part of the block unchanged and create our `local-exec` provisioner
+  provisioner "local-exec" {
+    command = "chmod 600 ${local_file.private_key_pem.filename}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo rm -rf /tmp",
+      "sudo git clone https://github.com/hashicorp/demo-terraform-101 /tmp",
+      "sudo sh /tmp/assets/setup-web.sh",
+    ]
+  }
+
+  tags = {
+    Name = "Web EC2 Server"
+  }
+
+  lifecycle {
+    ignore_changes = [security_groups]
+  }
+
+}
+
+# Terraform Resource Block - To Build EC2 instance in Public Subnet
+resource "aws_instance" "web_server_2" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+  subnet_id     = aws_subnet.public_subnets["public_subnet_2"].id
+  tags = {
+    Name = "Web EC2 Server 2"
+  }
+}
+
+module "server" {
+  source          = "./modules/server"
+  ami             = data.aws_ami.ubuntu.id
+  subnet_id       = aws_subnet.public_subnets["public_subnet_3"].id
+  security_groups = [
+    aws_security_group.vpc-ping.id,
+    aws_security_group.ingress-ssh.id,
+    aws_security_group.vpc-web.id
+  ]
+}

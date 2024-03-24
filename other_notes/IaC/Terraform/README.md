@@ -16,7 +16,8 @@
       - [Terraform Init](#terraform-init)
       - [Format HCL Files](#format-hcl-files)
       - [Validating a Configuration](#validating-a-configuration)
-      - [Genenerating a Terraform Plan](#genenerating-a-terraform-plan)
+      - [Generating a Terraform Plan](#generating-a-terraform-plan)
+      - [Generating a Terraform Plan File](#generating-a-terraform-plan-file)
       - [Applying a Terraform Plan](#applying-a-terraform-plan)
       - [List All The Currently Managed Resources By Terraform](#list-all-the-currently-managed-resources-by-terraform)
       - [Terraform Destroy](#terraform-destroy)
@@ -61,6 +62,11 @@
       - [Select Workspace](#select-workspace)
     - [Terraform Modules](#terraform-modules)
       - [Terraform Modules Example](#terraform-modules-example)
+      - [Access Local Modules](#access-local-modules)
+      - [Install and Apply Module](#install-and-apply-module)
+    - [Terraform Module Sources](#terraform-module-sources)
+      - [1. Public Module Registry](#1-public-module-registry)
+      - [2. Source A Module From GitHub](#2-source-a-module-from-github)
 
 ## Infrastructure as Code (IaC)
 
@@ -136,6 +142,9 @@ Once your Terraform workspace has been initialized you are ready to begin planni
 
 ```sh
 terraform fmt
+
+# Recursively format files
+terraform fmt -recursive
 ```
 
 #### Validating a Configuration
@@ -153,13 +162,30 @@ terraform validate
 Success! The configuration is valid.
 ```
 
-#### Genenerating a Terraform Plan
+#### Generating a Terraform Plan
 
 - Terraform has a dry run mode where you can preview what Terraform will change without making any actual changes to your infrastructure.
 - This dry run is performed by running a `terraform plan`.
 
 ```bash
 terraform plan
+```
+
+#### Generating a Terraform Plan File
+
+- The terraform plan command with the `-out` option in Terraform allows you to save the generated execution plan to a file.
+- This plan outlines the changes Terraform intends to make to your infrastructure if you run terraform apply.
+
+- **Benefits**:
+  - By saving the plan, you can analyze the intended infrastructure modifications at your convenience, even without an internet connection.
+  - The saved plan file can be easily shared with colleagues for review and discussion before applying the changes.
+  - You can integrate the plan file into your version control system to track changes in the planned infrastructure state over time.
+
+```sh
+terraform plan -out <plan_name>
+
+# e.g.
+terraform plan -out tfplan
 ```
 
 #### Applying a Terraform Plan
@@ -839,7 +865,7 @@ terraform import aws_instance.demo_server i-0c0505eacad53de2c
 
 ```
 
-- Running this throws an expected error because the resource block is missing required arguments.
+- Running this throws **`an expected error`** because the resource block is missing required arguments.
 
 ```sh
 terraform plan
@@ -853,8 +879,8 @@ terraform state show aws_instance.demo_server
 ```hcl
 # Add manually created resource
 resource "aws_instance" "your_instance_name" {
-  ami             = "ami-080e1f13689e07408"
-  instance_type   = "t2.micro"
+  ami             = "ami-080e1f13689e07408" # new!
+  instance_type   = "t2.micro"              # new!
 }
 ```
 
@@ -959,4 +985,147 @@ output "public_dns" {
   value = aws_instance.web.public_dns
   description = "Public DNS of the instance"
 }
+```
+
+#### Access Local Modules
+
+- In your root configuration (also called your root module) `/workspace/terraform/main.tf`, we can call our new server module with a Terraform module block.
+- Remember that terraform only works with the configuration files that are in it's current working directory.
+- Modules allow us to reference Terraform configuration that lives outside of our working directory.
+- In this case we'll incorporate all configuration that is both inside our working directory (root module) and inside the server directory (child module).
+
+```hcl
+# It takes 4 arguments but 3 are required
+module "server" {
+  source          = "./modules/server"
+  ami             = data.aws_ami.ubuntu.id
+  subnet_id       = aws_subnet.public_subnets["public_subnet_3"].id
+  security_groups = [
+    aws_security_group.vpc-ping.id,
+    aws_security_group.ingress-ssh.id,
+    aws_security_group.vpc-web.id
+  ]
+}
+```
+
+#### Install and Apply Module
+
+- Terraform configuration files located within modules are pulled down by Terraform during initialization, so any time you add or update a module version you must run a `terraform init`.
+
+```sh
+terraform init
+```
+
+### Terraform Module Sources
+
+- Modules can be sourced from a number of different locations, including both local and remote sources.
+- The `Terraform Module Registry`, `HTTP urls` and `S3 buckets` are examples of remote sources, while folders and subfolders are examples of local sources.
+- Support for various module sources allow you to include Terraform configuration from a variety of locations while still providing proper organization of code.
+
+#### 1. Public Module Registry
+
+- [Auto Scaling Docs](https://registry.terraform.io/modules/terraform-aws-modules/autoscaling/aws/latest)
+- Terraform Public Registry is an index of modules shared publicly. This public registry is the easiest way to get started with Terraform and find modules created by others in the community.
+- You can also use a private registry as a feature of Terraform Cloud/Terraform Enterprise.
+- Modules on the public Terraform Registry can be sourced using a registry source address of the form `//`, with each module's information page on the registry site including the exact address to use.
+- Example:
+  - We will use the `AWS Autoscaling module` to deploy an AWS Autoscaling group to our environment.
+  - Update the `main.tf` to include this module from the Terraform Module Registry.
+
+```hcl
+module "autoscaling" {
+  source  = "terraform-aws-modules/autoscaling/aws"
+  version = "4.9.0"
+
+  # Autoscaling group
+  name = "myasg"
+
+  vpc_zone_identifier = [aws_subnet.private_subnets["private_subnet_1"].id,
+  aws_subnet.private_subnets["private_subnet_2"].id,
+  aws_subnet.private_subnets["private_subnet_3"].id]
+  min_size            = 0
+  max_size            = 1
+  desired_capacity    = 1
+
+  # Launch template
+  use_lt    = true
+  create_lt = true
+
+  image_id      = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+
+  tags_as_map = {
+    Name = "Web EC2 Server 2"
+  }
+}
+```
+
+- Any time that the source of a module is updated or added to our configuration, the working directory needs to be reintilized.
+
+```sh
+terraform init
+```
+
+- We can follow that by issuing a terraform plan to see that additional resources that will be added by using the module.
+
+```sh
+terraform plan -out tfplan
+```
+
+- Once we are happy with how the module is behaving we can issue a terraform apply.
+
+```sh
+terraform apply tfplan
+```
+
+#### 2. Source A Module From GitHub
+
+- Another source of modules that we can use are those that are published directly on `GitHub`.
+- Terraform will recognize unprefixed github.com URLs and interpret them automatically as Git repository sources.
+- Let's update the source of our autoscaling group module from the Public Module registry to use github.com instead.
+- This will require us to remove the `version` argument from our module block.
+
+```hcl
+module "autoscaling" {
+  source = "github.com/terraform-aws-modules/terraform-aws-autoscaling?ref=v4.9.0"
+
+  # Autoscaling group
+  name = "myasg"
+
+  vpc_zone_identifier = [aws_subnet.private_subnets["private_subnet_1"].id,
+  aws_subnet.private_subnets["private_subnet_2"].id,
+  aws_subnet.private_subnets["private_subnet_3"].id]
+  min_size            = 0
+  max_size            = 1
+  desired_capacity    = 1
+
+  # Launch template
+  use_lt    = true
+  create_lt = true
+
+  image_id      = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+
+  tags_as_map = {
+    Name = "Web EC2 Server 2"
+  }
+}
+```
+
+- Re-intilize the providers.
+
+```sh
+terraform init
+```
+
+- We can follow that by issuing a terraform plan to see that additional resources that will be added by using the module.
+
+```sh
+terraform plan -out tfplan
+```
+
+- Once we are happy with how the module is behaving we can issue a terraform apply.
+
+```sh
+terraform apply tfplan
 ```
