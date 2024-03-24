@@ -67,6 +67,7 @@
     - [Terraform Module Sources](#terraform-module-sources)
       - [1. Public Module Registry](#1-public-module-registry)
       - [2. Source A Module From GitHub](#2-source-a-module-from-github)
+  - [Generate Private Key](#generate-private-key)
 
 ## Infrastructure as Code (IaC)
 
@@ -1128,4 +1129,34 @@ terraform plan -out tfplan
 
 ```sh
 terraform apply tfplan
+```
+
+## Generate Private Key
+
+- Instead of using this:
+
+```hcl
+resource "aws_key_pair" "generated" {
+  key_name   = "MyAWSKey"
+  public_key = tls_private_key.generated.public_key_openssh
+}
+```
+
+- Use this!
+
+```sh
+ssh-keygen -t rsa -b 4096 -m PEM -f path/to/your/key>/your_key_name.pem
+
+# e.g.
+ssh-keygen -t rsa -b 4096 -m PEM -f ${PWD}/MyAWSKey.pem
+```
+
+- Update the config code.
+
+```hcl
+resource "aws_key_pair" "imported_key" {
+  key_name   = "MyAWSKey"
+  public_key = file("path/to/your/public_key.pem.pub")
+}
+
 ```

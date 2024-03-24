@@ -155,6 +155,20 @@ data "aws_ami" "ubuntu" {
 # ==========================================================
 # Resource Block(s)
 # ==========================================================
+# resource "tls_private_key" "generated" {
+#   algorithm = "RSA"
+# }
+
+# resource "local_file" "public_key_pem" {
+#   content  = base64encode(file("./MyAWSKey.pem.pub"))
+#   filename = "MyAWSKey.pem.pub"
+# }
+
+resource "aws_key_pair" "imported" {
+  key_name   = var.my_key_pair
+  public_key = file("./${var.my_key_pair}.pem.pub")
+}
+
 # Terraform Resource Block - To Build EC2 instance in Public Subnet
 resource "aws_instance" "ubuntu_server" {
   ami                         = data.aws_ami.ubuntu.id
@@ -162,16 +176,16 @@ resource "aws_instance" "ubuntu_server" {
   subnet_id                   = aws_subnet.public_subnets["public_subnet_1"].id
   security_groups             = [aws_security_group.vpc-ping.id, aws_security_group.ingress-ssh.id, aws_security_group.vpc-web.id]
   associate_public_ip_address = true
-  key_name                    = aws_key_pair.generated.key_name
+  key_name                    = aws_key_pair.imported.key_name
   connection {
     user        = "ubuntu"
-    private_key = tls_private_key.generated.private_key_pem
+    # private_key = tls_private_key.generated.private_key_pem
     host        = self.public_ip
   }
 
   # Leave the first part of the block unchanged and create our `local-exec` provisioner
   provisioner "local-exec" {
-    command = "chmod 600 ${local_file.private_key_pem.filename}"
+    command = "chmod 600 ./${var.my_key_pair}.pem.pub"
   }
 
   provisioner "remote-exec" {
@@ -212,20 +226,6 @@ resource "aws_security_group" "vpc-ping" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-resource "tls_private_key" "generated" {
-  algorithm = "RSA"
-}
-
-resource "local_file" "private_key_pem" {
-  content  = tls_private_key.generated.private_key_pem
-  filename = "MyAWSKey.pem"
-}
-
-resource "aws_key_pair" "generated" {
-  key_name   = "MyAWSKey"
-  public_key = tls_private_key.generated.public_key_openssh
 }
 
 resource "aws_security_group" "ingress-ssh" {
@@ -284,16 +284,16 @@ resource "aws_instance" "web_server" {
   subnet_id                   = aws_subnet.public_subnets["public_subnet_1"].id
   security_groups             = [aws_security_group.vpc-ping.id, aws_security_group.ingress-ssh.id, aws_security_group.vpc-web.id]
   associate_public_ip_address = true
-  key_name                    = aws_key_pair.generated.key_name
+  key_name                    = aws_key_pair.imported.key_name
   connection {
     user        = "ubuntu"
-    private_key = tls_private_key.generated.private_key_pem
+    # private_key = tls_private_key.generated.private_key_pem
     host        = self.public_ip
   }
 
   # Leave the first part of the block unchanged and create our `local-exec` provisioner
   provisioner "local-exec" {
-    command = "chmod 600 ${local_file.private_key_pem.filename}"
+    command = "chmod 600 ./${var.my_key_pair}.pem.pub"
   }
 
   provisioner "remote-exec" {

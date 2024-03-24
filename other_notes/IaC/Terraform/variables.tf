@@ -34,6 +34,12 @@ variable "public_subnets" {
   }
 }
 
+variable "my_key_pair" {
+  type        = string
+  description = "Key-pair name"
+  default     = "MyAWSKey"
+}
+
 variable "ingress_port_1" {
   type        = number
   description = "First ingress port (default allows HTTP traffic)"

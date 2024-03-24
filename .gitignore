@@ -165,3 +165,4 @@ notepad.py
 *.json
 *.pem
 **/*.terraform
+**/*.pub
