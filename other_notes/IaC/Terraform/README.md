@@ -25,6 +25,7 @@
       - [Terraform Input Variable Block](#terraform-input-variable-block)
       - [Terraform Data Block](#terraform-data-block)
       - [Terraform Provider Block](#terraform-provider-block)
+      - [Terraform Outputs Block](#terraform-outputs-block)
     - [Example Terraform Usage](#example-terraform-usage)
     - [Terraform Plug-in Based Architecture](#terraform-plug-in-based-architecture)
       - [Install The Official Terraform AWS Provider](#install-the-official-terraform-aws-provider)
@@ -58,7 +59,8 @@
       - [Check The Current Terraform Workspace](#check-the-current-terraform-workspace)
       - [Create New Workspace](#create-new-workspace)
       - [Select Workspace](#select-workspace)
-    - [Terraform State Commands](#terraform-state-commands)
+    - [Terraform Modules](#terraform-modules)
+      - [Terraform Modules Example](#terraform-modules-example)
 
 ## Infrastructure as Code (IaC)
 
@@ -251,6 +253,9 @@ resource "aws_instance" "web_server" {
 
 #### Terraform Data Block
 
+- A `data block`, also sometimes called a data source block, is used to retrieve information from existing resources or external systems.
+- Unlike resource blocks that create or manage infrastructure, data blocks act as a read-only mechanism to fetch specific data points Terraform needs for your configuration.
+
 ```hcl
 data "aws_s3_bucket" "example_bucket" {
   bucket = "my-existing-bucket-name"
@@ -258,6 +263,9 @@ data "aws_s3_bucket" "example_bucket" {
 ```
 
 #### Terraform Provider Block
+
+- A `provider block` is a fundamental element used to configure interactions with external infrastructure platforms or services.
+- It essentially acts as a bridge between Terraform and the specific provider you're using to manage resources.
 
 ```hcl
 # Configure the AWS provider
@@ -276,6 +284,18 @@ resource "aws_instance" "web_server" {
 }
 ```
 
+#### Terraform Outputs Block
+
+- An `output block` is a way to extract and present data about your infrastructure after it's been provisioned.
+- It essentially allows you to export specific values from your Terraform configuration.
+
+```hcl
+output "instance_public_ip" {
+  value = aws_instance.my_instance.public_ip
+  description = "Public IP address of the instance"
+}
+```
+
 ### Example Terraform Usage
 
 - Export your creds.
@@ -288,6 +308,9 @@ export AWS_SECRET_ACCESS_KEY="<YOUR SECRET KEY>"
 ```hcl
 # === main.tf ===
 # Configure the AWS Provider
+# ==========================================================
+# Provider Block(s)
+# ==========================================================
 provider "aws" {
   region = "us-east-1"
 }
@@ -296,6 +319,9 @@ provider "aws" {
 data "aws_availability_zones" "available" {}
 data "aws_region" "current" {}
 
+# ==========================================================
+# Resource Block(s)
+# ==========================================================
 # Define the VPC
 resource "aws_vpc" "vpc" {
   cidr_block = var.vpc_cidr
@@ -337,7 +363,9 @@ resource "aws_subnet" "public_subnets" {
 # Create route tables for public and private subnets
 # Other config goes here ...
 
-
+# ==========================================================
+# Input Variable Block(s)
+# ==========================================================
 # === variables.tf ===
 variable "aws_region" {
   type    = string
@@ -878,4 +906,57 @@ terraform workspace select <workspace_name>
 terraform workspace select default
 ```
 
-### Terraform State Commands
+### Terraform Modules
+
+- A `Terraform module` is a way to package and reuse a set of Terraform configuration files.
+- It groups resources that perform a specific function or manage a particular infrastructure component together.
+- Modules promote code `organization`, `maintainability`, and `sharing` of infrastructure building blocks.
+
+#### Terraform Modules Example
+
+```hcl
+# Filename: modules/servers/servers.tf
+# ==========================================================
+# Input Variable Blocks
+# ==========================================================
+# Required variables
+variable "ami" {}
+variable "subnet_id" {}
+variable "security_groups" {
+  type = list(any)
+}
+# Optional variable (coz it has default=...)
+variable "size" {
+  default = "t2.micro"
+}
+
+
+# ==========================================================
+# Resource Block(s)
+# ==========================================================
+# It expects 4 arguments (1 is optional)
+resource "aws_instance" "web" {
+  ami                    = var.ami
+  instance_type          = var.size
+  subnet_id              = var.subnet_id
+  vpc_security_group_ids = var.security_groups
+
+  tags = {
+    "Name"        = "Server from Module"
+    "Environment" = "Training"
+  }
+}
+
+# ==========================================================
+# Output Blocks
+# ==========================================================
+output "public_ip" {
+  value = aws_instance.web.public_ip
+  description = "Public IP address of the instance"
+}
+
+output "public_dns" {
+  value = aws_instance.web.public_dns
+  description = "Public DNS of the instance"
+}
+```

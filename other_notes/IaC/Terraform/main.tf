@@ -1,12 +1,21 @@
+# ==========================================================
+# Provider Block(s)
+# ==========================================================
 # Configure the AWS Provider
 provider "aws" {
   region = "us-east-1"
 }
 
+# ==========================================================
+# Data Block(s)
+# ==========================================================
 # Retrieve the list of AZs in the current AWS region
 data "aws_availability_zones" "available" {}
 data "aws_region" "current" {}
 
+# ==========================================================
+# Resource Block(s)
+# ==========================================================
 # Define the VPC
 resource "aws_vpc" "vpc" {
   cidr_block = var.vpc_cidr
@@ -150,15 +159,12 @@ resource "aws_security_group" "sg_1" {
   }
 }
 
-
 resource "aws_instance" "web" {
   ami           = "ami-0d7a109bf30624c99"
   instance_type = var.instance_type
 
   subnet_id              = aws_subnet.public_subnets["public_subnet_1"].id
   vpc_security_group_ids = [aws_security_group.sg_1.id]
-
-
 
   tags = {
     Name      = "web"
