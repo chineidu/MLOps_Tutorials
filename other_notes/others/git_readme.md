@@ -11,6 +11,11 @@
       - [2. Reordering Commits](#2-reordering-commits)
       - [3. Fixing A Commit Message](#3-fixing-a-commit-message)
       - [4. Rebase Onto Upstream Branch (Automatic)](#4-rebase-onto-upstream-branch-automatic)
+  - [Git Fetch](#git-fetch)
+    - [Benefits of Git Fetch](#benefits-of-git-fetch)
+    - [Common Git Fetch Use Cases](#common-git-fetch-use-cases)
+      - [1. Update Local Knowledge of Remote Repository:](#1-update-local-knowledge-of-remote-repository)
+      - [2. Fetching And Creating A Remote Branch That Doesn't Exist Locally](#2-fetching-and-creating-a-remote-branch-that-doesnt-exist-locally)
 
 ## Git Rebase
 
@@ -71,3 +76,42 @@ git rebase -i origin/main  # Rewinds and replays on top of "main" branch
 
 # Optional: Edit commits here (squash, reword, drop)
 ```
+
+## Git Fetch
+
+- Git fetch is a command in Git version control that retrieves the latest changes from a remote repository without merging them into your local working directory.
+- It updates your local knowledge of the remote repository's branches and tags, but doesn't modify your local branch.
+
+### Benefits of Git Fetch
+
+- **Staying Updated**: git fetch keeps you informed about changes in the remote repository. After fetching, you can use git merge to integrate those changes into your local branch.
+- **Collaboration**: When collaborating on a project, fetching ensures you're aware of the latest updates pushed by other team members before merging.
+- **Following Upstream**: Regularly fetching lets you track the progress of the main project repository (usually called origin/main).
+
+### Common Git Fetch Use Cases
+
+#### 1. Update Local Knowledge of Remote Repository:
+
+- Before `merging` or `rebasing` your local branch with the remote branch, it's crucial to fetch the latest changes:
+
+```sh
+git fetch origin  # Fetch latest changes from "origin"
+```
+
+#### 2. Fetching And Creating A Remote Branch That Doesn't Exist Locally
+
+- You can fetch and create a remote branch that does not exist locally by running the following commands:
+
+```sh
+git fetch origin
+
+# Display all branches, both local and remote (prefixed with origin/).
+git branch -a
+
+# Update the contents of the local branch with the remote branch
+git checkout -b local_branch_name origin/remote_branch_name
+```
+
+- Replace:
+  - `local_branch_name` with the desired name of the local branch.
+  - `remote_branch_name` with the desired name of the remote branch
