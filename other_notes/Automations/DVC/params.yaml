@@ -42,3 +42,7 @@ train:
   max_depth: 15
   n_splits: 10
   use_log_model: True
+  trained_model_save_path: ./data/models/model_v1.joblib
+
+evaluate:
+  metrics_save_path: ./data/metrics/results.yaml

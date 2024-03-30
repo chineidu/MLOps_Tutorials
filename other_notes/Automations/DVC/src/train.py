@@ -8,6 +8,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold
 from tqdm import tqdm
 from typeguard import typechecked
+from utils import save_model
 
 config: DictConfig = OmegaConf.load("./other_notes/Automations/DVC/params.yaml")
 penalty: str = config.train.penalty
@@ -40,9 +41,6 @@ def train(config: DictConfig) -> None:
     y_train: pd.Series = pd.read_parquet(path=config.features.train_target_save_path)[
         config.data.target
     ]
-    y_test: pd.Series = pd.read_parquet(path=config.features.test_target_save_path)[
-        config.data.target
-    ]
 
     # Implementing oversampling for handling the imbalanced class
     smt = SMOTETomek(random_state=random_state)
@@ -56,7 +54,7 @@ def train(config: DictConfig) -> None:
     auc_vals: list[float] | list = []  # type: ignore
 
     # Loop through folds
-    for n_fold, (train_idx, valid_idx) in tqdm(enumerate(folds.split(X_train, y_train), start=1)):
+    for _, (train_idx, valid_idx) in tqdm(enumerate(folds.split(X_train, y_train), start=1)):
         """In each iteration of the cross-validation loop, the model is trained on a specific
         subset of the data (training set) and validated on a different subset (validation set),
         facilitating the evaluation of the model's performance across diverse portions of the
@@ -82,8 +80,14 @@ def train(config: DictConfig) -> None:
 
         except Exception as err:
             logger.error(f"{err}")
+    # The mean AUC value across all folds
+    mean_auc_validation = np.mean(auc_vals)
+    logger.info(
+        f"Mean AUC [Validation]: {mean_auc_validation:.4f}",
+    )
 
-    logger.info("Loop finished Successfully")
+    logger.info("Training finished successfully")
+    save_model(config=config, model=model)
 
     return None
 

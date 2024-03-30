@@ -27,6 +27,7 @@ A tutorial on how to use **DVC (Data Version Control)** in your projects to vers
     - [Download Files Tracked By DVC In Your Remote Repo](#download-files-tracked-by-dvc-in-your-remote-repo)
   - [DVC Pipelines](#dvc-pipelines)
     - [Create Parameters (Config)](#create-parameters-config)
+    - [Load Config File Using OmegaConf](#load-config-file-using-omegaconf)
 
 ## Installation
 
@@ -209,5 +210,43 @@ dvc import https://github.com/chineidu/MLOps_Tutorials.git ./data
 
 ```yaml
 # params.yaml
+data:
+  csv_file_path: ./data/titanic_data.csv
+  test_size: 0.2
+  random_state: 123
+  target: survived
+  train_save_path: ./data/artifacts/train.parquet
+  test_save_path: ./data/artifacts/test.parquet
 
+features:
+  unique_id: name
+  cat_vars:
+    - embarked
+    - sex
+  cols_to_drop:
+    - boat
+    - body
+    - cabin
+    - home.dest
+```
+
+### Load Config File Using OmegaConf
+
+```py
+from omegaconf import DictConfig, OmegaConf
+
+config: DictConfig = OmegaConf.load("./other_notes/Automations/DVC/params.yaml")
+
+
+csv_file_path: str = config.data.csv_file_path
+test_size: float = config.data.test_size
+unique_id: str = config.features.unique_id
+cat_vars: list[str] = list(config.features.cat_vars)
+
+@typechecked
+def prepare_data(config: DictConfig) -> None:
+    """This is used to load and split the data."""
+    data: pl.DataFrame = pl.read_csv(source=csv_file_path)
+    # Add other logic
+    ...
 ```

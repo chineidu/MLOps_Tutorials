@@ -1,10 +1,15 @@
 from typing import Any
 
+import joblib
 import pandas as pd
 import polars as pl
+from logger import logger
+from omegaconf import DictConfig
 from sklearn.base import TransformerMixin
+from typeguard import typechecked
 
 
+@typechecked
 def _check_if_dataframe(
     data: pd.DataFrame | pl.DataFrame,
 ) -> pd.DataFrame | pl.DataFrame | TypeError:
@@ -14,6 +19,7 @@ def _check_if_dataframe(
     return data
 
 
+@typechecked
 def get_data_summary(data: pd.DataFrame | pl.DataFrame, features: list[str]) -> pd.DataFrame:
     """Get the summary statistics of the data using Pandas."""
 
@@ -55,6 +61,22 @@ def get_value_counts(data: pd.DataFrame | pl.DataFrame, feature: str) -> pl.Data
     return result_df
 
 
+@typechecked
+def save_model(config: DictConfig, model: Any) -> None:
+    """This is used to persist the trained model."""
+    with open(config.train.trained_model_save_path, "wb") as f:
+        joblib.dump(model, filename=f)
+    logger.info("Model saved successfully")
+
+
+@typechecked
+def load_model(config: DictConfig) -> Any:
+    """This is used to load the trained model."""
+    with open(config.train.trained_model_save_path, "rb") as f:
+        model: Any = joblib.load(filename=f)
+        return model
+
+
 class Preparedata(TransformerMixin):
     def __init__(self, variables: list[str]) -> None:
         self.variables = variables
@@ -73,6 +95,7 @@ class Preparedata(TransformerMixin):
 
         return X
 
+    @typechecked
     def transform(self, X: pd.DataFrame | pl.DataFrame, y=None) -> pd.DataFrame:
         """Apply the transformation."""
         X = self._to_lower(X)
