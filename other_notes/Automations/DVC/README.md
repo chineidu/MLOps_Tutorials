@@ -8,16 +8,26 @@ A tutorial on how to use **DVC (Data Version Control)** in your projects to vers
 
 - [DVC Tutorial](#dvc-tutorial)
   - [Table of Content](#table-of-content)
+  - [Installation](#installation)
   - [Initialize DVC](#initialize-dvc)
     - [Track Files](#track-files)
+    - [Check Cached Files](#check-cached-files)
     - [Commit Files](#commit-files)
     - [Auto-stage Files](#auto-stage-files)
   - [Add Remote Storage](#add-remote-storage)
     - [Google Drive (Remote Storage)](#google-drive-remote-storage)
+    - [Push To Remote](#push-to-remote)
     - [Pull Data From Remote](#pull-data-from-remote)
     - [Push Data To Remote After An Update](#push-data-to-remote-after-an-update)
+    - [Remove / Modify Remote Storage](#remove--modify-remote-storage)
     - [Switching between versions](#switching-between-versions)
   - [Check Status](#check-status)
+
+## Installation
+
+```sh
+pip install dvc dvc_gdrive
+```
 
 ## Initialize DVC
 
@@ -37,6 +47,12 @@ dvc add <path_to_files>
 
 # e.g.
 dvc add src/data src/models
+```
+
+### Check Cached Files
+
+```sh
+tree .dvc/cache
 ```
 
 ### Commit Files
@@ -67,8 +83,13 @@ dvc remote add --default <storage_name> gdrive://<your_folder_id>
 
 # e.g
 dvc remote add -d myremote gdrive://0AIac4JZqHhKmUk9PDA
+```
 
-# Push to the remote storage
+### Push To Remote
+
+- Push to the remote storage. It prompts you for authentication
+
+```sh
 dvc push  # Assuming there's data to push
 
 git commit -m "Add data"
@@ -92,6 +113,29 @@ dvc add data/filename
 git commit -m "Dataset updates"
 dvc push
 ```
+
+### Remove / Modify Remote Storage
+
+- To delete or re-authenticate a remote storage, check [docs](https://dvc.org/doc/user-guide/data-management/remote-storage/google-drive#configuration-parameters).
+- For `macOs`, navigate to this path:
+
+```sh
+cd ~/Library/Caches
+```
+
+- For `linux`, navigate to this path:
+
+```sh
+cd ~/.cache
+```
+
+- Delete the directory:
+
+```sh
+# Delete the directory containing the prev. auth
+rm -rf pydrive2fs
+```
+
 
 ### Switching between versions
 
