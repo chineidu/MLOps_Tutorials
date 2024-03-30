@@ -1,0 +1,44 @@
+data:
+  csv_file_path: ./data/titanic_data.csv
+  test_size: 0.2
+  random_state: 123
+  target: survived
+  train_save_path: ./data/artifacts/train.parquet
+  test_save_path: ./data/artifacts/test.parquet
+
+features:
+  unique_id: name
+  cat_vars:
+    - embarked
+    - sex
+  cols_to_drop:
+    - boat
+    - body
+    - cabin
+    - home.dest
+  num_vars:
+    - age
+    - fare
+    - parch
+    - pclass
+    - sibsp
+    - ticket
+  preprocess_vars:
+    - embarked
+    - sex
+    - ticket
+  transform_output: pandas
+  train_features_save_path: ./data/artifacts/train_features.parquet
+  test_features_save_path: ./data/artifacts/test_features.parquet
+  train_target_save_path: ./data/artifacts/train_target.parquet
+  test_target_save_path: ./data/artifacts/test_target.parquet
+
+train:
+  penalty: l2
+  C: 1.0
+  random_state: 123
+  solver: lbfgs
+  n_estimators: 50
+  max_depth: 15
+  n_splits: 10
+  use_log_model: True

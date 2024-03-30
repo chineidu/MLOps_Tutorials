@@ -22,6 +22,11 @@ A tutorial on how to use **DVC (Data Version Control)** in your projects to vers
     - [Remove / Modify Remote Storage](#remove--modify-remote-storage)
     - [Switching between versions](#switching-between-versions)
   - [Check Status](#check-status)
+    - [Check Files Tracked By DVC In Your Remote Repo](#check-files-tracked-by-dvc-in-your-remote-repo)
+    - [Check Files Tracked By DVC In Your Local Repo](#check-files-tracked-by-dvc-in-your-local-repo)
+    - [Download Files Tracked By DVC In Your Remote Repo](#download-files-tracked-by-dvc-in-your-remote-repo)
+  - [DVC Pipelines](#dvc-pipelines)
+    - [Create Parameters (Config)](#create-parameters-config)
 
 ## Installation
 
@@ -136,7 +141,6 @@ cd ~/.cache
 rm -rf pydrive2fs
 ```
 
-
 ### Switching between versions
 
 - The regular workflow is to use git checkout first (to switch a branch or checkout a `.dvc file` version) and then run dvc checkout to sync data:
@@ -156,4 +160,54 @@ git commit -m "Revert dataset updates"
 
 ```sh
 dvc status
+```
+
+### Check Files Tracked By DVC In Your Remote Repo
+
+```sh
+dvc list <repo_url> <file_directory>
+
+# e.g.
+dvc list https://github.com/chineidu/MLOps_Tutorials.git ./data
+```
+
+### Check Files Tracked By DVC In Your Local Repo
+
+- This command focuses specifically on DVC-tracked data and provides information about their status:
+
+```sh
+# (run this command in your DVC project directory)
+dvc data status
+```
+
+### Download Files Tracked By DVC In Your Remote Repo
+
+```sh
+dvc get <repo_url> <file_directory>
+
+# e.g.
+dvc get https://github.com/chineidu/MLOps_Tutorials.git ./data
+```
+
+- To download the data and the dvc files for tracking the data
+
+```sh
+dvc import <repo_url> <file_directory>
+
+# e.g.
+dvc import https://github.com/chineidu/MLOps_Tutorials.git ./data
+```
+
+## DVC Pipelines
+
+- A dvc `pipeline` in Data Version Control (`DVC`) refers to a series of automated data processing steps designed to be reproducible and manageable.
+- It essentially allows you to define and execute workflows that transform your raw data into the final results you need for tasks like machine learning or data analysis.
+
+### Create Parameters (Config)
+
+- Create a `params.yaml` file for the configuration.
+
+```yaml
+# params.yaml
+
 ```
