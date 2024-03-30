@@ -17,6 +17,7 @@ A tutorial on how to use **DVC (Data Version Control)** in your projects to vers
     - [Pull Data From Remote](#pull-data-from-remote)
     - [Push Data To Remote After An Update](#push-data-to-remote-after-an-update)
     - [Switching between versions](#switching-between-versions)
+  - [Check Status](#check-status)
 
 ## Initialize DVC
 
@@ -105,4 +106,10 @@ Commit it (no need to do `dvc push` this time since this original version of the
 
 ```bash
 git commit -m "Revert dataset updates"
+```
+
+## Check Status
+
+```sh
+dvc status
 ```
