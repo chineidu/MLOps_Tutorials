@@ -11,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from typeguard import typechecked
 from utils import Preparedata
 
-config: DictConfig = OmegaConf.load("./other_notes/Automations/DVC/params.yaml")
+config: DictConfig = OmegaConf.load("./params.yaml")
 
 
 set_config(transform_output=config.features.transform_output)
@@ -61,7 +61,7 @@ def prepare_features(config: DictConfig) -> None:
         X_test.select([name, config.data.target]).sort(name).drop([name]).to_pandas()
     )
     X_train_tr: pd.DataFrame = processor.fit_transform(X=X_train.to_pandas())
-    X_test_tr: pd.DataFrame = processor.fit_transform(X=X_test.to_pandas())
+    X_test_tr: pd.DataFrame = processor.transform(X=X_test.to_pandas())
 
     try:
         # Save data

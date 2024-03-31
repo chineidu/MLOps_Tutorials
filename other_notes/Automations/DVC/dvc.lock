@@ -1,0 +1,154 @@
+schema: '2.0'
+stages:
+  prepare_data:
+    cmd: python ./src/prepare_data.py
+    deps:
+    - path: ./data/titanic_data.csv
+      hash: md5
+      md5: 894507296df7bd91fd2d367a6489ccca
+      size: 104076
+    - path: ./src/prepare_data.py
+      hash: md5
+      md5: d4991b3a2d1fbf54f58bbc0e5fa68883
+      size: 1067
+    params:
+      params.yaml:
+        data:
+          csv_file_path: ./data/titanic_data.csv
+          test_size: 0.2
+          random_state: 20
+          target: survived
+          train_save_path: ./data/artifacts/train.parquet
+          test_save_path: ./data/artifacts/test.parquet
+    outs:
+    - path: ./data/artifacts/test.parquet
+      hash: md5
+      md5: 3e4f53b6e01dbfff4b0d7c5b0b5f9dae
+      size: 13734
+    - path: ./data/artifacts/train.parquet
+      hash: md5
+      md5: f564947799d32a1dbc7ccc0d6ab5b884
+      size: 35323
+  prepare_features:
+    cmd: python ./src/prepare_features.py
+    deps:
+    - path: ./data/artifacts/test.parquet
+      hash: md5
+      md5: 3e4f53b6e01dbfff4b0d7c5b0b5f9dae
+      size: 13734
+    - path: ./data/artifacts/train.parquet
+      hash: md5
+      md5: f564947799d32a1dbc7ccc0d6ab5b884
+      size: 35323
+    - path: ./src/prepare_features.py
+      hash: md5
+      md5: 262e0a120b5735c5bd38dd5105589408
+      size: 2979
+    params:
+      params.yaml:
+        features:
+          unique_id: name
+          cat_vars:
+          - embarked
+          - sex
+          cols_to_drop:
+          - boat
+          - body
+          - cabin
+          - home.dest
+          num_vars:
+          - age
+          - fare
+          - parch
+          - pclass
+          - sibsp
+          - ticket
+          preprocess_vars:
+          - embarked
+          - sex
+          - ticket
+          transform_output: pandas
+          train_features_save_path: ./data/artifacts/train_features.parquet
+          test_features_save_path: ./data/artifacts/test_features.parquet
+          train_target_save_path: ./data/artifacts/train_target.parquet
+          test_target_save_path: ./data/artifacts/test_target.parquet
+    outs:
+    - path: ./data/artifacts/test_features.parquet
+      hash: md5
+      md5: 27d50580352ff24f9065c6ed8fcf4be9
+      size: 11306
+    - path: ./data/artifacts/test_target.parquet
+      hash: md5
+      md5: ba4423a650ec389805664c37a673ba71
+      size: 1325
+    - path: ./data/artifacts/train_features.parquet
+      hash: md5
+      md5: 13a26f01bacde2eba28a459be739fb46
+      size: 15649
+    - path: ./data/artifacts/train_target.parquet
+      hash: md5
+      md5: 9ba0b634643eeca81d6b9f6c195f664b
+      size: 1441
+  train_model:
+    cmd: python ./src/train.py
+    deps:
+    - path: ./data/artifacts/test_features.parquet
+      hash: md5
+      md5: 27d50580352ff24f9065c6ed8fcf4be9
+      size: 11306
+    - path: ./data/artifacts/train_features.parquet
+      hash: md5
+      md5: 13a26f01bacde2eba28a459be739fb46
+      size: 15649
+    - path: ./data/artifacts/train_target.parquet
+      hash: md5
+      md5: 9ba0b634643eeca81d6b9f6c195f664b
+      size: 1441
+    - path: ./src/train.py
+      hash: md5
+      md5: eb89418ed5c7b3ad5365d2299bc5bec3
+      size: 3523
+    params:
+      params.yaml:
+        train:
+          penalty: l2
+          C: 1.0
+          solver: lbfgs
+          n_estimators: 35
+          max_depth: 20
+          n_splits: 10
+          use_log_model: false
+          trained_model_save_path: ./data/models/model_v1.joblib
+    outs:
+    - path: ./data/models/model_v1.joblib
+      hash: md5
+      md5: 2708be4bcf50e1a5122f97c24776a084
+      size: 1137849
+  evaluate_model:
+    cmd: python ./src/evaluate.py
+    deps:
+    - path: ./data/artifacts/test_features.parquet
+      hash: md5
+      md5: 27d50580352ff24f9065c6ed8fcf4be9
+      size: 11306
+    - path: ./data/artifacts/test_target.parquet
+      hash: md5
+      md5: ba4423a650ec389805664c37a673ba71
+      size: 1325
+    - path: ./data/models/model_v1.joblib
+      hash: md5
+      md5: 2708be4bcf50e1a5122f97c24776a084
+      size: 1137849
+    - path: ./src/evaluate.py
+      hash: md5
+      md5: 41f4f0d0b81a6071ed449694ab65c693
+      size: 1649
+    params:
+      params.yaml:
+        evaluate:
+          metrics_save_path: ./data/metrics/results.yaml
+    outs:
+    - path: ./data/metrics/results.yaml
+      hash: md5
+      md5: f38f5fd145804ba2f3d93f214fad7c7e
+      size: 58

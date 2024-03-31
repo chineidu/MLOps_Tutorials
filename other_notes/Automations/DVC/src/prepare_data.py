@@ -4,7 +4,7 @@ from omegaconf import DictConfig, OmegaConf
 from sklearn.model_selection import train_test_split
 from typeguard import typechecked
 
-config: DictConfig = OmegaConf.load("./other_notes/Automations/DVC/params.yaml")
+config: DictConfig = OmegaConf.load("./params.yaml")
 
 
 @typechecked

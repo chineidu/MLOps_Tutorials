@@ -10,10 +10,10 @@ from tqdm import tqdm
 from typeguard import typechecked
 from utils import save_model
 
-config: DictConfig = OmegaConf.load("./other_notes/Automations/DVC/params.yaml")
+config: DictConfig = OmegaConf.load("./params.yaml")
 penalty: str = config.train.penalty
 C: float = config.train.C
-random_state: int = config.train.random_state
+random_state: int = config.data.random_state
 solver: str = config.train.solver
 n_estimators: int = config.train.n_estimators
 max_depth: int = config.train.max_depth

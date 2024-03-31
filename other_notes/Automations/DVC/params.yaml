@@ -1,7 +1,7 @@
 data:
   csv_file_path: ./data/titanic_data.csv
-  test_size: 0.2
-  random_state: 123
+  test_size: 0.20
+  random_state: 20
   target: survived
   train_save_path: ./data/artifacts/train.parquet
   test_save_path: ./data/artifacts/test.parquet
@@ -36,12 +36,11 @@ features:
 train:
   penalty: l2
   C: 1.0
-  random_state: 123
   solver: lbfgs
-  n_estimators: 50
-  max_depth: 15
+  n_estimators: 35
+  max_depth: 20
   n_splits: 10
-  use_log_model: True
+  use_log_model: False
   trained_model_save_path: ./data/models/model_v1.joblib
 
 evaluate:

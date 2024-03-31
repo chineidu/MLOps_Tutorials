@@ -1,0 +1,49 @@
+stages:
+  prepare_data:
+    cmd: python ./src/prepare_data.py
+    deps:
+      - ./src/prepare_data.py
+      - ./data/titanic_data.csv
+    params:
+      - data
+    outs:
+      - ./data/artifacts/train.parquet
+      - ./data/artifacts/test.parquet
+
+  prepare_features:
+    cmd: python ./src/prepare_features.py
+    deps:
+      - ./src/prepare_features.py
+      - ./data/artifacts/train.parquet
+      - ./data/artifacts/test.parquet
+    params:
+      - features
+    outs:
+      - ./data/artifacts/train_features.parquet
+      - ./data/artifacts/test_features.parquet
+      - ./data/artifacts/train_target.parquet
+      - ./data/artifacts/test_target.parquet
+
+  train_model:
+    cmd: python ./src/train.py
+    deps:
+      - ./src/train.py
+      - ./data/artifacts/train_features.parquet
+      - ./data/artifacts/test_features.parquet
+      - ./data/artifacts/train_target.parquet
+    params:
+      - train
+    outs:
+      - ./data/models/model_v1.joblib
+
+  evaluate_model:
+    cmd: python ./src/evaluate.py
+    deps:
+      - ./src/evaluate.py
+      - ./data/artifacts/test_features.parquet
+      - ./data/artifacts/test_target.parquet
+      - ./data/models/model_v1.joblib
+    params:
+      - evaluate
+    outs:
+      - ./data/metrics/results.yaml

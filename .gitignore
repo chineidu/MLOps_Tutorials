@@ -165,4 +165,3 @@ notepad.py
 *.pem
 **/*.terraform
 **/*.pub
-/data

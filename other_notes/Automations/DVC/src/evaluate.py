@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from typeguard import typechecked
 from utils import load_model
 
-config: DictConfig = OmegaConf.load("./other_notes/Automations/DVC/params.yaml")
+config: DictConfig = OmegaConf.load("./params.yaml")
 model_path: Any = config.train.trained_model_save_path
 model = load_model(config=config)
 metrics_save_path: Any = config.evaluate.metrics_save_path
@@ -36,7 +36,7 @@ def evaluate(config: DictConfig) -> dict[str, Any]:
         "f1_score": float(_f1_score),
     }
 
-    logger.info(f" Evaluation results [Test]: {results}")
+    logger.info(f" Evaluation results [Unseen]: {results}")
 
     # Save as yaml
     OmegaConf.save(config=results, f=metrics_save_path)
