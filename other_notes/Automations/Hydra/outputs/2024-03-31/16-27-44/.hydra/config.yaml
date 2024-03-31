@@ -1,0 +1,2 @@
+solver: lbfgs
+penalty: l1

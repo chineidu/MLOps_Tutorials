@@ -1,0 +1,5 @@
+train:
+  penalty: l2
+  C: 1.0
+  solver: lbfgs
+  n_estimators: 35
