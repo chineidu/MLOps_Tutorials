@@ -7,10 +7,14 @@
   - [Hydra](#hydra)
     - [Hydra Installation](#hydra-installation)
     - [Hydra With CLI](#hydra-with-cli)
+    - [Hydra: Specify A Config File](#hydra-specify-a-config-file)
+    - [Hydra: Update or Add Parameters From The CLI](#hydra-update-or-add-parameters-from-the-cli)
   - [OmegaConf](#omegaconf)
     - [OmegaConf Installation](#omegaconf-installation)
     - [Benefits of OmegaConf](#benefits-of-omegaconf)
     - [Load A Config (YAML) File Using OmegaConf](#load-a-config-yaml-file-using-omegaconf)
+    - [OmegaConf: Variable Interpolation](#omegaconf-variable-interpolation)
+    - [Variable Interpolation With Env Variables](#variable-interpolation-with-env-variables)
 
 ## Hydra
 
@@ -61,6 +65,43 @@ python main.py +solver=lbfgs +penalty=l1
 # output:
 # solver: lbfgs
 # penalty: l1
+```
+
+### Hydra: Specify A Config File
+
+```py
+@hydra.main(config_path=".", config_name="config", version_base=None)
+def main(config: DictConfig) -> None:
+    """Main function"""
+    console.print(OmegaConf.to_yaml(config))
+
+
+if __name__ == "__main__":
+    main()
+```
+
+- Specify the `config_path`. If it's in the same directory, `config_path="."`
+- Add the name of the config file without the extension. i.e. , `config_name='config'`
+
+### Hydra: Update or Add Parameters From The CLI
+
+```yaml
+# config.yaml
+training:
+  batch_size: 126
+  epochs: 30
+  learning_rate: 5e-4
+```
+
+```sh
+# No need to add `+` since the key already exists
+python main.py training.batch_size=64
+
+# Output:
+# training:
+#   batch_size: 64  # This changed!
+#   epochs: 30
+#   learning_rate: 5e-4
 ```
 
 ## OmegaConf
@@ -139,4 +180,94 @@ def train(config: DictConfig) -> None:
 
 if __name__ == "__main__":
     train(config=config)
+```
+
+### OmegaConf: Variable Interpolation
+
+```yaml
+# server.yaml
+# Server general information
+server:
+  name: my_server  # Replace with your server name
+  description: This is a basic server configuration.
+
+# Network configuration
+network:
+  # Replace with your actual IP address
+  address: 192.168.1.100
+  port: 8080  # Common port for web servers, adjust as needed
+
+network2:
+  address: ${network.address}
+  description: Description of ${.address}
+  # OR
+  # description: Description of ${network2.address}
+```
+
+```py
+@hydra.main(config_path=".", config_name="server", version_base=None)
+def main(config: DictConfig) -> None:
+    """Main function"""
+    console.print(OmegaConf.to_yaml(config, resolve=True))
+
+
+if __name__ == "__main__":
+    main()
+```
+
+- To display the variable interpolation, add `resolve=True`.
+- On the CLI run:
+
+```sh
+python main.py
+
+# Output:
+server:
+  name: my_server
+  description: This is a basic server configuration.
+network:
+  address: 192.168.1.100
+  port: 8080
+network2:
+  address: 192.168.1.100
+  description: Description of 192.168.1.100
+```
+
+### Variable Interpolation With Env Variables
+
+```yaml
+auth:
+  type: basic  # Choose authentication type (basic, token, etc.)
+  username: ${oc.env:ENV_NAME}
+  password: ${oc.env:ENV_PASSWORD,password123}
+```
+
+- Access the env vars using `oc.env:`
+- Set default env values using: `${oc.env:ENV_PASSWORD,your_default_value}`. e.g. `${oc.env:ENV_PASSWORD,password123}`
+
+```py
+import os
+
+@hydra.main(config_path=".", config_name="server", version_base=None)
+def main(config: DictConfig) -> None:
+    """Main function"""
+    # Add env variables
+    os.environ["ENV_NAME"] = "neidu"
+
+    console.print(OmegaConf.to_yaml(config, resolve=True))
+
+
+if __name__ == "__main__":
+    main()
+```
+
+- Output:
+
+```sh
+python main.py
+
+# auth:
+#   type: basic
+#   username: neidu
+#   password: password123
 ```

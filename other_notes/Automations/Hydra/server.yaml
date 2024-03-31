@@ -1,0 +1,24 @@
+server:
+  name: my_server  # Replace with your server name
+  description: This is a basic server configuration.
+
+# Network configuration
+network:
+  # Replace with your actual IP address
+  address: 192.168.1.100
+  port: 8080  # Common port for web servers, adjust as needed
+
+network2:
+  address: ${network.address}
+  description: Description of ${network2.address}
+
+# Optional: Authentication configuration (uncomment if needed)
+auth:
+  type: basic  # Choose authentication type (basic, token, etc.)
+  username: ${oc.env:ENV_NAME}
+  password: ${oc.env:ENV_PASSWORD,password123}
+
+# Optional: Logging configuration (uncomment if needed)
+logging:
+  level: info  # Set log level (debug, info, warning, error, etc.)
+  file: server.log  # Specify log file path
