@@ -1,6 +1,6 @@
 data:
   csv_file_path: ./data/titanic_data.csv
-  test_size: 0.20
+  test_size: 0.25
   random_state: 20
   target: survived
   train_save_path: ./data/artifacts/train.parquet
