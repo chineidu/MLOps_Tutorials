@@ -9,12 +9,15 @@
     - [Hydra With CLI](#hydra-with-cli)
     - [Hydra: Specify A Config File](#hydra-specify-a-config-file)
     - [Hydra: Update or Add Parameters From The CLI](#hydra-update-or-add-parameters-from-the-cli)
+    - [Hydra: Grouping Config Files](#hydra-grouping-config-files)
+    - [Hydra: Add Multiple Defaults To Multi Group Config](#hydra-add-multiple-defaults-to-multi-group-config)
   - [OmegaConf](#omegaconf)
     - [OmegaConf Installation](#omegaconf-installation)
     - [Benefits of OmegaConf](#benefits-of-omegaconf)
     - [Load A Config (YAML) File Using OmegaConf](#load-a-config-yaml-file-using-omegaconf)
     - [OmegaConf: Variable Interpolation](#omegaconf-variable-interpolation)
     - [Variable Interpolation With Env Variables](#variable-interpolation-with-env-variables)
+    - [OmegaConf: Merge Config Files](#omegaconf-merge-config-files)
 
 ## Hydra
 
@@ -102,6 +105,91 @@ python main.py training.batch_size=64
 #   batch_size: 64  # This changed!
 #   epochs: 30
 #   learning_rate: 5e-4
+```
+
+### Hydra: Grouping Config Files
+
+- To group your config files, you need to create a directory with this file structure:
+
+```text
+mainDir               # it can be any name
+├── config.yaml       # it can be any name
+└── subDir            # it can be any name
+    ├── file1.yaml
+    └── file2.yaml
+    └── ...
+    └── fileN.yaml
+```
+
+- Create the files and the sub directories.
+
+```yaml
+# ===================================== #
+# file1.yaml
+# ===================================== #
+model:
+  name: resnet18
+# Training configuration
+train:
+  batch_size: 32
+  epochs: 80
+  optimizer:
+    name: adam
+    learning_rate: 0.001
+
+# ===================================== #
+# file2.yaml
+# ===================================== #
+model:
+  name: resnet50
+
+# Training configuration
+train:
+  batch_size: 16
+  epochs: 100
+  optimizer:
+    name: adam
+    learning_rate: 0.001
+
+
+# ===================================== #
+# config.yaml
+# ===================================== #
+# Specify the default (important!)
+defaults:
+  - experiment: file1
+```
+
+```py
+@hydra.main(config_path="mainDir", config_name="config", version_base=None)
+def main(config: DictConfig) -> None:
+    """Main function"""
+    console.print(OmegaConf.to_yaml(config, resolve=True))
+
+if __name__ == "__main__":
+    main()
+```
+
+### Hydra: Add Multiple Defaults To Multi Group Config
+
+- This can be done by using `override`
+- Using `_self_` key, you can update the default key/object. i.e. Any key/object that comes after `_self_` becomes the default!
+
+```yaml
+# ===================================== #
+# config.yaml
+# ===================================== #
+# Specify the default (important!)
+defaults:
+  - experiment: file1
+  - override experiment: file2
+  - _self_ # Every object/key below it becaomes the defaulr
+
+train:
+  batch_size: 16
+  epochs: 5
+  optimizer:
+    name: sgd
 ```
 
 ## OmegaConf
@@ -266,8 +354,54 @@ if __name__ == "__main__":
 ```sh
 python main.py
 
+# Output
 # auth:
 #   type: basic
 #   username: neidu
 #   password: password123
+```
+
+### OmegaConf: Merge Config Files
+
+```yaml
+# config_1.yaml
+training:
+  batch_size: 126
+  epochs: 30
+  learning_rate: 5e-4
+
+# config_2.yaml
+server:
+  name: my_server  # Replace with your server name
+  description: This is a basic server configuration.
+```
+
+```py
+def main() -> None:
+    """Main function"""
+    config_1: DictConfig = OmegaConf.load("config.yaml")
+    config_2: DictConfig = OmegaConf.load("server.yaml")
+    config: DictConfig = OmegaConf.merge(config_1, config_2)
+
+    console.print(OmegaConf.to_yaml(config, resolve=True))
+
+
+if __name__ == "__main__":
+    config: DictConfig = OmegaConf.load("server.yaml")
+    main()
+```
+
+- Output:
+
+```sh
+python main.py
+
+# output:
+# training:
+#   batch_size: 126
+#   epochs: 30
+#   learning_rate: 5e-4
+# server:
+#   name: my_server  # Replace with your server name
+#   description: This is a basic server configuration.
 ```

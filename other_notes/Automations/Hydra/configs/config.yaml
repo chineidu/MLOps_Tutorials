@@ -1,0 +1,8 @@
+# Specify the default (important!)
+defaults:
+  - experiment: exp-with-resnet18
+  - _self_ # Every object/key below it becaomes the defaulr
+
+experiment:
+  optimizer:
+    name: sgd
