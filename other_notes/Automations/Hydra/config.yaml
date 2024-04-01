@@ -3,3 +3,10 @@ training:
   batch_size: 126
   epochs: 30
   learning_rate: 5e-4
+
+log_model:
+  _target_: sklearn.linear_model.LogisticRegression
+  _partial_: true
+  C: 0.5
+  penalty: "l2"
+  solver: "liblinear"

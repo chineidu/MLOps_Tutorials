@@ -1,6 +1,5 @@
 import hydra
-from hydra.utils import instantiate
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from rich.console import Console
 from rich.theme import Theme
 
@@ -27,12 +26,10 @@ class Training:
         )
 
 
-@hydra.main(config_path=".", config_name="config", version_base=None)
+@hydra.main(config_path="./configs", config_name="config", version_base=None)
 def main(config: DictConfig) -> None:
     """Main function"""
-    training_hydra: DictConfig = instantiate(config.training)
-    # console.print(OmegaConf.to_yaml(config, resolve=True))
-    console.print(training_hydra)
+    console.print(OmegaConf.to_yaml(config, resolve=True))
 
 
 if __name__ == "__main__":

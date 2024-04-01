@@ -11,6 +11,7 @@
     - [Hydra: Update or Add Parameters From The CLI](#hydra-update-or-add-parameters-from-the-cli)
     - [Hydra: Grouping Config Files](#hydra-grouping-config-files)
     - [Hydra: Add Multiple Defaults To Multi Group Config](#hydra-add-multiple-defaults-to-multi-group-config)
+    - [Hydra: Create Packages Using Default Lists](#hydra-create-packages-using-default-lists)
     - [Hydra: Multirun](#hydra-multirun)
       - [Using Glob Pattern](#using-glob-pattern)
     - [Hydra: Debugging](#hydra-debugging)
@@ -201,13 +202,52 @@ defaults:
   # - override subDir: file2
   - subDir2: server2
   - another_config_file # This merges the file
-  - _self_ # Every object/key below it becomes the defaulr
+  - _self_ # Every object/key below it becomes the default
 
 train:
   batch_size: 16
   epochs: 5
   optimizer:
     name: sgd
+```
+
+### Hydra: Create Packages Using Default Lists
+
+- Create a new package by copying the contents on an existing package.
+- e.g. `experiment@neidu: exp-with-resnet50`
+  - This creates a new object named `neidu` and populates the object with the contents of `exp-with-resnet50.yaml`
+
+```yaml
+# ===================================== #
+# config.yaml
+# ===================================== #
+# Specify the default (important!)
+defaults:
+  - experiment: exp-with-resnet18
+  - loss_function: mseLoss
+  - experiment@neidu: exp-with-resnet50
+  - _self_ # Every object/key below it becomes the default
+
+
+experiment:
+  optimizer:
+    name: sgd
+```
+
+```sh
+# Outputs:
+# neidu:
+#   model:
+#     name: resnet50
+#   train:
+#     batch_size: 16
+#     epochs: 100
+#     optimizer:
+#       name: adam
+#       learning_rate: 0.001
+#   data:
+#     train_dir: /path/to/your/training/data
+#     val_dir: /path/to/your/validation/data
 ```
 
 ### Hydra: Multirun
@@ -260,6 +300,7 @@ python main.py --cfg job --package subDir
 - This is done with the `instantiate` function and  `_target_` key.
 - `_target_` points to the location of the `Python class` to be instantiated.
   - e.g.  _target_: main.Training means go to `main.py` and locate the class: `Taining`.
+- `_partial_` key can be used to partially init an object that requires additional data during init. i.e. `_partial_=true`
 
 ```yaml
 # ===================================== #
@@ -267,10 +308,17 @@ python main.py --cfg job --package subDir
 # ===================================== #
 training:
   _target_: main.Training
+  _partial_=true
   batch_size: 126
   epochs: 30
   learning_rate: 5e-4
 
+log_model:
+  _target_: sklearn.linear_model.LogisticRegression
+  _partial_: true
+  C: 0.5
+  penalty: "l2"
+  solver: "liblinear"
 ```
 
 ```py
@@ -295,7 +343,10 @@ class Training:
 def main(config: DictConfig) -> None:
     """Main function"""
     training_hydra: DictConfig = instantiate(config.training)
+    log_model: DictConfig = instantiate(config.log_model)
+
     console.print(training_hydra)
+    console.print(log_model)
 
 
 if __name__ == "__main__":
@@ -305,6 +356,7 @@ if __name__ == "__main__":
 ```sh
 # Outpur
 # Training(batch_size=126, epochs=30, learning_rate=0.0005)
+# functools.partial(<class 'sklearn.linear_model._logistic.LogisticRegression'>, C=0.5, penalty='l2', solver='liblinear')
 ```
 
 ---
