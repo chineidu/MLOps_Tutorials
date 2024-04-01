@@ -18,6 +18,7 @@ repos:
       # Run the linter.
       - id: ruff
         args: [--fix]
+        exclude: ^other_notes/Automations/Hydra/SimpleProject/
       # Run the formatter.
       - id: ruff-format
 
