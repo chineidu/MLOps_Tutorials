@@ -24,8 +24,9 @@ A tutorial on how to use **DVC (Data Version Control)** in your projects to vers
   - [Delete Files](#delete-files)
     - [Delete Locally](#delete-locally)
     - [Delete Remote File](#delete-remote-file)
+  - [**Back To Top**](#back-to-top)
   - [Check Status](#check-status)
-    - [Check Files Tracked By DVC In Your Remote Repo](#check-files-tracked-by-dvc-in-your-remote-repo)
+    - [Check Files Tracked By DVC In Any Remote Repo](#check-files-tracked-by-dvc-in-any-remote-repo)
     - [Check Files Tracked By DVC In Your Local Repo](#check-files-tracked-by-dvc-in-your-local-repo)
     - [Download Files Tracked By DVC In Your Remote Repo](#download-files-tracked-by-dvc-in-your-remote-repo)
   - [DVC Pipelines](#dvc-pipelines)
@@ -34,8 +35,12 @@ A tutorial on how to use **DVC (Data Version Control)** in your projects to vers
     - [DVC Pipeline Setup](#dvc-pipeline-setup)
     - [DVC Dag](#dvc-dag)
     - [Run Pipeline](#run-pipeline)
+    - [List The Stages In A Pipeline](#list-the-stages-in-a-pipeline)
+  - [**Top**](#top)
 
 ## Installation
+
+- Install dvd and other dependencies.
 
 ```sh
 pip install dvc dvc_gdrive
@@ -99,6 +104,7 @@ dvc config core.autostage true
 
 ### Google Drive (Remote Storage)
 
+- `-d` or `--default` is used to set the storage as the default storage.
 - To add a remote storage, e.g Google Drive, run:
 
 ```sh
@@ -140,19 +146,19 @@ dvc push
 ### Remove / Modify Remote Storage
 
 - To delete or re-authenticate a remote storage, check [docs](https://dvc.org/doc/user-guide/data-management/remote-storage/google-drive#configuration-parameters).
-- For `macOs`, navigate to this path:
+- `Step 1`: For `macOs`, navigate to this path:
 
 ```sh
 cd ~/Library/Caches
 ```
 
-- For `linux`, navigate to this path:
+- `Step 1`: For `linux`, navigate to this path:
 
 ```sh
 cd ~/.cache
 ```
 
-- Delete the directory:
+- `Step 2`: Delete the directory:
 
 ```sh
 # Delete the directory containing the prev. auth
@@ -189,6 +195,8 @@ dvc remove file_1.txt.dvc
 
 ### Delete Remote File
 
+- This compares the locally tracked files with the remote and deletes the files that don't match.
+
 ```sh
 # Check remote name
 dvc remote list
@@ -196,6 +204,9 @@ dvc remote list
 dvc gc -w
 ```
 
+---
+
+## **[Back To Top](#table-of-content)**
 
 ## Check Status
 
@@ -203,7 +214,9 @@ dvc gc -w
 dvc status
 ```
 
-### Check Files Tracked By DVC In Your Remote Repo
+### Check Files Tracked By DVC In Any Remote Repo
+
+- This assumes you're authorized to access the data.
 
 ```sh
 dvc list <repo_url> <file_directory>
@@ -348,3 +361,13 @@ dvc dag
 ```sh
 dvc repro
 ```
+
+### List The Stages In A Pipeline
+
+```sh
+dvc stage list
+```
+
+---
+
+## **[Top](#table-of-content)**

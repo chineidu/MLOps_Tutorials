@@ -15,6 +15,8 @@
       - [Using Glob Pattern](#using-glob-pattern)
     - [Hydra: Debugging](#hydra-debugging)
     - [View The Contents of A Package](#view-the-contents-of-a-package)
+    - [Hydra: Instantiate Objects](#hydra-instantiate-objects)
+  - [**Back To Top**](#back-to-top)
   - [OmegaConf](#omegaconf)
     - [OmegaConf Installation](#omegaconf-installation)
     - [Benefits of OmegaConf](#benefits-of-omegaconf)
@@ -22,6 +24,7 @@
     - [OmegaConf: Variable Interpolation](#omegaconf-variable-interpolation)
     - [Variable Interpolation With Env Variables](#variable-interpolation-with-env-variables)
     - [OmegaConf: Merge Config Files](#omegaconf-merge-config-files)
+  - [**Top**](#top)
 
 ## Hydra
 
@@ -189,7 +192,6 @@ some_values:
   model_name: "light gbm"
 
 
-
 # ===================================== #
 # config.yaml
 # ===================================== #
@@ -251,6 +253,63 @@ python main.py --cfg hydra
 ```sh
 python main.py --cfg job --package subDir
 ```
+
+### Hydra: Instantiate Objects
+
+- This is used to instantiate objects using the definitions in the yaml/config files.
+- This is done with the `instantiate` function and  `_target_` key.
+- `_target_` points to the location of the `Python class` to be instantiated.
+  - e.g.  _target_: main.Training means go to `main.py` and locate the class: `Taining`.
+
+```yaml
+# ===================================== #
+# config.yaml
+# ===================================== #
+training:
+  _target_: main.Training
+  batch_size: 126
+  epochs: 30
+  learning_rate: 5e-4
+
+```
+
+```py
+import hydra
+from hydra.utils import instantiate
+from omegaconf import DictConfig, OmegaConf
+
+class Training:
+    def __init__(self, batch_size: int, epochs: int, learning_rate: float) -> None:
+        self.batch_size = batch_size
+        self.epochs = epochs
+        self.learning_rate = learning_rate
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.__class__.__name__}(batch_size={self.batch_size}, "
+            f"epochs={self.epochs}, learning_rate={self.learning_rate})"
+        )
+
+
+@hydra.main(config_path=".", config_name="config", version_base=None)
+def main(config: DictConfig) -> None:
+    """Main function"""
+    training_hydra: DictConfig = instantiate(config.training)
+    console.print(training_hydra)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+```sh
+# Outpur
+# Training(batch_size=126, epochs=30, learning_rate=0.0005)
+```
+
+---
+
+## **[Back To Top](#table-of-content)**
 
 ## OmegaConf
 
@@ -473,3 +532,7 @@ python main.py
 #   name: my_server  # Replace with your server name
 #   description: This is a basic server configuration.
 ```
+
+---
+
+## **[Top](#table-of-content)**

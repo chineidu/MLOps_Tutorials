@@ -1,4 +1,5 @@
 training:
+  _target_: main.Training
   batch_size: 126
   epochs: 30
   learning_rate: 5e-4
