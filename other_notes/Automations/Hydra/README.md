@@ -199,7 +199,7 @@ defaults:
   # - override subDir: file2
   - subDir2: server2
   - another_config_file # This merges the file
-  - _self_ # Every object/key below it becaomes the defaulr
+  - _self_ # Every object/key below it becomes the defaulr
 
 train:
   batch_size: 16
@@ -211,6 +211,7 @@ train:
 ### Hydra: Multirun
 
 - You can run a script with multiple config files at the same time.
+- This is done using the `-m` or `--multirun` flag.
 
 ```sh
 python main.py -m subDir=file1,file2  subDir2=server2,server3,server5
@@ -230,13 +231,13 @@ python main.py -m subDir="glob(*, exclude=file2)"
 
 ### Hydra: Debugging
 
-- To view the content of the config file that was run, run:
+- To view the `content` of the `config file` that was run, run:
 
 ```sh
 python main.py --cfg job
 ```
 
-- To view the content of the `Hydra` default config  that was run, run:
+- To view the `content` of the `Hydra` default config  that was run, enter the cmd:
 
 ```sh
 python main.py --cfg hydra
@@ -244,7 +245,8 @@ python main.py --cfg hydra
 
 ### View The Contents of A Package
 
-- To view the content of the config file within a sub-directory/package, run:
+- This is used to view the content of the config file within a sub-directory/package.
+- This is done with the `-p` or `--package` flag.
 
 ```sh
 python main.py --cfg job --package subDir
@@ -274,7 +276,9 @@ pip install omegaconf
 ### Load A Config (YAML) File Using OmegaConf
 
 ```yaml
+# ===================================== #
 # params.yaml
+# ===================================== #
 data:
   csv_file_path: ./data/titanic_data.csv
   test_size: 0.25
@@ -331,7 +335,9 @@ if __name__ == "__main__":
 ### OmegaConf: Variable Interpolation
 
 ```yaml
+# ===================================== #
 # server.yaml
+# ===================================== #
 # Server general information
 server:
   name: my_server  # Replace with your server name
@@ -345,9 +351,9 @@ network:
 
 network2:
   address: ${network.address}
-  description: Description of ${.address}
+  description: Description of ${.address} # relative path
   # OR
-  # description: Description of ${network2.address}
+  # description: Description of ${network2.address} # abs path
 ```
 
 ```py
@@ -422,13 +428,17 @@ python main.py
 ### OmegaConf: Merge Config Files
 
 ```yaml
+# ===================================== #
 # config_1.yaml
+# ===================================== #
 training:
   batch_size: 126
   epochs: 30
   learning_rate: 5e-4
 
+# ===================================== #
 # config_2.yaml
+# ===================================== #
 server:
   name: my_server  # Replace with your server name
   description: This is a basic server configuration.

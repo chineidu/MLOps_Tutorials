@@ -2,7 +2,7 @@
 defaults:
   - experiment: exp-with-resnet18
   - loss_function: mseLoss
-  - _self_ # Every object/key below it becaomes the defaulr
+  - _self_ # Every object/key below it becomes the defaulr
 
 experiment:
   optimizer:
