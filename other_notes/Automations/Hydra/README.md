@@ -1,5 +1,7 @@
 # Hydra And OmegaConf
 
+- [Course](https://www.udemy.com/course/sustainable-and-scalable-machine-learning-project-development)
+
 ## Table of Content
 
 - [Hydra And OmegaConf](#hydra-and-omegaconf)
@@ -17,6 +19,7 @@
     - [Hydra: Debugging](#hydra-debugging)
     - [View The Contents of A Package](#view-the-contents-of-a-package)
     - [Hydra: Instantiate Objects](#hydra-instantiate-objects)
+    - [Hydra: Install Tab Completion](#hydra-install-tab-completion)
   - [**Back To Top**](#back-to-top)
   - [OmegaConf](#omegaconf)
     - [OmegaConf Installation](#omegaconf-installation)
@@ -357,6 +360,18 @@ if __name__ == "__main__":
 # Outpur
 # Training(batch_size=126, epochs=30, learning_rate=0.0005)
 # functools.partial(<class 'sklearn.linear_model._logistic.LogisticRegression'>, C=0.5, penalty='l2', solver='liblinear')
+```
+
+### Hydra: Install Tab Completion
+
+- [official docs](https://hydra.cc/docs/1.2/tutorials/basic/running_your_app/tab_completion/#zsh-instructions)
+- You can install tab completion by using `--hydra-help` and following the instructions.
+
+```sh
+python file_name.py --hydra-help
+
+# Run: You may need to restart the shell
+eval "$(python main.py -sc install=bash)"
 ```
 
 ---

@@ -12,8 +12,19 @@ This repo was inspired by the following Udemy courses:
    - [Testing and Monitoring](https://www.udemy.com/course/draft/2122690/learn/lecture/17718922?start=645#overview)
 4. **Spark**: [Spark notes](https://github.com/chineidu/MLOps_Tutorials/tree/main/spark_notes)
 5. **GoLang**: [Go Lang](https://github.com/chineidu/MLOps_Tutorials/blob/main/main/README.md)
-6. **Poetry**: [Poetry](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Poetry/README.md)
+6. **SQL**:
+   - [SQL basics](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/sql_notes/README_sql.md)
+   - [SQLAlchemy](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/sql_notes/README_orm.md)
+   - [Advanced SQL](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/sql_notes/ADVANCED_SQL.md)
 7. **Terraform**: [Terraform](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/IaC/Terraform/README.md)
+8. **MLOps**:
+   - [Git](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/others/git_readme.md)
+   - [Hydra And OmegaConf](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/Hydra/README.md)
+   - [DVC](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/DVC/README.md)
+   - [GitHub Actions](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/Github_actions/README.md)
+   - [Poetry](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Poetry/README.md)
+   - [Alembic](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Alembic_notes/README.md)
+   - [Pre-commit Hooks](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/Pre_commit/README.md)
 
 ## Using Docker Commands
 
