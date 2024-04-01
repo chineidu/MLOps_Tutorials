@@ -1,11 +1,7 @@
 # Specify the default (important!)
 defaults:
+  - _self_ # Every object/key below it becomes the default
+  - model: logistic_regression
   - experiment: exp-with-resnet18
   - loss_function: mseLoss
-  - experiment@neidu: exp-with-resnet50
-  - _self_ # Every object/key below it becomes the default
-
-
-experiment:
-  optimizer:
-    name: sgd
+  # - experiment@neidu: exp-with-resnet50

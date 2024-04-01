@@ -1,11 +1,19 @@
-# Hydra And OmegaConf
+# OmegaConf And Hydra
 
 - [Course](https://www.udemy.com/course/sustainable-and-scalable-machine-learning-project-development)
 
 ## Table of Content
 
-- [Hydra And OmegaConf](#hydra-and-omegaconf)
+- [OmegaConf And Hydra](#omegaconf-and-hydra)
   - [Table of Content](#table-of-content)
+  - [OmegaConf](#omegaconf)
+    - [OmegaConf Installation](#omegaconf-installation)
+    - [Benefits of OmegaConf](#benefits-of-omegaconf)
+    - [Load A Config (YAML) File Using OmegaConf](#load-a-config-yaml-file-using-omegaconf)
+    - [OmegaConf: Variable Interpolation](#omegaconf-variable-interpolation)
+    - [Variable Interpolation With Env Variables](#variable-interpolation-with-env-variables)
+    - [OmegaConf: Merge Config Files](#omegaconf-merge-config-files)
+  - [**Back To Top**](#back-to-top)
   - [Hydra](#hydra)
     - [Hydra Installation](#hydra-installation)
     - [Hydra With CLI](#hydra-with-cli)
@@ -20,15 +28,235 @@
     - [View The Contents of A Package](#view-the-contents-of-a-package)
     - [Hydra: Instantiate Objects](#hydra-instantiate-objects)
     - [Hydra: Install Tab Completion](#hydra-install-tab-completion)
-  - [**Back To Top**](#back-to-top)
-  - [OmegaConf](#omegaconf)
-    - [OmegaConf Installation](#omegaconf-installation)
-    - [Benefits of OmegaConf](#benefits-of-omegaconf)
-    - [Load A Config (YAML) File Using OmegaConf](#load-a-config-yaml-file-using-omegaconf)
-    - [OmegaConf: Variable Interpolation](#omegaconf-variable-interpolation)
-    - [Variable Interpolation With Env Variables](#variable-interpolation-with-env-variables)
-    - [OmegaConf: Merge Config Files](#omegaconf-merge-config-files)
+    - [Hydra: Create Configs Using Structured-Configs](#hydra-create-configs-using-structured-configs)
+    - [Hydra: Validate Configs Using Schema](#hydra-validate-configs-using-schema)
   - [**Top**](#top)
+
+## OmegaConf
+
+### OmegaConf Installation
+
+```sh
+pip install omegaconf
+```
+
+- `OmegaConf` is a library for managing configurations in Python. It's designed to be flexible and handle configurations from various sources:
+  - YAML files (a common configuration format)
+  - Python dataclasses (structured data containers)
+  - Regular Python objects
+  - Command-line arguments
+
+### Benefits of OmegaConf
+
+- OmegaConf offers these key benefits:
+  - **Hierarchical structure**: Configurations are organized in a tree-like manner, making them easy to navigate and understand.
+  - **Merging capabilities**: It can combine configurations from different sources, allowing you to set defaults and override them with specific settings.
+  - **Consistent API**: Regardless of the source, you interact with the configuration using the same methods and properties.
+
+### Load A Config (YAML) File Using OmegaConf
+
+```yaml
+# ===================================== #
+# params.yaml
+# ===================================== #
+data:
+  csv_file_path: ./data/titanic_data.csv
+  test_size: 0.25
+  random_state: 20
+  target: survived
+  train_save_path: ./data/artifacts/train.parquet
+  test_save_path: ./data/artifacts/test.parquet
+
+features:
+  unique_id: name
+  cat_vars:
+    - embarked
+    - sex
+  cols_to_drop:
+    - boat
+    - body
+    - cabin
+    - home.dest
+  transform_output: pandas
+  train_features_save_path: ./data/artifacts/train_features.parquet
+  test_features_save_path: ./data/artifacts/test_features.parquet
+  train_target_save_path: ./data/artifacts/train_target.parquet
+  test_target_save_path: ./data/artifacts/test_target.parquet
+
+evaluate:
+  metrics_save_path: ./data/metrics/results.yaml
+```
+
+- From the Python file, set up the following:
+
+```py
+from omegaconf import DictConfig, OmegaConf
+
+# Load config
+config: DictConfig = OmegaConf.load("./params.yaml")
+
+# Access the parameters
+penalty: str = config.train.penalty
+C: float = config.train.C
+random_state: int = config.data.random_state
+solver: str = config.train.solver
+
+def train(config: DictConfig) -> None:
+    """This is used to prepare the data."""
+    X_train: pd.DataFrame = pd.read_parquet(path=config.features.train_features_save_path)
+    X_test: pd.DataFrame = pd.read_parquet(path=config.features.test_features_save_path)
+    # Other logic
+    ...
+
+if __name__ == "__main__":
+    train(config=config)
+```
+
+### OmegaConf: Variable Interpolation
+
+```yaml
+# ===================================== #
+# server.yaml
+# ===================================== #
+# Server general information
+server:
+  name: my_server  # Replace with your server name
+  description: This is a basic server configuration.
+
+# Network configuration
+network:
+  # Replace with your actual IP address
+  address: 192.168.1.100
+  port: 8080  # Common port for web servers, adjust as needed
+
+network2:
+  address: ${network.address}
+  description: Description of ${.address} # relative path
+  # OR
+  # description: Description of ${network2.address} # abs path
+```
+
+```py
+@hydra.main(config_path=".", config_name="server", version_base=None)
+def main(config: DictConfig) -> None:
+    """Main function"""
+    console.print(OmegaConf.to_yaml(config, resolve=True))
+
+
+if __name__ == "__main__":
+    main()
+```
+
+- To display the variable interpolation, add `resolve=True`.
+- On the CLI run:
+
+```sh
+python main.py
+
+# Output:
+server:
+  name: my_server
+  description: This is a basic server configuration.
+network:
+  address: 192.168.1.100
+  port: 8080
+network2:
+  address: 192.168.1.100
+  description: Description of 192.168.1.100
+```
+
+### Variable Interpolation With Env Variables
+
+```yaml
+auth:
+  type: basic  # Choose authentication type (basic, token, etc.)
+  username: ${oc.env:ENV_NAME}
+  password: ${oc.env:ENV_PASSWORD,password123}
+```
+
+- Access the env vars using `oc.env:`
+- Set default env values using: `${oc.env:ENV_PASSWORD,your_default_value}`. e.g. `${oc.env:ENV_PASSWORD,password123}`
+
+```py
+import os
+
+@hydra.main(config_path=".", config_name="server", version_base=None)
+def main(config: DictConfig) -> None:
+    """Main function"""
+    # Add env variables
+    os.environ["ENV_NAME"] = "neidu"
+
+    console.print(OmegaConf.to_yaml(config, resolve=True))
+
+
+if __name__ == "__main__":
+    main()
+```
+
+- Output:
+
+```sh
+python main.py
+
+# Output
+# auth:
+#   type: basic
+#   username: neidu
+#   password: password123
+```
+
+### OmegaConf: Merge Config Files
+
+```yaml
+# ===================================== #
+# config_1.yaml
+# ===================================== #
+training:
+  batch_size: 126
+  epochs: 30
+  learning_rate: 5e-4
+
+# ===================================== #
+# config_2.yaml
+# ===================================== #
+server:
+  name: my_server  # Replace with your server name
+  description: This is a basic server configuration.
+```
+
+```py
+def main() -> None:
+    """Main function"""
+    config_1: DictConfig = OmegaConf.load("config.yaml")
+    config_2: DictConfig = OmegaConf.load("server.yaml")
+    config: DictConfig = OmegaConf.merge(config_1, config_2)
+
+    console.print(OmegaConf.to_yaml(config, resolve=True))
+
+
+if __name__ == "__main__":
+    config: DictConfig = OmegaConf.load("server.yaml")
+    main()
+```
+
+- Output:
+
+```sh
+python main.py
+
+# output:
+# training:
+#   batch_size: 126
+#   epochs: 30
+#   learning_rate: 5e-4
+# server:
+#   name: my_server  # Replace with your server name
+#   description: This is a basic server configuration.
+```
+
+---
+
+## **[Back To Top](#table-of-content)**
 
 ## Hydra
 
@@ -374,230 +602,121 @@ python file_name.py --hydra-help
 eval "$(python main.py -sc install=bash)"
 ```
 
----
+### Hydra: Create Configs Using Structured-Configs
 
-## **[Back To Top](#table-of-content)**
+- The following line are used to init the ConfigStore
 
-## OmegaConf
-
-### OmegaConf Installation
-
-```sh
-pip install omegaconf
-```
-
-- `OmegaConf` is a library for managing configurations in Python. It's designed to be flexible and handle configurations from various sources:
-  - YAML files (a common configuration format)
-  - Python dataclasses (structured data containers)
-  - Regular Python objects
-  - Command-line arguments
-
-### Benefits of OmegaConf
-
-- OmegaConf offers these key benefits:
-  - **Hierarchical structure**: Configurations are organized in a tree-like manner, making them easy to navigate and understand.
-  - **Merging capabilities**: It can combine configurations from different sources, allowing you to set defaults and override them with specific settings.
-  - **Consistent API**: Regardless of the source, you interact with the configuration using the same methods and properties.
-
-### Load A Config (YAML) File Using OmegaConf
-
-```yaml
-# ===================================== #
-# params.yaml
-# ===================================== #
-data:
-  csv_file_path: ./data/titanic_data.csv
-  test_size: 0.25
-  random_state: 20
-  target: survived
-  train_save_path: ./data/artifacts/train.parquet
-  test_save_path: ./data/artifacts/test.parquet
-
-features:
-  unique_id: name
-  cat_vars:
-    - embarked
-    - sex
-  cols_to_drop:
-    - boat
-    - body
-    - cabin
-    - home.dest
-  transform_output: pandas
-  train_features_save_path: ./data/artifacts/train_features.parquet
-  test_features_save_path: ./data/artifacts/test_features.parquet
-  train_target_save_path: ./data/artifacts/train_target.parquet
-  test_target_save_path: ./data/artifacts/test_target.parquet
-
-evaluate:
-  metrics_save_path: ./data/metrics/results.yaml
-```
-
-- From the Python file, set up the following:
-
-```py
-from omegaconf import DictConfig, OmegaConf
-
-# Load config
-config: DictConfig = OmegaConf.load("./params.yaml")
-
-# Access the parameters
-penalty: str = config.train.penalty
-C: float = config.train.C
-random_state: int = config.data.random_state
-solver: str = config.train.solver
-
-def train(config: DictConfig) -> None:
-    """This is used to prepare the data."""
-    X_train: pd.DataFrame = pd.read_parquet(path=config.features.train_features_save_path)
-    X_test: pd.DataFrame = pd.read_parquet(path=config.features.test_features_save_path)
-    # Other logic
-    ...
-
-if __name__ == "__main__":
-    train(config=config)
-```
-
-### OmegaConf: Variable Interpolation
-
-```yaml
-# ===================================== #
-# server.yaml
-# ===================================== #
-# Server general information
-server:
-  name: my_server  # Replace with your server name
-  description: This is a basic server configuration.
-
-# Network configuration
-network:
-  # Replace with your actual IP address
-  address: 192.168.1.100
-  port: 8080  # Common port for web servers, adjust as needed
-
-network2:
-  address: ${network.address}
-  description: Description of ${.address} # relative path
-  # OR
-  # description: Description of ${network2.address} # abs path
+```text
+cs = ConfigStore.instance()
+cs.store(name="config", node=ExperimentConfig)
 ```
 
 ```py
-@hydra.main(config_path=".", config_name="server", version_base=None)
+from dataclasses import dataclass
+import hydra
+from hydra.core.config_store import ConfigStore
+
+@dataclass
+class ExperimentConfig:
+    model: str = "resnet18"
+    epochs: int = 30
+    learning_rate: float = 5e-3
+
+# Setup the config store
+cs = ConfigStore.instance()
+cs.store(name="config", node=ExperimentConfig)
+
+@hydra.main(config_path=None, config_name="config", version_base=None)
 def main(config: DictConfig) -> None:
     """Main function"""
     console.print(OmegaConf.to_yaml(config, resolve=True))
-
 
 if __name__ == "__main__":
     main()
 ```
 
-- To display the variable interpolation, add `resolve=True`.
-- On the CLI run:
-
 ```sh
 python main.py
 
-# Output:
-server:
-  name: my_server
-  description: This is a basic server configuration.
-network:
-  address: 192.168.1.100
-  port: 8080
-network2:
-  address: 192.168.1.100
-  description: Description of 192.168.1.100
+# Outputs:
+# model: resnet18
+# epochs: 30
+# learning_rate: 0.005
 ```
 
-### Variable Interpolation With Env Variables
-
-```yaml
-auth:
-  type: basic  # Choose authentication type (basic, token, etc.)
-  username: ${oc.env:ENV_NAME}
-  password: ${oc.env:ENV_PASSWORD,password123}
-```
-
-- Access the env vars using `oc.env:`
-- Set default env values using: `${oc.env:ENV_PASSWORD,your_default_value}`. e.g. `${oc.env:ENV_PASSWORD,password123}`
-
-```py
-import os
-
-@hydra.main(config_path=".", config_name="server", version_base=None)
-def main(config: DictConfig) -> None:
-    """Main function"""
-    # Add env variables
-    os.environ["ENV_NAME"] = "neidu"
-
-    console.print(OmegaConf.to_yaml(config, resolve=True))
-
-
-if __name__ == "__main__":
-    main()
-```
-
-- Output:
-
-```sh
-python main.py
-
-# Output
-# auth:
-#   type: basic
-#   username: neidu
-#   password: password123
-```
-
-### OmegaConf: Merge Config Files
+### Hydra: Validate Configs Using Schema
 
 ```yaml
 # ===================================== #
-# config_1.yaml
+# config.yaml
 # ===================================== #
+defaults:
+  - _self_
+  - main_config_schema # schema
+
 training:
+  _target_: main.Training
   batch_size: 126
   epochs: 30
   learning_rate: 5e-4
 
-# ===================================== #
-# config_2.yaml
-# ===================================== #
-server:
-  name: my_server  # Replace with your server name
-  description: This is a basic server configuration.
+log_model:
+  _target_: sklearn.linear_model.LogisticRegression
+  _partial_: true
+  C: 0.5
+  penalty: "l2"
+  solver: "liblinear"
 ```
 
-```py
-def main() -> None:
-    """Main function"""
-    config_1: DictConfig = OmegaConf.load("config.yaml")
-    config_2: DictConfig = OmegaConf.load("server.yaml")
-    config: DictConfig = OmegaConf.merge(config_1, config_2)
+- Add the schema to the default lists. i.e. `main_config_schema`
 
+```py
+from dataclasses import dataclass
+# OR
+from pydantic.dataclasses import dataclass # Better!
+import hydra
+from hydra.core.config_store import ConfigStore
+from omegaconf import DictConfig, OmegaConf
+
+@dataclass
+class TrainingSchema:
+    _target_: str
+    batch_size: int
+    epochs: int
+    learning_rate: float
+
+
+@dataclass
+class LogModelSchema:
+    _target_: str
+    _partial_: bool
+    C: float
+    penalty: str
+    solver: str
+
+
+@dataclass
+class MainConfigSchema:
+    training: TrainingSchema
+    log_model: LogModelSchema
+
+
+# Setup the config store
+cs = ConfigStore.instance()
+cs.store(name="main_config_schema", node=MainConfigSchema)
+# Add groups
+# cs.store(group="experiments", name="resnet18_schema, node=ResNet18)
+
+
+@hydra.main(config_path=".", config_name="config", version_base=None)
+def main(config: DictConfig) -> None:
+    """Main function"""
     console.print(OmegaConf.to_yaml(config, resolve=True))
 
 
 if __name__ == "__main__":
-    config: DictConfig = OmegaConf.load("server.yaml")
     main()
-```
 
-- Output:
-
-```sh
-python main.py
-
-# output:
-# training:
-#   batch_size: 126
-#   epochs: 30
-#   learning_rate: 5e-4
-# server:
-#   name: my_server  # Replace with your server name
-#   description: This is a basic server configuration.
 ```
 
 ---

@@ -1,16 +1,9 @@
-model:
-  name: resnet50 # Specify model name as resnet50
-
-# Training configuration
-train:
-  # Adjust these values as needed for your training (might require more memory for ResNet50)
-  batch_size: 16 # You might need to adjust this based on GPU memory
-  epochs: 100
-  optimizer:
-    name: adam # Common optimizer choice, adjust if needed
-    learning_rate: 0.001 # Starting learning rate
+name: resnet50 # Specify model name as resnet50
+batch_size: 16
+epochs: 100
+optimeser_name: adam
+learning_rate: 0.001
 
 # Data path (replace with your actual data paths)
-data:
-  train_dir: /path/to/your/training/data
-  val_dir: /path/to/your/validation/data
+train_dir: /path/to/your/training/data
+val_dir: /path/to/your/validation/data

@@ -1,0 +1,12 @@
+# Logistic Regression Parameters
+logistic_regression:
+  _target_: sklearn.linear_model.LogisticRegression
+  solver: lbfgs
+  # Regularization parameter (controls model complexity)
+  C: 0.9
+  # Maximum number of iterations
+  max_iter: 1000
+  # Tolerance for stopping convergence
+  tol: 1e-4
+  # Multi-class strategy (options: 'ovr', 'multinomial')
+  multi_class: ovr

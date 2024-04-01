@@ -2,6 +2,8 @@
 
 This course contains tutorials for Docker, K8s, Model deployment, ML Systems Testing and Monitoring, etc.
 
+## [MLOps Roadmap](https://roadmap.sh/mlops)
+
 This repo was inspired by the following Udemy courses:
 
 1. **Docker**: [Docker notes](https://github.com/chineidu/MLOps_Tutorials/tree/main/docker_notes)

@@ -1,0 +1,19 @@
+# Random Forest Parameters
+random_forests:
+  _target_: sklearn.ensemble.RandomForestClassifier
+  # Number of trees in the forest
+  n_estimators: 100
+  # Maximum depth of individual trees
+  max_depth: null # Set to None for automatic depth selection
+  # Minimum number of samples required to split a node
+  min_samples_split: 2
+  # Minimum number of samples required at each leaf node
+  min_samples_leaf: 1
+  # Number of features to consider at each split
+  max_features: "auto" # Consider all features by default
+  # Criterion function to measure the quality of a split
+  criterion: "gini" # Alternative: "entropy"
+  # Whether to bootstrap samples when building trees (default: True)
+  bootstrap: True
+  # Random seed for reproducibility (optional)
+  random_state: 42
