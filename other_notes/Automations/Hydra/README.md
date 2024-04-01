@@ -11,6 +11,10 @@
     - [Hydra: Update or Add Parameters From The CLI](#hydra-update-or-add-parameters-from-the-cli)
     - [Hydra: Grouping Config Files](#hydra-grouping-config-files)
     - [Hydra: Add Multiple Defaults To Multi Group Config](#hydra-add-multiple-defaults-to-multi-group-config)
+    - [Hydra: Multirun](#hydra-multirun)
+      - [Using Glob Pattern](#using-glob-pattern)
+    - [Hydra: Debugging](#hydra-debugging)
+    - [View The Contents of A Package](#view-the-contents-of-a-package)
   - [OmegaConf](#omegaconf)
     - [OmegaConf Installation](#omegaconf-installation)
     - [Benefits of OmegaConf](#benefits-of-omegaconf)
@@ -157,7 +161,7 @@ train:
 # ===================================== #
 # Specify the default (important!)
 defaults:
-  - experiment: file1
+  - subDir: file1
 ```
 
 ```py
@@ -174,15 +178,27 @@ if __name__ == "__main__":
 
 - This can be done by using `override`
 - Using `_self_` key, you can update the default key/object. i.e. Any key/object that comes after `_self_` becomes the default!
+- You can also merge a config file by adding it as a default list.
 
 ```yaml
+# ===================================== #
+# another_config_file.yaml
+# ===================================== #
+some_values:
+  n_estimators: 30
+  model_name: "light gbm"
+
+
+
 # ===================================== #
 # config.yaml
 # ===================================== #
 # Specify the default (important!)
 defaults:
-  - experiment: file1
-  - override experiment: file2
+  - subDir: file1
+  # - override subDir: file2
+  - subDir2: server2
+  - another_config_file # This merges the file
   - _self_ # Every object/key below it becaomes the defaulr
 
 train:
@@ -190,6 +206,48 @@ train:
   epochs: 5
   optimizer:
     name: sgd
+```
+
+### Hydra: Multirun
+
+- You can run a script with multiple config files at the same time.
+
+```sh
+python main.py -m subDir=file1,file2  subDir2=server2,server3,server5
+
+# Another example
+python main.py -m experiment=exp-with-resnet18,exp-with-resnet50 loss_function=mseLoss
+```
+
+#### Using Glob Pattern
+
+```sh
+python main.py -m experiment="glob(*)"
+
+# Exclude some files
+python main.py -m subDir="glob(*, exclude=file2)"
+```
+
+### Hydra: Debugging
+
+- To view the content of the config file that was run, run:
+
+```sh
+python main.py --cfg job
+```
+
+- To view the content of the `Hydra` default config  that was run, run:
+
+```sh
+python main.py --cfg hydra
+```
+
+### View The Contents of A Package
+
+- To view the content of the config file within a sub-directory/package, run:
+
+```sh
+python main.py --cfg job --package subDir
 ```
 
 ## OmegaConf

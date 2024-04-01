@@ -1,6 +1,7 @@
 # Specify the default (important!)
 defaults:
   - experiment: exp-with-resnet18
+  - loss_function: mseLoss
   - _self_ # Every object/key below it becaomes the defaulr
 
 experiment:

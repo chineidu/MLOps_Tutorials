@@ -1,0 +1,9 @@
+# Configuration for MSELoss (Mean Squared Error)
+
+loss:
+  # Select the loss function
+  name: MSELoss
+
+  # Parameters for MSELoss (no parameters by default)
+  parameters:
+    reduction: mean  # Optional reduction strategy (mean, sum, none)

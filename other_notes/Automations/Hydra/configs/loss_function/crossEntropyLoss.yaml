@@ -1,0 +1,10 @@
+# Configuration for CrossEntropyLoss
+
+loss:
+  # Select the loss function
+  name: CrossEntropyLoss
+
+  # Parameters for CrossEntropyLoss
+  parameters:
+    reduction: mean  # Choose reduction strategy (mean, sum, none)
+    weight: null  # Optional class weights
