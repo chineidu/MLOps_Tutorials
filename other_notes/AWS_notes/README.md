@@ -8,6 +8,7 @@
   - [Common Operations](#common-operations)
     - [Copy Files](#copy-files)
     - [List Objects In A Bucket](#list-objects-in-a-bucket)
+    - [Set GCP Region and Zone](#set-gcp-region-and-zone)
 
 ## Common Operations
 
@@ -28,3 +29,8 @@ aws s3 ls <s3://bucket>
 # e.g.
 aws s3 ls s3://my-special-bucket/raw_trans_data/
 ```
+
+### Set GCP Region and Zone
+
+gcloud config set compute/region eu-west2
+gcloud config set compute/zone eu-west2-a
