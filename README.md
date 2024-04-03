@@ -1,4 +1,15 @@
-# MLOps_Tutorials
+# MLOps Tutorials
+
+## Table of Content
+
+- [MLOps Tutorials](#mlops-tutorials)
+  - [Table of Content](#table-of-content)
+  - [MLOps Roadmap](#mlops-roadmap)
+  - [Using Docker Commands](#using-docker-commands)
+  - [Docker Compose](#docker-compose)
+    - [Mongodb String URI Format](#mongodb-string-uri-format)
+    - [Example Dockerfile](#example-dockerfile)
+  - [Markdown Extension Docs](#markdown-extension-docs)
 
 This course contains tutorials for Docker, K8s, Model deployment, ML Systems Testing and Monitoring, etc.
 
@@ -135,3 +146,7 @@ EXPOSE 8000
 # Entry point
 CMD [ "python3", "main.py", "--host", "0.0.0.0"]
 ```
+
+## Markdown Extension Docs
+
+- The docs can be found [here](https://github.com/DavidAnson/markdownlint/blob/v0.32.1/README.md#configuration).
