@@ -181,4 +181,6 @@ clean:
 ```makefile
 include dependencies.mk
 include my_envs_dir/.env
+export # export the env vars
+
 ```

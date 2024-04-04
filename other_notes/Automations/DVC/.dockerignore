@@ -1,0 +1,6 @@
+# Ignore all!
+.
+
+# Except the following files/directories
+!docker
+!pyproject.toml

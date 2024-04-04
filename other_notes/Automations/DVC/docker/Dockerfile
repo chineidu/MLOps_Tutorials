@@ -1,7 +1,7 @@
 # Base image
 FROM python:3.11-slim
 
-ARG MLFLOW_ARTIFACTS_STORE
+ARG MLFLOW_ARTIFACT_STORE
 
 # 1. Disable Python's output buffering. Useful for debugging.
 # 2. Set the environment variables
@@ -21,29 +21,34 @@ ENV \
 # Git was installed because it is required by MLFlow.
 RUN apt-get -qq update \
     && apt-get -qq -y install git \
-    && rm-rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/apt/lists/* \
     && apt-get -qq -y clean
 
 # Create the directory with subdirectories.
-RUN mkdir -p "{MLFLOW_BACKEND_STORE}"/app
+RUN mkdir -p "${MLFLOW_ARTIFACT_STORE}"/app
 
 # 1. Copy the run-server.sh script for starting the mlflow server
 # 2. Make the script executable.
-# 3. Set up Poetry for dependency management.
-# NB: I didn't combine the RUN commands because the temporary HOME var only affects
-# Poetry install. If combined, changes to run-server.sh (irrelevant to Poetry) would
-# rebuild the whole layer, wasting space
-COPY ["./docker/run-server.sh", "./"]
-RUN chmod +x ./run-server.sh
+# 3. Adjust PATH so that the script can be accessed from anywhere within the container.
+COPY ./docker/run-server.sh /usr/local/bin/run-server.sh
+RUN chmod +x /usr/local/bin/run-server.sh
+ENV PATH="/usr/local/bin:${PATH}"
+
+# Set up Poetry for dependency management.
 RUN HOME=/tmp pip install --no-cache-dir poetry==1.7.1
-COPY ["./pyproject.toml", "./poetry.lock", "./"]
+COPY ./pyproject.toml ./*.lock /app/
 
 WORKDIR /app
 
-RUN python -m venv ${VIRTUAL_ENV} \
+# 1. Create a virtual environment,
+# 2. Upgrade the pip package manager
+# 3. Install project dependencies with poetry
+# 4. Copy the dependency lock file
+# 5. Clean up the cache directory.
+RUN python -m venv "${VIRTUAL_ENV}" \
     && pip install --upgrade pip \
     && poetry install \
-    && cp poetry.lock ${BUILD_POETRY_LOCK} \
-    && rm -rf "${HOME}/.cache"
+    && cp poetry.lock "${BUILD_POETRY_LOCK}" \
+    && rm -rf "${HOME}/.cache/*"
 
-CMD ["./run-server.sh"]
+CMD ["run-server.sh"]
