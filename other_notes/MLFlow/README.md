@@ -15,6 +15,7 @@
   - [5. Starting the MLflow Tracking Server](#5-starting-the-mlflow-tracking-server)
     - [5b. Setup MLflow Tracking Server For Self-managed MLflow](#5b-setup-mlflow-tracking-server-for-self-managed-mlflow)
   - [6. Configure Backend Store](#6-configure-backend-store)
+  - [7. Configure Artifact Store](#7-configure-artifact-store)
 
 ## Simple Setup
 
@@ -239,3 +240,7 @@ print(model)
 ## 6. Configure Backend Store
 
 - [Docs](https://mlflow.org/docs/latest/tracking/backend-stores.html)
+
+## 7. Configure Artifact Store
+
+- [Docs](https://mlflow.org/docs/latest/tracking/artifacts-stores.html)

@@ -38,6 +38,7 @@ This repo was inspired by the following Udemy courses:
    - [Poetry](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Poetry/README.md)
    - [Alembic](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Alembic_notes/README.md)
    - [Pre-commit Hooks](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/Pre_commit/README.md)
+   - [MLFlow](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/MLFlow/README.md)
 
 ## Using Docker Commands
 
