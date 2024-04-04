@@ -17,6 +17,7 @@
     - [Makefile: Create Dependencies](#makefile-create-dependencies)
     - [Makefile: If Statement](#makefile-if-statement)
     - [Makefile: `.PHONY`](#makefile-phony)
+    - [Include Keyword](#include-keyword)
 
 ## Make
 
@@ -171,4 +172,13 @@ make if-example
 .PHONY: clean
 clean:
     rm -rf *.o *.exe
+```
+
+### Include Keyword
+
+- This is used to include files, diretories.
+
+```makefile
+include dependencies.mk
+include my_envs_dir/.env
 ```

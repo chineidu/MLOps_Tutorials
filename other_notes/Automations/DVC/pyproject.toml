@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "mlflow-tracking-server"
+version = "0.1.0"
+description = "MLFlow tracking server"
+license = "MIT"
+authors = ["Chinedu Ezeofor <sneidue@email.com>"]
+packages = [
+        { include = "fast_token_classifier" },
+        { include = "api" },
+        ]
+classifiers = [
+    "Topic :: Software Development :: Experiment Tracking",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+[tool.poetry.dependencies]
+python = "^3.10.8"
+mlflow = "==2.11.3"
+psycopg-binary = "~=3.1.18"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

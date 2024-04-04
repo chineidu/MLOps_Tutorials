@@ -47,6 +47,7 @@
       - [1. Connection Between The Docker Container And The Internet (Web)](#1-connection-between-the-docker-container-and-the-internet-web)
       - [2. Connection Between The Docker Container And The Localhost](#2-connection-between-the-docker-container-and-the-localhost)
       - [3. Connection Between The Docker Container And Another Docker Container](#3-connection-between-the-docker-container-and-another-docker-container)
+    - [Inter-Process Communication (IPC)](#inter-process-communication-ipc)
   - [Docker Compose](#docker-compose)
     - [Sample Docker-compose File](#sample-docker-compose-file)
     - [Start And Stop The Containers](#start-and-stop-the-containers)
@@ -625,6 +626,14 @@ docker run -it -p 8000:8000 --name cool_app --rm --network api_network mlops:v1
 # For more commands
 docker network --help
 ```
+
+### Inter-Process Communication (IPC)
+
+- In a Docker Compose file, the `ipc: host` configuration specifies that the container will share the host machine's Inter-Process Communication (IPC) namespace.
+- This means the container can access and utilize the same IPC resources (e.g., shared memory, semaphores, message queues) as the processes running directly on the host system.
+- Breakdown:
+  - **IPC Namespace**: An IPC namespace acts as a separation mechanism for processes. Processes within the same namespace can communicate with each other using IPC mechanisms, while processes in different namespaces are isolated.
+  - **Shared Resources**: When you set ipc: host, the container essentially joins the host's IPC namespace, granting it access to shared memory segments, semaphores, and message queues already established on the host machine.
 
 ## Docker Compose
 
