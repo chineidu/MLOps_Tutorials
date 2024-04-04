@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
-from imblearn.combine import SMOTETomek
 from logger import logger
 from omegaconf import DictConfig, OmegaConf
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from tqdm import tqdm
 from typeguard import typechecked
@@ -41,14 +41,6 @@ def train(config: DictConfig) -> None:
     y_train: pd.Series = pd.read_parquet(path=config.features.train_target_save_path)[
         config.data.target
     ]
-
-    # Implementing oversampling for handling the imbalanced class
-    smt = SMOTETomek(random_state=random_state)
-
-    X_t_sampled, y_t_sampled = smt.fit_resample(X_train, y_train)
-    logger.info(f"Data shape after SMOTE: {X_t_sampled.shape, y_t_sampled.shape}")
-
-    from sklearn.metrics import roc_auc_score
 
     test_preds = np.empty((n_splits, X_test.shape[0]))
     auc_vals: list[float] | list = []  # type: ignore

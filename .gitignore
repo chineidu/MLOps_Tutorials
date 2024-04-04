@@ -165,3 +165,5 @@ notepad.py
 *.pem
 **/*.terraform
 **/*.pub
+**/mlartifacts
+**/mlruns

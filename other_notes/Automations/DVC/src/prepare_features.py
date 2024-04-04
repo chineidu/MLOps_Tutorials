@@ -2,6 +2,7 @@ import pandas as pd
 import polars as pl
 from feature_engine.imputation import CategoricalImputer, MeanMedianImputer
 from feature_engine.selection import DropFeatures
+from imblearn.combine import SMOTETomek
 from logger import logger
 from omegaconf import DictConfig, OmegaConf
 from sklearn import set_config
@@ -19,6 +20,7 @@ cat_vars: list[str] = list(config.features.cat_vars)
 cols_to_drop: list[str] = list(config.features.cols_to_drop)
 preprocess_vars: list[str] = list(config.features.preprocess_vars)
 name: str = config.features.unique_id
+random_state: int = config.data.random_state
 num_vars: list[str] = list(config.features.num_vars)
 col_transf: ColumnTransformer = ColumnTransformer(
     transformers=[
@@ -63,11 +65,17 @@ def prepare_features(config: DictConfig) -> None:
     X_train_tr: pd.DataFrame = processor.fit_transform(X=X_train.to_pandas())
     X_test_tr: pd.DataFrame = processor.transform(X=X_test.to_pandas())
 
+    # Implementing oversampling for handling the imbalanced class
+    smt = SMOTETomek(random_state=random_state)
+
+    X_t_sampled, y_t_sampled = smt.fit_resample(X_train_tr, y_train)
+    logger.info(f"Data shape after SMOTE: {X_t_sampled.shape, y_t_sampled.shape}")
+
     try:
         # Save data
-        X_train_tr.to_parquet(path=config.features.train_features_save_path, index=False)
+        X_t_sampled.to_parquet(path=config.features.train_features_save_path, index=False)
         X_test_tr.to_parquet(path=config.features.test_features_save_path, index=False)
-        y_train.to_parquet(path=config.features.train_target_save_path, index=False)
+        y_t_sampled.to_parquet(path=config.features.train_target_save_path, index=False)
         y_test.to_parquet(path=config.features.test_target_save_path, index=False)
         logger.info("`Train` and `Test` features saved!")
 
