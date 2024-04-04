@@ -8,6 +8,7 @@
   - [Table of Contents](#table-of-contents)
   - [Simple Setup](#simple-setup)
     - [Simple Tracking URI Setup](#simple-tracking-uri-setup)
+    - [Creating Experiments With Meaningful Tags](#creating-experiments-with-meaningful-tags)
   - [1. MLflow Tracking Quickstart](#1-mlflow-tracking-quickstart)
   - [2. MLFlow Tracking Server Overview](#2-mlflow-tracking-server-overview)
   - [3. Register a Model](#3-register-a-model)
@@ -16,6 +17,7 @@
     - [5b. Setup MLflow Tracking Server For Self-managed MLflow](#5b-setup-mlflow-tracking-server-for-self-managed-mlflow)
   - [6. Configure Backend Store](#6-configure-backend-store)
   - [7. Configure Artifact Store](#7-configure-artifact-store)
+  - [8. Searching based On Tags](#8-searching-based-on-tags)
 
 ## Simple Setup
 
@@ -203,6 +205,32 @@ TRACKING_URI: str = f"{TRACKING_SERVER_HOST}:{PORT}"
 mlflow.set_tracking_uri(TRACKING_URI)
 ```
 
+### [Creating Experiments With Meaningful Tags](https://mlflow.org/docs/latest/getting-started/logging-first-model/step3-create-experiment.html)
+
+```py
+# Provide an Experiment description that will appear in the UI
+experiment_description = (
+    "This is the grocery forecasting project. "
+    "This experiment contains the produce models for apples."
+)
+
+# Provide searchable tags that define characteristics of the Runs that
+# will be in this Experiment
+experiment_tags = {
+    "project_name": "grocery-forecasting",
+    "store_dept": "produce",
+    "team": "stores-ml",
+    "project_quarter": "Q3-2023",
+    "mlflow.note.content": experiment_description,
+}
+
+# Create the Experiment, providing a unique name
+produce_apples_experiment = client.create_experiment(
+    name="Apple_Models", tags=experiment_tags
+)
+
+```
+
 ## 1. MLflow Tracking Quickstart
 
 - Check [here](https://www.mlflow.org/docs/latest/getting-started/intro-quickstart/index.html) for quickstart.
@@ -244,3 +272,7 @@ print(model)
 ## 7. Configure Artifact Store
 
 - [Docs](https://mlflow.org/docs/latest/tracking/artifacts-stores.html)
+
+## 8. Searching based On Tags
+
+- [Docs](https://mlflow.org/docs/latest/getting-started/logging-first-model/step4-experiment-search.html)

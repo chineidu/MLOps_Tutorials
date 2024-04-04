@@ -177,6 +177,8 @@ def run_experiment(
 
     with mlflow.start_run(run_name=experiment.run_name):
         mlflow.set_tag("model.type", experiment.experiment_type)
+        # mlflow.set_tags()
+
         # I'm using autolog
         mlflow.sklearn.autolog()
         logger.info(f" Training {experiment.model_name!r} ")

@@ -8,6 +8,7 @@
     - [Docker Image](#docker-image)
     - [Docker Container](#docker-container)
     - [Dockerfile](#dockerfile)
+    - [Dockerfile Best Practices](#dockerfile-best-practices)
   - [Build A Docker Image And Run A Container](#build-a-docker-image-and-run-a-container)
     - [Build A Docker Image](#build-a-docker-image)
     - [Create And Run A Docker Container](#create-and-run-a-docker-container)
@@ -116,6 +117,29 @@ EXPOSE 8000
 # Entry point
 CMD [ "python3", "src/main.py", "--host", "0.0.0.0"]
 ```
+
+### Dockerfile Best Practices
+
+1. **Use a `.dockerignore` File**: Similar to a .gitignore file, a .dockerignore file allows you to exclude unnecessary files and directories from the Docker build context, reducing the build context size.
+
+2. **Base Images**: Use official, well-maintained base images for a smaller footprint and security.
+
+3. **Minimize RUN Instructions and Layer Counts**: Try to chain multiple RUN commands together using `&&` to reduce the number of layers in the final image. This can improve build times and reduce image size.
+
+4. **Order Dockerfile Instructions Strategically**: Place the most frequently changing instructions (e.g., COPY, ADD) towards the end of the Dockerfile, so that the build cache can be leveraged more effectively. i.e. leverage caching.
+
+5. **Avoid Installing Unnecessary Packages**: Only install the packages and dependencies that are required for your application to run. Use a requirements file (e.g., requirements.txt for Python) to manage dependencies.
+
+6. **Combine `RUN` Commands**: Streamline builds by combining related RUN commands with &&.
+   - Avoid unnecessary `COPY` or `ADD` instructions, as each one creates a new layer.
+
+7. **Clean Up After Each Step**: Remove any unnecessary files or artifacts after each step to minimize the size of the intermediate layers and reduce the final image size. Use the RUN instruction with && to combine commands and clean up in the same layer.
+
+8. **Parameterize Your Dockerfile**: Use `ARG` and `ENV` instructions to define build-time variables that can be passed during the docker build command. This allows you to easily customize the Dockerfile for different environments or use cases.
+
+9. **Documentation**: Add comments to improve readability and maintainability.
+
+10. **Consistent Naming Convention**: Use a consistent naming convention for your Dockerfiles, such as `Dockerfile.app` or `Dockerfile.db`
 
 ## Build A Docker Image And Run A Container
 
