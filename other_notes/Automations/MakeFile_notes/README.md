@@ -18,6 +18,7 @@
     - [Makefile: If Statement](#makefile-if-statement)
     - [Makefile: `.PHONY`](#makefile-phony)
     - [Include Keyword](#include-keyword)
+    - [Run A Specific Makefile](#run-a-specific-makefile)
 
 ## Make
 
@@ -182,5 +183,15 @@ clean:
 include dependencies.mk
 include my_envs_dir/.env
 export # export the env vars
+```
 
+### Run A Specific Makefile
+
+- You you have more than one makefiles. e.g. `Makefile` and `Makefile.prod`, to run the targets in `Makefile.prod`, run:
+
+```sh
+make -f Makefile.prod <target>
+
+# e.g.
+make -f Makefile.prod if-example
 ```

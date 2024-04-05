@@ -1,3 +1,4 @@
+# For local debugging and testing!
 version: "3.8"
 
 services:

@@ -7,7 +7,6 @@ ENV HOME=/root
 # 3. LC_ALL and LANG: ensures that the application can handle Unicode characters correctly.
 # 4. DEBIAN_FRONTEND: prevents interactive prompts during package installations.
 # 5. BUILD_POETRY_LOCK: specify the location of a Poetry lock file.
-
 ENV \
     PYTHONUNBUFFERED=1 \
     VIRTUAL_ENV="${HOME}/venv" \
