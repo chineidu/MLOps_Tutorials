@@ -21,6 +21,10 @@
     - [8. Searching based On Tags](#8-searching-based-on-tags)
   - [MLFlow Setups](#mlflow-setups)
     - [1. Local MLFlow Setup](#1-local-mlflow-setup)
+      - [Setup 1](#setup-1)
+    - [2. Remote MLFlow Setup](#2-remote-mlflow-setup)
+      - [AWS Setup](#aws-setup)
+      - [GCP Setup](#gcp-setup)
 
 ## Simple Setup
 
@@ -282,9 +286,26 @@ print(model)
 
 - [Docs](https://mlflow.org/docs/latest/getting-started/logging-first-model/step4-experiment-search.html)
 
-
 ## MLFlow Setups
 
 ### 1. Local MLFlow Setup
 
-- Click [here](./other_notes/MLFlow/LOCAL_MLFLOW_SETUP.md)
+#### Setup 1
+
+- This setup uses:
+  - `Docker` for local deployment
+  - `localhost` as server
+  - `local filesystem` as artifacts store
+  - and `Postgres` as metadata store (database)
+
+- Click [here](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/MLFlow/LOCAL_MLFLOW_SETUP.md)
+
+### 2. Remote MLFlow Setup
+
+#### AWS Setup
+
+- Click [here](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/MLFlow/AWS_SETUP_README.md)
+
+#### GCP Setup
+
+- Click [here](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/MLFlow/GCP_SETUP_README.md)
