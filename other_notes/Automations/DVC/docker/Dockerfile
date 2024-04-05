@@ -24,8 +24,8 @@ RUN apt-get -qq update \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get -qq -y clean
 
-# Create the directory with subdirectories.
-RUN mkdir -p "${MLFLOW_ARTIFACT_STORE}"/app
+# Create the directories.
+RUN mkdir -p "${MLFLOW_ARTIFACT_STORE}" /app
 
 # 1. Copy the run-server.sh script for starting the mlflow server
 # 2. Make the script executable.
@@ -51,4 +51,5 @@ RUN python -m venv "${VIRTUAL_ENV}" \
     && cp poetry.lock "${BUILD_POETRY_LOCK}" \
     && rm -rf "${HOME}/.cache/*"
 
+# Entrypoint to start the MLflow server
 CMD ["run-server.sh"]

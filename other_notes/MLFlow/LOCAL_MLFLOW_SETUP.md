@@ -52,6 +52,8 @@ services:
     container_name: mlflow-backend-store # Also used as hostname
     env_file: # Location of file(s) containing the env vars
     - ./.envs/.postgres
+    volumes: # Persist the data volume
+      - postgresql-data:/var/lib/postgresql/data
 
   mlflow-server: # 2nd service
     image: local-mlflow-tracking-server
@@ -78,7 +80,6 @@ services:
 volumes:
   postgresql-data:
   artifact-store:
-
 ```
 
 ### Env Variables Example
@@ -170,6 +171,7 @@ RUN python -m venv "${VIRTUAL_ENV}" \
     && cp poetry.lock "${BUILD_POETRY_LOCK}" \
     && rm -rf "${HOME}/.cache/*"
 
+# Entrypoint to start the MLflow server
 CMD ["run-server.sh"]
 ```
 
@@ -194,11 +196,14 @@ mlflow server -h 0.0.0.0 \
 # ===========================
 # ./Makefile
 # ===========================
-# Include environment variables and export them
+# Include environment variables
 include ./.envs/.mlflow-dev
 include ./.envs/.mlflow-prod
 include ./.envs/.postgres
-export # Make all the variables defined in the files above accessible throughout the Makefile.
+
+# Make all the variables defined in the files above
+# accessible throughout the Makefile.
+export
 
 # Docker Compose Commands
 DOCKER_COMPOSE_RUN = docker-compose run --rm mlflow-server
@@ -222,6 +227,8 @@ exec-in: up # Run a command in the docker image
     # OR
     # ${DOCKER_COMPOSE_EXEC}
 
-lock-dependencies: # Copy pre-built poetry.lock if available, otherwise generate a new lock file with poetry lock.
+# Copy pre-built poetry.lock if available, otherwise generate a
+# new lock file with poetry lock.
+lock-dependencies:
     ${DOCKER_COMPOSE_RUN} bash -c "if [ -e ${BUILD_POETRY_LOCK} ]; then cp ${BUILD_POETRY_LOCK} ./poetry.lock; else poetry lock; fi"
 ```

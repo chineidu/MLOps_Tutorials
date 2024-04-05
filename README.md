@@ -10,6 +10,9 @@
     - [Mongodb String URI Format](#mongodb-string-uri-format)
     - [Example Dockerfile](#example-dockerfile)
   - [Markdown Extension Docs](#markdown-extension-docs)
+  - [Common Linux Commands](#common-linux-commands)
+    - [Check Active Ports](#check-active-ports)
+    - [Kill A Process Running On A Port](#kill-a-process-running-on-a-port)
 
 This course contains tutorials for Docker, K8s, Model deployment, ML Systems Testing and Monitoring, etc.
 
@@ -151,3 +154,35 @@ CMD [ "python3", "main.py", "--host", "0.0.0.0"]
 ## Markdown Extension Docs
 
 - The docs can be found [here](https://github.com/DavidAnson/markdownlint/blob/v0.32.1/README.md#configuration).
+
+## Common Linux Commands
+
+### Check Active Ports
+
+```sh
+# Check active ports
+sudo lsof -i -P -n | grep LISTEN
+
+# OR
+# Identify the process using the port
+sudo lsof -i :<port_number>
+
+# e.g.
+sudo lsof -i :5252
+```
+
+### Kill A Process Running On A Port
+
+```sh
+# Identify the process using the port
+sudo lsof -i :<port_number>
+
+# e.g.
+sudo lsof -i :5252
+
+# Kill the process
+sudo kill -9 <process_id>
+
+# e.g.
+sudo kill -9 76339
+```

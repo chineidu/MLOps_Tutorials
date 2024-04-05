@@ -13,7 +13,7 @@
 
 ### Poetry Example 1
 
-```Docker
+```Dockerfile
 # Use an official Python runtime as a parent image
 FROM python:3.9-slim
 
@@ -48,6 +48,9 @@ CMD ["python", "earth_quake_predictor/train.py"]
 ### Docker-Compose: Example 1
 
 ```yaml
+# ===========================
+# docker-compose.yaml
+# ===========================
 version: "3.8"
 
 services:
@@ -56,6 +59,8 @@ services:
     container_name: mlflow-backend-store # Also used as hostname
     env_file: # Location of file(s) containing the env vars
     - ./.envs/.postgres
+    volumes: # Persist the data volume
+      - postgresql-data:/var/lib/postgresql/data
 
   mlflow-server: # 2nd service
     image: local-mlflow-tracking-server
