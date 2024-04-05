@@ -1,6 +1,6 @@
 # Include environment variables
-include ./.envs/.mlflow-dev
-include ./.envs/.mlflow-prod
+include ./.envs/.mlflow.dev
+include ./.envs/.mlflow.prod
 include ./.envs/.postgres
 
 # Make all the variables defined in the files above
@@ -11,14 +11,23 @@ export
 DOCKER_COMPOSE_RUN = docker-compose run --rm mlflow-server
 DOCKER_COMPOSE_EXEC = docker-compose exec mlflow-server bash
 
+ifeq (${DOCKER_COMPOSE_FILE}, dev)
+	COMPOSE_FILE = docker-compose.yaml
+else
+	COMPOSE_FILE = docker-compose.prod.yaml
+endif
+
 # Set a variable within its context. It'll be used later in the Makefile.
 lock-dependencies: BUILD_POETRY_LOCK = /poetry.lock.build
 
 # Makefile Targets
-build: # Build the docker image
+print_compose_file:
+	@echo "Using COMPOSE_FILE: ${COMPOSE_FILE}"
+
+build: print_compose_file # Build the docker image
 	docker-compose build
 
-down: # Stop the docker image
+down: print_compose_file # Stop the docker image
 	docker-compose down
 
 up: down # Run the docker image

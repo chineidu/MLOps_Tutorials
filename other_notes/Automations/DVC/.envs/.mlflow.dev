@@ -1,3 +1,6 @@
 MLFLOW_BACKEND_STORE=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mlflow-backend-store/${POSTGRES_DB}
 MLFLOW_ARTIFACT_STORE=/mlflow-artifact-store
 MLFLOW_TRACKING_URI=http://${LOCAL_DEV_MLFLOW_SERVER_HOST}:${LOCAL_DEV_MLFLOW_SERVER_PORT}
+
+# For development, use dev, otherwise use ""
+DOCKER_COMPOSE_FILE=dev

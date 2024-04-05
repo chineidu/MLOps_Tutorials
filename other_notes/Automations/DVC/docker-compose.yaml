@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   mlflow-db: # 1st service
+    user: root # Run as root
     image: postgres:16-bullseye
     container_name: mlflow-backend-store # Also used as hostname
     env_file: # Location of file(s) containing the env vars
@@ -23,8 +24,8 @@ services:
       - mlflow-db
     env_file:
       - ./.envs/.postgres
-      - ./.envs/.mlflow-dev
-      - ./.envs/.mlflow-prod
+      - ./.envs/.mlflow.dev
+      - ./.envs/.mlflow.prod
     volumes:
       - ./:/app
       - artifact-store:/${MLFLOW_ARTIFACT_STORE} # Named volume

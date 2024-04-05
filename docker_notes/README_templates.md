@@ -76,8 +76,8 @@ services:
       - mlflow-db
     env_file:
       - ./.envs/.postgres
-      - ./.envs/.mlflow-dev
-      - ./.envs/.mlflow-prod
+      - ./.envs/.mlflow.dev
+      - ./.envs/.mlflow.prod
     volumes:
       - ./:/app
       - artifact-store:/${MLFLOW_ARTIFACT_STORE} # Named volume

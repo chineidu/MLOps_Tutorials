@@ -167,3 +167,4 @@ notepad.py
 **/*.pub
 **/mlartifacts
 **/mlruns
+**/.mlflow.prod

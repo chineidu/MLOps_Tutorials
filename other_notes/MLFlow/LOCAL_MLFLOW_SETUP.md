@@ -69,8 +69,8 @@ services:
       - mlflow-db
     env_file:
       - ./.envs/.postgres
-      - ./.envs/.mlflow-dev
-      - ./.envs/.mlflow-prod
+      - ./.envs/.mlflow.dev
+      - ./.envs/.mlflow.prod
     volumes:
       - ./:/app
       - artifact-store:/${MLFLOW_ARTIFACT_STORE} # Named volume
@@ -86,7 +86,7 @@ volumes:
 
 ```.env
 # ===========================
-# /.envs/.mlflow-dev
+# /.envs/.mlflow.dev
 # ===========================
 MLFLOW_BACKEND_STORE=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@mlflow-backend-store/${POSTGRES_DB}
 MLFLOW_ARTIFACT_STORE=/mlflow-artifact-store
@@ -96,7 +96,7 @@ MLFLOW_TRACKING_URI=http://${LOCAL_DEV_MLFLOW_SERVER_HOST}:${LOCAL_DEV_MLFLOW_SE
 
 
 # ===========================
-# ./.envs/.mlflow-prod
+# ./.envs/.mlflow.prod
 # ===========================
 LOCAL_DEV_MLFLOW_SERVER_HOST=127.0.0.1
 LOCAL_DEV_MLFLOW_SERVER_PORT=5252
@@ -197,8 +197,8 @@ mlflow server -h 0.0.0.0 \
 # ./Makefile
 # ===========================
 # Include environment variables
-include ./.envs/.mlflow-dev
-include ./.envs/.mlflow-prod
+include ./.envs/.mlflow.dev
+include ./.envs/.mlflow.prod
 include ./.envs/.postgres
 
 # Make all the variables defined in the files above
