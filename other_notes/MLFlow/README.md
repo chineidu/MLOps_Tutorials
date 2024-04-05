@@ -9,15 +9,18 @@
   - [Simple Setup](#simple-setup)
     - [Simple Tracking URI Setup](#simple-tracking-uri-setup)
     - [Creating Experiments With Meaningful Tags](#creating-experiments-with-meaningful-tags)
-  - [1. MLflow Tracking Quickstart](#1-mlflow-tracking-quickstart)
-  - [2. MLFlow Tracking Server Overview](#2-mlflow-tracking-server-overview)
-  - [3. Register a Model](#3-register-a-model)
-  - [4. Load a Registered Model](#4-load-a-registered-model)
-  - [5. Starting the MLflow Tracking Server](#5-starting-the-mlflow-tracking-server)
-    - [5b. Setup MLflow Tracking Server For Self-managed MLflow](#5b-setup-mlflow-tracking-server-for-self-managed-mlflow)
-  - [6. Configure Backend Store](#6-configure-backend-store)
-  - [7. Configure Artifact Store](#7-configure-artifact-store)
-  - [8. Searching based On Tags](#8-searching-based-on-tags)
+  - [MLFlow Guide](#mlflow-guide)
+    - [1. MLflow Tracking Quickstart](#1-mlflow-tracking-quickstart)
+    - [2. MLFlow Tracking Server Overview](#2-mlflow-tracking-server-overview)
+    - [3. Register a Model](#3-register-a-model)
+    - [4. Load a Registered Model](#4-load-a-registered-model)
+    - [5. Starting the MLflow Tracking Server](#5-starting-the-mlflow-tracking-server)
+      - [5b. Setup MLflow Tracking Server For Self-managed MLflow](#5b-setup-mlflow-tracking-server-for-self-managed-mlflow)
+    - [6. Configure Backend Store](#6-configure-backend-store)
+    - [7. Configure Artifact Store](#7-configure-artifact-store)
+    - [8. Searching based On Tags](#8-searching-based-on-tags)
+  - [MLFlow Setups](#mlflow-setups)
+    - [1. Local MLFlow Setup](#1-local-mlflow-setup)
 
 ## Simple Setup
 
@@ -231,19 +234,21 @@ produce_apples_experiment = client.create_experiment(
 
 ```
 
-## 1. MLflow Tracking Quickstart
+## MLFlow Guide
+
+### 1. MLflow Tracking Quickstart
 
 - Check [here](https://www.mlflow.org/docs/latest/getting-started/intro-quickstart/index.html) for quickstart.
 
-## 2. MLFlow Tracking Server Overview
+### 2. MLFlow Tracking Server Overview
 
 - Check [here](https://www.mlflow.org/docs/latest/getting-started/tracking-server-overview/index.html) for quickstart.
 
-## 3. Register a Model
+### 3. Register a Model
 
 - Check [here](https://www.mlflow.org/docs/latest/getting-started/registering-first-model/step1-register-model.html) for quickstart.
 
-## 4. Load a Registered Model
+### 4. Load a Registered Model
 
 - Check [here](https://www.mlflow.org/docs/latest/getting-started/registering-first-model/step3-load-model.html) for quickstart.
 Load a Registered Model
@@ -257,22 +262,29 @@ model = mlflow.sklearn.load_model(f"models:/{model_name}/{model_version}")
 print(model)
 ```
 
-## 5. Starting the MLflow Tracking Server
+### 5. Starting the MLflow Tracking Server
 
 - Check [here](https://www.mlflow.org/docs/latest/getting-started/logging-first-model/step1-tracking-server.html) for quickstart.
 
-### 5b. Setup MLflow Tracking Server For Self-managed MLflow
+#### 5b. Setup MLflow Tracking Server For Self-managed MLflow
 
 - [Docs](https://www.mlflow.org/docs/latest/getting-started/logging-first-model/step1-tracking-server.html)
 
-## 6. Configure Backend Store
+### 6. Configure Backend Store
 
 - [Docs](https://mlflow.org/docs/latest/tracking/backend-stores.html)
 
-## 7. Configure Artifact Store
+### 7. Configure Artifact Store
 
 - [Docs](https://mlflow.org/docs/latest/tracking/artifacts-stores.html)
 
-## 8. Searching based On Tags
+### 8. Searching based On Tags
 
 - [Docs](https://mlflow.org/docs/latest/getting-started/logging-first-model/step4-experiment-search.html)
+
+
+## MLFlow Setups
+
+### 1. Local MLFlow Setup
+
+- Click [here](./other_notes/MLFlow/LOCAL_MLFLOW_SETUP.md)

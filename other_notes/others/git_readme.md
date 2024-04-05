@@ -16,6 +16,7 @@
     - [Common Git Fetch Use Cases](#common-git-fetch-use-cases)
       - [1. Update Local Knowledge of Remote Repository:](#1-update-local-knowledge-of-remote-repository)
       - [2. Fetching And Creating A Remote Branch That Doesn't Exist Locally](#2-fetching-and-creating-a-remote-branch-that-doesnt-exist-locally)
+  - [Git Tags](#git-tags)
 
 ## Git Rebase
 
@@ -115,3 +116,5 @@ git checkout -b local_branch_name origin/remote_branch_name
 - Replace:
   - `local_branch_name` with the desired name of the local branch.
   - `remote_branch_name` with the desired name of the remote branch
+
+## Git Tags
