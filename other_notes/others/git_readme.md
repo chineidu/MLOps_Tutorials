@@ -17,6 +17,12 @@
       - [1. Update Local Knowledge of Remote Repository:](#1-update-local-knowledge-of-remote-repository)
       - [2. Fetching And Creating A Remote Branch That Doesn't Exist Locally](#2-fetching-and-creating-a-remote-branch-that-doesnt-exist-locally)
   - [Git Tags](#git-tags)
+    - [Types of Tags: Lightweight vs. Annotated](#types-of-tags-lightweight-vs-annotated)
+      - [Lightweight Tags](#lightweight-tags)
+      - [Annotated Tags](#annotated-tags)
+    - [List Tags](#list-tags)
+    - [View Commit Logs/History](#view-commit-logshistory)
+    - [Push Changes To A Remote Repo With Tags](#push-changes-to-a-remote-repo-with-tags)
 
 ## Git Rebase
 
@@ -118,3 +124,59 @@ git checkout -b local_branch_name origin/remote_branch_name
   - `remote_branch_name` with the desired name of the remote branch
 
 ## Git Tags
+
+- `Tagging` is a way to mark specific points in your project's history as important or noteworthy.
+- Tags act like bookmarks or milestones, allowing you to easily reference and access those specific versions of your codebase later.
+- Tags are fixed pointers to specific commits, unlike branches that can change.
+
+### Types of Tags: Lightweight vs. Annotated
+
+#### Lightweight Tags
+
+- `Lightweight` tags are simply references (pointers) to a specific commit.
+- They are lightweight and efficient to store.
+
+```sh
+git tag <tag_version>
+
+# E.g.
+git tag v1.0.1
+```
+
+#### Annotated Tags
+
+- In addition to referencing a commit, `annotated` tags can also store additional information like a `tag message`, `tagger name`, and `email address`.
+- Annotated tags provide richer context for the tagged version.
+- The `-a` flag indicates that it's an `annotated` tag.
+
+```sh
+git tag -a <tag_version> -m <add_your_commit_message>
+
+# E.g.
+git tag -a v1.0.1 -m "Added new feature X and bug fixes"
+```
+
+### List Tags
+
+```sh
+git tag
+```
+
+### View Commit Logs/History
+
+- You can check your commit history with the associated tags if available.
+
+```sh
+git log --decorate
+
+# One line nicely formatted view
+git log --pretty=online
+```
+
+### Push Changes To A Remote Repo With Tags
+
+- After creating an `annotated` tag and commiting your changes, run:
+
+```sh
+git push --follow-tags
+```
