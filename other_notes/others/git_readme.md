@@ -23,6 +23,7 @@
     - [List Tags](#list-tags)
     - [View Commit Logs/History](#view-commit-logshistory)
     - [Push Changes To A Remote Repo With Tags](#push-changes-to-a-remote-repo-with-tags)
+      - [Create An Alias For Pushing Tags](#create-an-alias-for-pushing-tags)
 
 ## Git Rebase
 
@@ -180,3 +181,18 @@ git log --pretty=online
 ```sh
 git push --follow-tags
 ```
+
+#### Create An Alias For Pushing Tags
+
+- It might be inconvenient to type out `git push --follow-tags` everytime you want to push tags to the remote repo.
+- Instead, you can create and configure a global git alias.
+
+```sh
+# Configure alias
+git config --global alias.pushf '!git push --follow-tags'
+
+# To push tags to remote
+git pushf
+```
+
+- This means that whenever you type `git pushf`, it will automatically run `git push --follow-tags` instead.
