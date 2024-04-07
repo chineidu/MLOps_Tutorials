@@ -34,18 +34,20 @@ This repo was inspired by the following Udemy courses:
    - [Advanced SQL](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/sql_notes/ADVANCED_SQL.md)
 7. **Terraform**: [Terraform](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/IaC/Terraform/README.md)
 8. **MLOps**:
-   - [Git](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/others/git_readme.md)
-   - [Hydra And OmegaConf](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/Hydra/README.md)
-   - [DVC](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/DVC/README.md)
-   - [GitHub Actions](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/Github_actions/README.md)
-   - [Poetry](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Poetry/README.md)
    - [Alembic](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Alembic_notes/README.md)
-   - [Pre-commit Hooks](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/Pre_commit/README.md)
+   - [DVC](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/DVC/README.md)
+   - [FastAPI](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/FastAPI/README.md)
+   - [Git](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/others/git_readme.md)
+   - [GitHub Actions](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/Github_actions/README.md)
+   - [Hydra And OmegaConf](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/Hydra/README.md)
    - [MLFlow](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/MLFlow/README.md)
+   - [Poetry](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Poetry/README.md)
+   - [Pre-commit Hooks](https://github.com/chineidu/MLOps_Tutorials/blob/main/other_notes/Automations/Pre_commit/README.md)
 
 ## Using Docker Commands
 
-- The commands can get very long. [Docker compose](#docker-compose) can be used instead.
+- The commands can get very long.
+- [Docker compose](#docker-compose) can be used instead.
 
 ```shell
 # Service 1
