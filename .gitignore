@@ -168,3 +168,4 @@ notepad.py
 **/mlartifacts
 **/mlruns
 **/.mlflow.prod
+**/service_account

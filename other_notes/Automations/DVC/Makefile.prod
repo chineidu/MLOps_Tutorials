@@ -7,14 +7,27 @@ export
 SHELL := /usr/bin/env bash
 HOSTNAME := $(shell hostname)
 
+# I added this line because I have multiple compose files
+ifeq (${DOCKER_COMPOSE_FILE}, dev)
+	COMPOSE_FILE = docker-compose.yaml
+else
+	COMPOSE_FILE = docker-compose.prod.yaml
+endif
+
 ifeq (, $(shell which docker-compose))
 	DOCKER_COMPOSE_COMMAND = docker compose
 else
 	DOCKER_COMPOSE_COMMAND = docker-compose
 endif
 
+# ===== Makefile Targets =====
+# Makefiles use $$ to escape $, allowing shell commands to use variables correctly.
 print_compose_file:
-	@echo "Using COMPOSE_FILE: ${COMPOSE_FILE}"
+	@echo "Using COMPOSE_FILE: $${COMPOSE_FILE}"
+
+check_gcp_instance_logs:
+	@gcloud compute --project=${GCP_PROJECT_ID} instances get-serial-port-output \
+	${DOCKER_IMAGE_NAME} --zone=${ZONE} --port=1
 
 lock-dependencies: BUILD_POETRY_LOCK = /root/poetry.lock.build
 
@@ -24,6 +37,7 @@ guard-%:
 
 ## Deploy MLFlow using GCP Cloud Run
 deploy: push
+	chmod u+x ./scripts/create-server.sh
 	./scripts/create-server.sh
 
 ## Run ssh tunnel for MLFlow
@@ -31,7 +45,7 @@ mlflow-tunnel:
 	gcloud compute ssh "$${VM_NAME}" --zone "$${ZONE}" --tunnel-through-iap -- -N -L "$${MLFLOW_PORT}:localhost:$${MLFLOW_PORT}"
 
 ## Build docker containers with docker-compose
-build:
+build: print_compose_file
 	$(DOCKER_COMPOSE_COMMAND) build
 
 ## Build docker containers with docker-compose
@@ -40,21 +54,22 @@ _build-for-dependencies:
 	$(DOCKER_COMPOSE_COMMAND) build
 
 ## Push docker image to GCP Container Registery. Requires IMAGE_TAG to be specified.
+# Makefiles use $$ to escape $, allowing shell commands to use variables correctly.
 push: guard-IMAGE_TAG build
 	@gcloud auth configure-docker eu.gcr.io --quiet
 	@docker tag  "${DOCKER_IMAGE_NAME}:latest" "$${GCP_DOCKER_REGISTERY_URL}:$${IMAGE_TAG}"
 	@docker push "$${GCP_DOCKER_REGISTERY_URL}:$${IMAGE_TAG}"
 
 ## docker-compose up
-up:
+up: down
 	$(DOCKER_COMPOSE_COMMAND) up
 
 ## docker-compose up -d
-upd:
+upd: down
 	$(DOCKER_COMPOSE_COMMAND) up -d
 
 ## docker-compose down
-down:
+down: print_compose_file
 	$(DOCKER_COMPOSE_COMMAND) down
 
 ## docker exec -it mlflow-tracking-server bash

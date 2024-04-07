@@ -57,4 +57,4 @@ RUN python -m venv "${VIRTUAL_ENV}" \
     && rm -rf "${HOME}/.cache/*"
 
 ENTRYPOINT ["/bin/bash"]
-CMD ["/run-server.prod.sh"]
+CMD ["run-server.prod.sh"]

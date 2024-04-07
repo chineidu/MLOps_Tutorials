@@ -20,6 +20,7 @@
     - [Inspecting Docker Images](#inspecting-docker-images)
     - [Inspecting Docker Containers](#inspecting-docker-containers)
     - [Check Logs](#check-logs)
+    - [Exec Into A Docker Container](#exec-into-a-docker-container)
   - [Rename And Push|Pull A Docker Image To|From DockerHub](#rename-and-pushpull-a-docker-image-tofrom-dockerhub)
     - [Login To DockerHub](#login-to-dockerhub)
     - [Rename An Image](#rename-an-image)
@@ -254,6 +255,15 @@ docker logs [container_id|container_name]
 
 # e.g.
 docker logs 5a7c0da524ef
+```
+
+### Exec Into A Docker Container
+
+```sh
+docker exec [options] container_id command [arguments]
+
+# e.g.
+docker exec -it 28e04db53aaa sh
 ```
 
 ## Rename And Push|Pull A Docker Image To|From DockerHub

@@ -14,7 +14,7 @@ classifiers = [
 python = "^3.10.8"
 mlflow = "==2.11.3"
 psycopg2-binary =  ">=2.9.7"
-google-cloud-storage = ">=2.15.0"
+google-cloud-storage = "^2.15.0"
 
 [build-system]
 requires = ["poetry-core"]

@@ -3,18 +3,17 @@ version: "3.8"
 
 services:
  app: &app # 1st service
-    user: root
+    user: root # Run as the root user
     hostname: ${HOSTNAME}
     image: ${DOCKER_IMAGE_NAME}
     build:
       context: ./
-      dockerfile: ./docker/Dockerfile
+      dockerfile: ./docker/Dockerfile.prod
     container_name: mlflow-tracking-server
     ports:
-      - ${PROD_DEV_MLFLOW_SERVER_PORT}:${PROD_DEV_MLFLOW_SERVER_PORT}
+      - ${MLFLOW_PORT}:${MLFLOW_PORT}
     env_file:
-      - ./.envs/.mlflow.dev # .gcp
-      - ./.envs/.mlflow.prod # .tracking-server
+      - ./.envs/.mlflow.prod
     volumes:
       - ./:/app
     ipc: host

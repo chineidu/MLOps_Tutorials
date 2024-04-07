@@ -1,14 +1,22 @@
 #!/usr/bin/env bash
 
+# Enforce stricter error handling in the script.
 set -euo pipefail
 
-# Create VM
+# Grant the appropriate IAM role
+gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
+  --member="serviceAccount:${SERVICE_ACCOUNT}" \
+  --role="roles/secretmanager.secretAccessor"
+
+
+# Create the VM instance and add metadata
 gcloud compute instances create "${VM_NAME}" \
   --image "${IMAGE_NAME}" \
   --image-project "${IMAGE_PROJECT_ID}" \
   --boot-disk-auto-delete \
   --labels="${LABELS}" \
   --machine-type="${MACHINE_TYPE}" \
+  --service-account="${SERVICE_ACCOUNT}" \
   --zone="${ZONE}" \
   --no-address \
   --network="${NETWORK}" \
