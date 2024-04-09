@@ -28,8 +28,7 @@
     - [View The Contents of A Package](#view-the-contents-of-a-package)
     - [Hydra: Instantiate Objects](#hydra-instantiate-objects)
     - [Hydra: Install Tab Completion](#hydra-install-tab-completion)
-    - [Hydra: Create Configs Using Structured-Configs](#hydra-create-configs-using-structured-configs)
-    - [Hydra: Validate Configs Using Schema](#hydra-validate-configs-using-schema)
+    - [Hydra: Create Configs Using Structured-Configs (Data Validation)](#hydra-create-configs-using-structured-configs-data-validation)
   - [**Top**](#top)
 
 ## OmegaConf
@@ -602,123 +601,138 @@ python file_name.py --hydra-help
 eval "$(python main.py -sc install=bash)"
 ```
 
-### Hydra: Create Configs Using Structured-Configs
+### Hydra: Create Configs Using Structured-Configs (Data Validation)
+
+- It is also used for data validation.
+- The setup below shows how to validate data with structured-configs.
+
+```text
+├── conf
+│   ├── config.yaml
+│   └── files
+│       └── mnist.yaml
+├── config_schema.py
+├── data
+│   ├── test_data.parquet
+│   └── train_data.parquet
+└── main.py
+```
 
 - The following line are used to init the ConfigStore
 
 ```text
 cs = ConfigStore.instance()
-cs.store(name="config", node=ExperimentConfig)
+cs.store(name="config_schema", node=Config)
+```
+
+```yaml
+# ===================================== #
+# conf/config.yaml
+# ===================================== #
+defaults:
+  - files: mnist
+  - _self_
+  - mnist_schema
+
+paths:
+  log: ./runs
+  data: ${hydra:runtime.cwd}/data/
+
+params:
+  epochs: 20
+  lr: 5e-5
+  batch_size: 128
+
+# Disable hydra output directory
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+
+# ===================================== #
+# conf/files/mnist.yaml
+# ===================================== #
+test_data: test_data.parquet
+train_data: train_data.parquet
+
 ```
 
 ```py
-from dataclasses import dataclass
-import hydra
-from hydra.core.config_store import ConfigStore
+# ===================================== #
+# config_schema.py
+# ===================================== #
+from pydantic.dataclasses import dataclass
+
 
 @dataclass
-class ExperimentConfig:
-    model: str = "resnet18"
-    epochs: int = 30
-    learning_rate: float = 5e-3
+class Files:
+    train_data: str
+    test_data: str
 
+@dataclass
+class Paths:
+    log: str
+    data: str
+
+@dataclass
+class Params:
+    epochs: int
+    lr: float
+    batch_size: int
+
+@dataclass
+class MNISTConfig:
+    files: Files
+    paths: Paths
+    params: Params
+
+
+# ===================================== #
+# main.py
+# ===================================== #
+import hydra
+import polars as pl
+from config_schema import MNISTConfig
+from hydra.core.config_store import ConfigStore
+from omegaconf import DictConfig, OmegaConf
 # Setup the config store
 cs = ConfigStore.instance()
-cs.store(name="config", node=ExperimentConfig)
+cs.store(name="mnist_schema", node=MNISTConfig)
 
-@hydra.main(config_path=None, config_name="config", version_base=None)
+
+@hydra.main(config_path="./conf", config_name="config", version_base=None)
 def main(config: DictConfig) -> None:
     """Main function"""
     console.print(OmegaConf.to_yaml(config, resolve=True))
+    data_fp: str = config.paths.data
+    fp: str = config.files.train_data
+    console.print(f"filepath: {data_fp + fp}")
+
 
 if __name__ == "__main__":
     main()
+
 ```
 
 ```sh
 python main.py
 
-# Outputs:
-# model: resnet18
-# epochs: 30
-# learning_rate: 0.005
-```
-
-### Hydra: Validate Configs Using Schema
-
-```yaml
 # ===================================== #
-# config.yaml
+# output:
 # ===================================== #
-defaults:
-  - _self_
-  - main_config_schema # schema
+# files:
+#   test_data: test_data.parquet
+#   train_data: train_data.parquet
+# paths:
+#   log: ./runs
+#   data: /Users/neidu/Desktop/Projects/Personal/My_Projects/MLOps_Tutorials/other_notes/Automations/Hydra/proj_2/data/
+# params:
+#   epochs: 20
+#   lr: 5.0e-05
+#   batch_size: 128
 
-training:
-  _target_: main.Training
-  batch_size: 126
-  epochs: 30
-  learning_rate: 5e-4
-
-log_model:
-  _target_: sklearn.linear_model.LogisticRegression
-  _partial_: true
-  C: 0.5
-  penalty: "l2"
-  solver: "liblinear"
+# filepath: /Users/neidu/Desktop/Projects/Personal/My_Projects/MLOps_Tutorials/other_notes/Automations/Hydra/proj_2/data/train_data.parquet
 ```
-
-- Add the schema to the default lists. i.e. `main_config_schema`
-
-```py
-from dataclasses import dataclass
-# OR
-from pydantic.dataclasses import dataclass # Better!
-import hydra
-from hydra.core.config_store import ConfigStore
-from omegaconf import DictConfig, OmegaConf
-
-@dataclass
-class TrainingSchema:
-    _target_: str
-    batch_size: int
-    epochs: int
-    learning_rate: float
-
-
-@dataclass
-class LogModelSchema:
-    _target_: str
-    _partial_: bool
-    C: float
-    penalty: str
-    solver: str
-
-
-@dataclass
-class MainConfigSchema:
-    training: TrainingSchema
-    log_model: LogModelSchema
-
-
-# Setup the config store
-cs = ConfigStore.instance()
-cs.store(name="main_config_schema", node=MainConfigSchema)
-# Add groups
-# cs.store(group="experiments", name="resnet18_schema, node=ResNet18)
-
-
-@hydra.main(config_path=".", config_name="config", version_base=None)
-def main(config: DictConfig) -> None:
-    """Main function"""
-    console.print(OmegaConf.to_yaml(config, resolve=True))
-
-
-if __name__ == "__main__":
-    main()
-
-```
-
----
 
 ## **[Top](#table-of-content)**
