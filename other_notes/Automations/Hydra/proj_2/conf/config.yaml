@@ -1,0 +1,19 @@
+defaults:
+  - files: mnist
+  - _self_
+  - mnist_schema
+
+paths:
+  log: ./runs
+  data: ${hydra:runtime.cwd}/data/
+
+params:
+  epochs: 20
+  lr: 5e-5
+  batch_size: 128
+
+# Disable hydra output directory
+hydra:
+  output_subdir: null
+  run:
+    dir: .
