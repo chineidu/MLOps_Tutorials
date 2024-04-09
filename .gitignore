@@ -167,5 +167,6 @@ notepad.py
 **/*.pub
 **/mlartifacts
 **/mlruns
-**/.mlflow.prod
+**/*.env
 **/service_account
+!**/example_mlflow_prod.env

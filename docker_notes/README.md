@@ -52,6 +52,7 @@
   - [Docker Compose](#docker-compose)
     - [Sample Docker-compose File](#sample-docker-compose-file)
     - [Start And Stop The Containers](#start-and-stop-the-containers)
+    - [Access Environment Variables In Docker Compose](#access-environment-variables-in-docker-compose)
     - [NOTE](#note)
   - [Deploying Containers](#deploying-containers)
     - [Using EC2 Instances](#using-ec2-instances)
@@ -677,7 +678,7 @@ services:
       - PASSWORD=password
 
     # OR (Another way of passing env vars)
-    # Note: You need to create a folder which contains the env file
+    # Location of file(s) containing the env vars. Only accessed by the container.
     env_file:
       - abs_path/to/env_file # e.g. folder/env_file
 
@@ -706,6 +707,15 @@ docker-compose up --help
 
 # Stop Containers
 docker-compose down
+```
+
+### Access Environment Variables In Docker Compose
+
+```sh
+docker-compose --env-file ./path/to/env/file command
+
+# e.g.
+docker-compose --env-file ./envs/mlflow_dev.env up
 ```
 
 ### NOTE

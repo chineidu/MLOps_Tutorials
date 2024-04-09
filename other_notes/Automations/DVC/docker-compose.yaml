@@ -5,8 +5,8 @@ services:
     user: root # Run as root
     image: postgres:16-bullseye
     container_name: mlflow-backend-store # Also used as hostname
-    env_file: # Location of file(s) containing the env vars
-    - ./.envs/.postgres
+    env_file: # Location of file(s) containing the env vars. Only accessed by the container.
+      - ./envs/mlflow_dev.env
     volumes: # Persist the data volume
       - postgresql-data:/var/lib/postgresql/data
 
@@ -17,19 +17,19 @@ services:
       dockerfile: ./docker/Dockerfile
       args:
         MLFLOW_ARTIFACT_STORE: ${MLFLOW_ARTIFACT_STORE}
-    container_name: local-mlflow-tracking-server
+        USER_ID: ${USER_ID}
+        USERNAME: ${USERNAME}
+    container_name: mlflow-tracking-server
     ports:
       - ${LOCAL_DEV_MLFLOW_SERVER_PORT}:${LOCAL_DEV_MLFLOW_SERVER_PORT}
     depends_on:
       - mlflow-db
-    env_file:
-      - ./.envs/.postgres
-      - ./.envs/.mlflow.dev
-      - ./.envs/.mlflow.prod
+    env_file: # Location of file(s) containing the env vars. Only accessed by the container.
+      - ./envs/mlflow_dev.env
     volumes:
       - ./:/app
       - artifact-store:/${MLFLOW_ARTIFACT_STORE} # Named volume
-    ipc: host
+    # ipc: host
 
 # Named volumes ONLY!
 volumes:

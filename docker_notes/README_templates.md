@@ -58,7 +58,7 @@ services:
     image: postgres:16-bullseye
     container_name: mlflow-backend-store # Also used as hostname
     env_file: # Location of file(s) containing the env vars
-    - ./.envs/.postgres
+      - ./.envs/.postgres
     volumes: # Persist the data volume
       - postgresql-data:/var/lib/postgresql/data
 
