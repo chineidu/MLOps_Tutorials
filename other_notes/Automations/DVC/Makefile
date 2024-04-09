@@ -56,10 +56,27 @@ notebook: up
 	$(DOCKER_COMPOSE_EXEC) jupyter lab --ip 0.0.0.0 --port 8888 --no-browser
 
 ## Copy pre-built poetry.lock if available, otherwise generate a new
-# lock file with poetry lock.
+## lock file with poetry lock.
 lock-dependencies:
 	${DOCKER_COMPOSE_RUN} bash -c "if [ -e ${BUILD_POETRY_LOCK} ]; then cp ${BUILD_POETRY_LOCK} ./poetry.lock; else poetry lock; fi"
 
+.DEFAULT_GOAL := help
+
+# Inspired by <http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html>
+# sed script explained:
+# /^##/:
+# 	* save line in hold space
+# 	* purge line
+# 	* Loop:
+# 		* append newline + line to hold space
+# 		* go to next line
+# 		* if line starts with doc comment, strip comment character off and loop
+# 	* remove target prerequisites
+# 	* append hold space (+ newline) to line
+# 	* replace newline plus comments by `---`
+# 	* print line
+# Separate expressions are necessary because labels cannot be delimited by
+# semicolon; see <http://stackoverflow.com/a/11799865/1968>
 .PHONY: help
 help:
 	@echo "$$(tput bold)Available rules:$$(tput sgr0)"

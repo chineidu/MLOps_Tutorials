@@ -38,8 +38,8 @@ RUN addgroup --system --gid ${USER_ID} ${USERNAME} \
 # 2. Recursively set ownership (chown -R) of these directories, plus /tmp and user's home to the specified user.
 # This ensures the user running the container has access and write permissions to these directories.
 RUN chown -R ${USER_NAME}:${USER_NAME} ${HOME}
-RUN mkdir -p "/${MLFLOW_ARTIFACT_STORE}" /app \
-    && chown -R ${USER_NAME}:${USER_NAME} "/${MLFLOW_ARTIFACT_STORE}" /app /tmp
+RUN mkdir -p "${MLFLOW_ARTIFACT_STORE}" /app \
+    && chown -R ${USER_NAME}:${USER_NAME} "${MLFLOW_ARTIFACT_STORE}" /app /tmp
 
 # Set up Poetry for dependency management.
 RUN HOME=/tmp pip install --no-cache-dir poetry==1.7.1
