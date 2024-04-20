@@ -11,6 +11,7 @@
     - [Benefits of OmegaConf](#benefits-of-omegaconf)
     - [Load A Config (YAML) File Using OmegaConf](#load-a-config-yaml-file-using-omegaconf)
     - [OmegaConf: Variable Interpolation](#omegaconf-variable-interpolation)
+    - [Access Runtime Variables](#access-runtime-variables)
     - [Variable Interpolation With Env Variables](#variable-interpolation-with-env-variables)
     - [OmegaConf: Merge Config Files](#omegaconf-merge-config-files)
   - [**Back To Top**](#back-to-top)
@@ -162,6 +163,16 @@ network:
 network2:
   address: 192.168.1.100
   description: Description of 192.168.1.100
+```
+
+### Access Runtime Variables
+
+- You can get the current working directory using `hydra.runtime.cwd`
+
+```yaml
+
+config:
+  data_path: ${hydra:runtime.cwd}/data
 ```
 
 ### Variable Interpolation With Env Variables
