@@ -18,6 +18,7 @@
   - [Loading Files With Document Loaders](#loading-files-with-document-loaders)
     - [Text Loader](#text-loader)
   - [Embeddings](#embeddings)
+  - [Asynchronous Calls](#asynchronous-calls)
 
 ## Access An LLM Without Chains
 
@@ -280,3 +281,86 @@ for d in docs:
 ```
 
 ## Embeddings
+
+
+## Asynchronous Calls
+
+```py
+import asyncio
+
+
+class CustomPromptTemplates(BaseModel):
+    template_1: str
+    template_2: str
+
+
+class AsyncCreditScore:
+    def __init__(self, prompt_templates: CustomPromptTemplates, llm: Any) -> None:
+        self.prompt_templates = prompt_templates
+        self.llm = llm
+
+    def _build_chain(self) -> RunnableSequence:
+        llm = self.llm
+        model_parser = llm | StrOutputParser()
+
+        # ========== Parser ==========
+        # Define the desired output schema
+        schema_1 = ResponseSchema(
+            name="score", description="The score of the result", type="string"
+        )
+        schema_2 = ResponseSchema(
+            name="reason", description="The reason for the score", type="string"
+        )
+        response_schemas: list[ResponseSchema] = [schema_1, schema_2]
+
+        # Create the StructuredOutputParser
+        response_parser = StructuredOutputParser.from_response_schemas(response_schemas)
+        format_instructions = response_parser.get_format_instructions()
+
+        # ========== Propmt(s) ==========
+        prompt_1: PromptTemplate = PromptTemplate(
+            input_variables=["customer_data"], template=self.prompt_templates.template_1
+        )
+        prompt_2: PromptTemplate = PromptTemplate(
+            input_variables=["report"],
+            template=self.prompt_templates.template_2,
+            partial_variables={"format_instructions": format_instructions},
+        )
+
+        # ========== Chains ==========
+        chain_1 = prompt_1 | model_parser
+        score_generator = {"report": chain_1} | prompt_2 | model | response_parser
+
+        return score_generator
+
+    async def _async_generate(
+        self, chain: RunnableSequence, data: dict[str, str]
+    ) -> dict[str, str]:
+        result: dict[str, str] = {}
+
+        with get_openai_callback() as cb:
+            score_data: dict[str, str] = await chain.ainvoke({"customer_data": data})
+            result["id"] = data.get("customer_id")
+            result["score_data"] = score_data
+            result["cost"] = str(cb)
+            return result
+
+    async def async_generate_response(
+        self, data_list: list[dict[str, str]]
+    ) -> list[dict[str, str]]:
+        score_generator = self._build_chain()
+        fututes: list[Any] = []
+
+        try:
+            for data in data_list:
+                # time.sleep(1)  # Remove this later!!!!
+                fututes.append(self._async_generate(score_generator, data))
+
+            results: list[Any] = await asyncio.gather(*fututes)
+            console.print("[INFO]: Successful!", style="info")
+            return results
+
+        except Exception as err:
+            console.print(f"[ERROR]: {err}", style="error")
+            return []
+```
