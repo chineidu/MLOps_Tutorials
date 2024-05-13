@@ -6,9 +6,58 @@
 
 - [Jupyter Notebook](#jupyter-notebook)
   - [Table of Content](#table-of-content)
-  - [Version 1](#version-1)
+  - [Check Installed Dependencies](#check-installed-dependencies)
+    - [Approach 1](#approach-1)
+    - [Approach 2](#approach-2)
+  - [Boilerplate 1](#boilerplate-1)
 
-## Version 1
+## Check Installed Dependencies
+
+- Required:
+
+```sh
+pip install watermark
+```
+
+### Approach 1
+
+```py
+%load_ext watermark
+%watermark -v -p numpy,pandas,polars,torch,lightning --conda
+
+# ==== Output ====
+# Python implementation: CPython
+# Python version       : 3.10.8
+# IPython version      : 8.23.0
+
+# numpy    : 1.26.4
+# pandas   : 2.2.2
+# polars   : 0.20.21
+# torch    : 2.2.2
+# lightning: 2.2.2
+
+# conda environment: n/a
+```
+
+### Approach 2
+
+```py
+from watermark import watermark
+
+print(watermark(packages="polars,scikit-learn,torch,lightning", python=True))
+
+# ==== Output ====
+# Python implementation: CPython
+# Python version       : 3.10.8
+# IPython version      : 8.23.0
+
+# polars      : 0.20.21
+# scikit-learn: 1.4.2
+# torch       : 2.2.2
+# lightning   : 2.2.2
+```
+
+## Boilerplate 1
 
 ```py
 # Built-in library
