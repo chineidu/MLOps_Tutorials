@@ -10,6 +10,7 @@
     - [Approach 1](#approach-1)
     - [Approach 2](#approach-2)
   - [Boilerplate 1](#boilerplate-1)
+  - [Jupyter Notebook Strip Output](#jupyter-notebook-strip-output)
 
 ## Check Installed Dependencies
 
@@ -106,4 +107,17 @@ np.random.seed(0)
 # auto reload imports
 %load_ext autoreload
 %autoreload 2
+```
+
+## [Jupyter Notebook Strip Output](https://github.com/kynan/nbstripout)
+
+```sh
+# installation
+pip install --upgrade nbstripout
+
+# Configure filter
+git config --global filter.nbstripout.clean 'nbstripout'
+
+# Remove empty cells
+nbstripout --drop-empty-cells
 ```
