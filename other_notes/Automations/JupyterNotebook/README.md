@@ -96,6 +96,10 @@ pd.options.display.max_rows = 1_000
 pd.options.display.max_columns = 1_000
 pd.options.display.max_colwidth = 600
 
+# Polars settings
+pl.Config.set_fmt_str_lengths(1_000)
+pl.Config.set_tbl_cols(n=1_000)
+
 warnings.filterwarnings("ignore")
 
 # Add seed
