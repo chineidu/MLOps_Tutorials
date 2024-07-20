@@ -90,6 +90,8 @@ console = Console(theme=custom_theme)
 # Visualization
 import matplotlib.pyplot as plt
 
+# NumPy settings
+np.set_printoptions(precision=4)
 
 # Pandas settings
 pd.options.display.max_rows = 1_000
@@ -101,9 +103,6 @@ pl.Config.set_fmt_str_lengths(1_000)
 pl.Config.set_tbl_cols(n=1_000)
 
 warnings.filterwarnings("ignore")
-
-# Add seed
-np.random.seed(0)
 
 # Black code formatter (Optional)
 %load_ext lab_black
