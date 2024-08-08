@@ -25,7 +25,7 @@
   - [Run Program](#run-program)
     - [Run Program \[Without Shell\]](#run-program-without-shell)
     - [Run Program \[With Shell\]](#run-program-with-shell)
-  - [Activate The Virtual Ebvironment](#activate-the-virtual-ebvironment)
+  - [Activate The Virtual Environment](#activate-the-virtual-environment)
 
 ## Create Virtual Env [Poetry]
 
@@ -141,7 +141,7 @@ poetry shell
 python filename.py
 ```
 
-## Activate The Virtual Ebvironment
+## Activate The Virtual Environment
 
 ```sh
 # RECOMMENDED
