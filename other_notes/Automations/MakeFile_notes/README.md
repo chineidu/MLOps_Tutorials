@@ -190,7 +190,7 @@ export # export the env vars
 - You you have more than one makefiles. e.g. `Makefile` and `Makefile.prod`, to run the targets in `Makefile.prod`, run:
 
 ```sh
-make -f Makefile.prod <target>
+make -f <makefile_name> <target_name>
 
 # e.g.
 make -f Makefile.prod if-example
