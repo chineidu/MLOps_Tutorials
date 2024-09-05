@@ -80,9 +80,12 @@ from rich.theme import Theme
 
 custom_theme = Theme(
     {
-        "info": "#76FF7B",
-        "warning": "#FBDDFE",
-        "error": "#FF0000",
+        "white": "#FFFFFF",  # Bright white
+        "info": "#00FF00",  # Bright green
+        "warning": "#FFD700",  # Bright gold
+        "error": "#FF1493",  # Deep pink
+        "success": "#00FFFF",  # Cyan
+        "highlight": "#FF4500",  # Orange-red
     }
 )
 console = Console(theme=custom_theme)
