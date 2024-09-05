@@ -147,7 +147,8 @@ def fancy_print(
     content_style: str | None = None,
     show_type: bool = True,
     expand: bool = False,
-) -> Panel:
+    return_panel: bool = False,
+) -> Panel | None:
 
     if isinstance(object, dict):
         content = Table(show_header=False, box=box.SIMPLE)
@@ -176,8 +177,11 @@ def fancy_print(
         border_style=border_style,
         expand=expand,
     )
-
-    return panel
+    if return_panel:
+        return panel
+    else:
+        console.print(panel)
+        return None
 
 
 # Example usage
