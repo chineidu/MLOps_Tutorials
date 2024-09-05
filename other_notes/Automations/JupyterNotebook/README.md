@@ -10,6 +10,7 @@
     - [Approach 1](#approach-1)
     - [Approach 2](#approach-2)
   - [Boilerplate 1](#boilerplate-1)
+  - [Rich Customisations](#rich-customisations)
   - [Jupyter Notebook Strip Output](#jupyter-notebook-strip-output)
 
 ## Check Installed Dependencies
@@ -113,6 +114,75 @@ warnings.filterwarnings("ignore")
 # auto reload imports
 %load_ext autoreload
 %autoreload 2
+```
+
+## Rich Customisations
+
+```py
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
+from rich.table import Table
+from rich import box
+from rich.theme import Theme
+
+custom_theme = Theme(
+    {
+        "white": "#FFFFFF",  # Bright white
+        "info": "#00FF00",  # Bright green
+        "warning": "#FFD700",  # Bright gold
+        "error": "#FF1493",  # Deep pink
+        "success": "#00FFFF",  # Cyan
+        "highlight": "#FF4500",  # Orange-red
+    }
+)
+
+console = Console(theme=custom_theme)
+
+
+def fancy_print(
+    object: Any,
+    title: str = "Result",
+    border_style: str = "bright_green",
+    content_style: str | None = None,
+    show_type: bool = True,
+    expand: bool = False,
+) -> Panel:
+
+    if isinstance(object, dict):
+        content = Table(show_header=False, box=box.SIMPLE)
+        for key, value in object.items():
+            content.add_row(
+                Text(str(key), style="cyan"),
+                Text(str(value), style=content_style or "white"),
+            )
+    elif isinstance(object, (list, tuple)):
+        content = Table(show_header=False, box=box.SIMPLE)
+        for i, item in enumerate(object):
+            content.add_row(
+                Text(str(i), style="cyan"),
+                Text(str(item), style=content_style or "white"),
+            )
+    else:
+        content = Text(str(object), style=content_style or "white")
+
+    if show_type:
+        title = f"{title} ({type(object).__name__})"
+
+    panel = Panel(
+        content,
+        title=title,
+        title_align="left",
+        border_style=border_style,
+        expand=expand,
+    )
+
+    return panel
+
+
+# Example usage
+console.print("hello, world!")
+fancy_print({"message": "Good morning!", "name": "John"})
 ```
 
 ## [Jupyter Notebook Strip Output](https://github.com/kynan/nbstripout)
