@@ -89,6 +89,7 @@ repos:
 ## Version 1.1
 
 ```yaml
+---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -98,16 +99,15 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-docstring-first
-        args: ["--maxkb=2000"]
+        args:
+          - --maxkb=5000
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version.
     rev: v0.3.4
     hooks:
-      # Run the linter.
       - id: ruff
-        args: [--fix]
-      # Run the formatter.
+        args:
+          - --fix
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -117,13 +117,19 @@ repos:
         name: mypy
         entry: mypy
         language: python
-        "types_or": [python, pyi]
+        types_or:
+          - python
+          - pyi
         exclude: ^tests/
         args:
-          [
-            "--ignore-missing-imports",
-            "--disallow-any-generics",
-            "--config-file",
-            "./pyproject.toml",
-          ]
+          - --ignore-missing-imports
+          - --disallow-any-generics
+          - --config-file
+          - ./pyproject.toml
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks
+
 ```
