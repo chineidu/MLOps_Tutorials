@@ -1,0 +1,48 @@
+abs_path: /Users/neidu/Desktop/Projects/Personal/My_Projects/MLOps_Tutorials/other_notes/BENTO_ML
+data:
+  csv_file_path: ${abs_path}/data/titanic_data.csv
+  test_size: 0.25
+  random_state: 20
+  target: survived
+  train_save_path: ${abs_path}/data/artifacts/train.parquet
+  test_save_path: ${abs_path}/data/artifacts/test.parquet
+
+features:
+  unique_id: name
+  cat_vars:
+    - embarked
+    - sex
+  cols_to_drop:
+    - boat
+    - body
+    - cabin
+    - home.dest
+  num_vars:
+    - age
+    - fare
+    - parch
+    - pclass
+    - sibsp
+    - ticket
+  preprocess_vars:
+    - embarked
+    - sex
+    - ticket
+  transform_output: pandas
+  train_features_save_path: ${abs_path}/data/artifacts/train_features.parquet
+  test_features_save_path: ${abs_path}/data/artifacts/test_features.parquet
+  train_target_save_path: ${abs_path}/data/artifacts/train_target.parquet
+  test_target_save_path: ${abs_path}/data/artifacts/test_target.parquet
+
+train:
+  penalty: l2
+  C: 1.0
+  solver: lbfgs
+  n_estimators: 35
+  max_depth: 20
+  n_splits: 10
+  use_log_model: False
+  trained_model_save_path: ${abs_path}/data/models/model_v1.joblib
+
+evaluate:
+  metrics_save_path: ${abs_path}/data/metrics/results.yaml
