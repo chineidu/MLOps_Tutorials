@@ -5,13 +5,24 @@ labels:
   project: titanic-prediction
 
 include:
-  - "*.py"
-  - "params.yaml"
+  - "*"
+
+models:
+  - "model_v1:latest" # model_name:model_tag
+  # - tag: "model_v1:vesion1.0"
+  #   filter: "label:staging"
+  #   alias: "model_v1_v1.0"
 
 python:
   packages:
     - polars
+    - pyarrow
     - scikit-learn
     - pydantic
     - omegaconf
-    - bentoml
+    - feature_engine
+    - typeguard
+    - joblib
+    - rich
+    - bentoml==1.3.11
+  lock_packages: false
