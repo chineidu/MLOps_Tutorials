@@ -13,5 +13,4 @@ train-processor = "python prepare_features.py"
 train-model = "python train.py"
 
 # Model serving #
-# pred-serve = "bentoml serve service:PredictionService"
-pred-serve = "python service.py"
+pred-serve = "bentoml serve service:PredictionService  --port 3005"

@@ -19,14 +19,14 @@ inference_vars: list[str] = config.features.inference_vars
 
 
 class Request(BaseModel):
-    age: int = Field(ge=0, le=100)
-    fare: float = Field(ge=0, le=200)
-    parch: int = Field(ge=0, le=8)
-    pclass: int = Field(ge=1, le=3)
-    sibsp: int = Field(ge=0, le=8)
+    age: int = Field(default=None, ge=0, le=100)
+    fare: float = Field(default=None, ge=0, le=400)
+    parch: int = Field(default=None, ge=0, le=8)
+    pclass: int = Field(default=None, ge=1, le=3)
+    sibsp: int = Field(default=None, ge=0, le=8)
     ticket: str
-    embarked: Literal["C", "S"]
-    sex: Literal["female", "male"]
+    embarked: Literal["C", "Q", "S", None] = None
+    sex: Literal["female", "male", None] = None
 
 
 @bentoml.service(
