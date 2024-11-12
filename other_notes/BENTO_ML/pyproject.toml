@@ -1,0 +1,17 @@
+# ----------------------------------
+# --- Poe the Poet Configuration ---
+# ----------------------------------
+[tool.poe.tasks]
+list-models = "bentoml models list"
+check-port = "lsof -i :3000"
+
+# Data pipelines #
+prep-data = "python prepare_data.py"
+
+# Feature engineering and model training #
+train-processor = "python prepare_features.py"
+train-model = "python train.py"
+
+# Model serving #
+# pred-serve = "bentoml serve service:PredictionService"
+pred-serve = "python service.py"

@@ -1,13 +1,24 @@
+from pathlib import Path
 from typing import Any
 
+import bentoml
 import joblib
 import pandas as pd
 import polars as pl
-from omegaconf import DictConfig
-from sklearn.base import TransformerMixin
+from logger import logger
+from omegaconf import DictConfig, OmegaConf
+from sklearn.base import ClassifierMixin, TransformerMixin
+from sklearn.pipeline import Pipeline
 from typeguard import typechecked
 
-from .logger import logger
+pl.set_random_seed(42)
+
+root: Path = Path(__file__).absolute().parent
+config: DictConfig = OmegaConf.load(f"{root}/params.yaml")
+columns: list[str] = (
+    config.features.num_vars + config.features.cat_vars + [config.features.unique_id]
+)
+uniq_id: str = config.features.unique_id
 
 
 @typechecked
@@ -47,6 +58,7 @@ def get_data_summary(data: pd.DataFrame | pl.DataFrame, features: list[str]) -> 
     return df_res
 
 
+@typechecked
 def get_value_counts(data: pd.DataFrame | pl.DataFrame, feature: str) -> pl.DataFrame:
     data = _check_if_dataframe(data=data)
     if isinstance(data, pd.DataFrame):
@@ -63,18 +75,34 @@ def get_value_counts(data: pd.DataFrame | pl.DataFrame, feature: str) -> pl.Data
 
 
 @typechecked
-def save_model(config: DictConfig, model: Any) -> None:
+def save_model(
+    config: DictConfig, model: ClassifierMixin | Pipeline, is_preprocessor: bool = False
+) -> None:
     """This is used to persist the trained model."""
-    with open(config.train.trained_model_save_path, "wb") as f:
+    model_path: str = config.train.trained_model_save_path
+    if is_preprocessor:
+        model_path = config.train.preprocessor_save_path
+
+    with open(model_path, "wb") as f:
         joblib.dump(model, filename=f)
-    logger.info("Model saved successfully")
+    logger.info(f"Model: {model!s} saved successfully")
 
 
 @typechecked
-def load_model(config: DictConfig) -> Any:
+def save_bento_model(config: DictConfig, model: ClassifierMixin) -> None:
+    bento_model = bentoml.sklearn.save_model(name=config.train.model_name, model=model)
+    logger.info(f"Model: {bento_model!s} saved successfully")
+
+
+@typechecked
+def load_model(config: DictConfig, is_preprocessor: bool = False) -> ClassifierMixin | Pipeline:
     """This is used to load the trained model."""
-    with open(config.train.trained_model_save_path, "rb") as f:
-        model: Any = joblib.load(filename=f)
+    model_path: str = config.train.trained_model_save_path
+    if is_preprocessor:
+        model_path = config.train.preprocessor_save_path
+    logger.info(f"Loading model: {model_path}")
+    with open(model_path, "rb") as f:
+        model: ClassifierMixin | Pipeline = joblib.load(filename=f)
         return model
 
 
@@ -107,4 +135,15 @@ class Preparedata(TransformerMixin):
             ticket=(pl.when(pl.col("ticket").eq(False)).then(pl.lit(0)).otherwise(pl.lit(1)))
         )
 
-        return X.to_pandas().sort_values(by="name")
+        return X.sort(uniq_id).drop(uniq_id).to_pandas()
+
+
+@typechecked
+def select_features(data: pl.DataFrame | pd.DataFrame) -> pl.DataFrame:
+    """Select the features from the data."""
+    if isinstance(data, pd.DataFrame):
+        data = pl.from_pandas(data)
+
+    if uniq_id not in data.columns:
+        data = data.with_columns(pl.int_range(0, len(data)).alias(uniq_id))
+    return data.select(columns)

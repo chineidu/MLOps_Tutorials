@@ -1,10 +1,14 @@
+from pathlib import Path
+
 import polars as pl
 from logger import logger
 from omegaconf import DictConfig, OmegaConf
 from sklearn.model_selection import train_test_split
 from typeguard import typechecked
 
-config: DictConfig = OmegaConf.load("./params.yaml")
+root: Path = Path(__file__).absolute().parent
+config: DictConfig = OmegaConf.load(f"{root}/params.yaml")
+uniq_id: str = config.features.unique_id
 
 
 @typechecked
@@ -13,6 +17,7 @@ def prepare_data(config: DictConfig) -> None:
     data: pl.DataFrame = pl.read_csv(source=config.data.csv_file_path).rename(
         {"home.dest": "home_dest"}
     )
+    data = data.with_columns(pl.int_range(0, len(data)).alias(uniq_id))
 
     X_train: pl.DataFrame
     X_test: pl.DataFrame
@@ -26,8 +31,8 @@ def prepare_data(config: DictConfig) -> None:
 
     try:
         # Save data
-        X_train.write_parquet(file=config.data.train_save_path, use_pyarrow=True)
-        X_test.write_parquet(file=config.data.test_save_path, use_pyarrow=True)
+        X_train.write_parquet(file=config.data.train_save_path)
+        X_test.write_parquet(file=config.data.test_save_path)
         logger.info("`Train` and `Test` data saved!")
 
     except Exception as err:

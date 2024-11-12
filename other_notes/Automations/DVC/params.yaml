@@ -15,7 +15,7 @@ features:
     - boat
     - body
     - cabin
-    - home.dest
+    - home_dest
   num_vars:
     - age
     - fare

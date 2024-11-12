@@ -1,4 +1,4 @@
-abs_path: /Users/neidu/Desktop/Projects/Personal/My_Projects/MLOps_Tutorials/other_notes/BENTO_ML
+abs_path: .
 data:
   csv_file_path: ${abs_path}/data/titanic_data.csv
   test_size: 0.25
@@ -8,7 +8,7 @@ data:
   test_save_path: ${abs_path}/data/artifacts/test.parquet
 
 features:
-  unique_id: name
+  unique_id: u_id
   cat_vars:
     - embarked
     - sex
@@ -16,18 +16,31 @@ features:
     - boat
     - body
     - cabin
-    - home.dest
+    - home_dest
   num_vars:
     - age
     - fare
     - parch
     - pclass
     - sibsp
-    - ticket
+    - ticket  # Preprocessed: str to
   preprocess_vars:
     - embarked
     - sex
     - ticket
+  inference_vars:
+    - num_vars__age
+    - num_vars__fare
+    - num_vars__parch
+    - num_vars__pclass
+    - num_vars__sibsp
+    - num_vars__ticket
+    - cat_vars__embarked_c
+    - cat_vars__embarked_q
+    - cat_vars__embarked_s
+    - cat_vars__sex_female
+    - cat_vars__sex_male
+
   transform_output: pandas
   train_features_save_path: ${abs_path}/data/artifacts/train_features.parquet
   test_features_save_path: ${abs_path}/data/artifacts/test_features.parquet
@@ -42,7 +55,9 @@ train:
   max_depth: 20
   n_splits: 10
   use_log_model: False
+  model_name: model_v1
   trained_model_save_path: ${abs_path}/data/models/model_v1.joblib
+  preprocessor_save_path: ${abs_path}/data/models/preprocessor.joblib
 
 evaluate:
   metrics_save_path: ${abs_path}/data/metrics/results.yaml

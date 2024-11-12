@@ -3,22 +3,20 @@ from pathlib import Path
 import pandas as pd
 import polars as pl
 from feature_engine.imputation import CategoricalImputer, MeanMedianImputer
-from feature_engine.selection import DropFeatures
 from imblearn.combine import SMOTETomek
+from logger import logger
 from omegaconf import DictConfig, OmegaConf
 from sklearn import set_config
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from typeguard import typechecked
+from utils import Preparedata, save_model, select_features  # type: ignore
 
-from .logger import logger
-from .utils import Preparedata
+pl.set_random_seed(42)
 
 root: Path = Path(__file__).absolute().parent
-
 config: DictConfig = OmegaConf.load(f"{root}/params.yaml")
-# print(OmegaConf.to_yaml(config, resolve=True))
 
 # Set global scikit-learn configuration.
 set_config(transform_output=config.features.transform_output)
@@ -26,7 +24,7 @@ set_config(transform_output=config.features.transform_output)
 cat_vars: list[str] = list(config.features.cat_vars)
 cols_to_drop: list[str] = list(config.features.cols_to_drop)
 preprocess_vars: list[str] = list(config.features.preprocess_vars)
-name: str = config.features.unique_id
+uniq_id: str = config.features.unique_id
 random_state: int = config.data.random_state
 num_vars: list[str] = list(config.features.num_vars)
 
@@ -43,7 +41,6 @@ col_transf: ColumnTransformer = ColumnTransformer(
 )
 processor: Pipeline = Pipeline(
     steps=[
-        ("drop_features", DropFeatures(features_to_drop=cols_to_drop)),
         ("preprocess", Preparedata(variables=preprocess_vars)),
         ("median_imputer", MeanMedianImputer(variables=num_vars)),
         (
@@ -63,15 +60,22 @@ def prepare_features(config: DictConfig) -> None:
     X_train: pl.DataFrame = pl.read_parquet(source=config.data.train_save_path)
     X_test: pl.DataFrame = pl.read_parquet(source=config.data.test_save_path)
 
-    # The name is the Unique_id (Polars does NOT maintain order)
+    # The uniq_id is the Unique_id (Polars does NOT maintain order)
     y_train: pd.DataFrame = (
-        X_train.select([name, config.data.target]).sort(name).drop([name]).to_pandas()
+        X_train.select([uniq_id, config.data.target]).sort(uniq_id).drop([uniq_id]).to_pandas()
     )
     y_test: pd.DataFrame = (
-        X_test.select([name, config.data.target]).sort(name).drop([name]).to_pandas()
+        X_test.select([uniq_id, config.data.target]).sort(uniq_id).drop([uniq_id]).to_pandas()
     )
+
+    X_train = select_features(X_train)
+    X_test = select_features(X_test)
+
     X_train_tr: pd.DataFrame = processor.fit_transform(X=X_train.to_pandas())
     X_test_tr: pd.DataFrame = processor.transform(X=X_test.to_pandas())
+
+    # Save the preprocessor
+    save_model(config=config, model=processor, is_preprocessor=True)
 
     # Implementing oversampling for handling the imbalanced class
     smt = SMOTETomek(random_state=random_state)

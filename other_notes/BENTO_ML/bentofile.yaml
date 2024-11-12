@@ -1,0 +1,17 @@
+service: "service:PredictionService"
+
+labels:
+  owner: Neidu
+  project: titanic-prediction
+
+include:
+  - "*.py"
+  - "params.yaml"
+
+python:
+  packages:
+    - polars
+    - scikit-learn
+    - pydantic
+    - omegaconf
+    - bentoml

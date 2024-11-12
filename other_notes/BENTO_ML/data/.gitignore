@@ -1,1 +1,4 @@
-/titanic_data.csv
+**/**/*.parquet
+**/**/*.csv
+**/**/*.pkl
+**/**/*.joblib
