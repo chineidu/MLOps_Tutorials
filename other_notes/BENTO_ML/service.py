@@ -31,7 +31,7 @@ class Request(BaseModel):
 
 @bentoml.service(
     name="titanic_prediction_service",
-    resources={"cpu": 1, "memory": "500MiB"},
+    resources={"cpu": 1, "memory": "500Mi"},
     traffic={"timeout": 10},
 )
 class PredictionService:

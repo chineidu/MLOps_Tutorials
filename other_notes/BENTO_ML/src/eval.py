@@ -1,14 +1,17 @@
+from pathlib import Path
 from typing import Any
 
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-from logger import logger
 from omegaconf import DictConfig, OmegaConf
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from typeguard import typechecked
-from utils import load_model
 
+from .logger import logger
+from .utils import load_model
+
+root: Path = Path(__file__).absolute().parent.parent
 config: DictConfig = OmegaConf.load("./params.yaml")
 model_path: Any = config.train.trained_model_save_path
 model = load_model(config=config)

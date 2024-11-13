@@ -4,18 +4,19 @@ import pandas as pd
 import polars as pl
 from feature_engine.imputation import CategoricalImputer, MeanMedianImputer
 from imblearn.combine import SMOTETomek
-from logger import logger
 from omegaconf import DictConfig, OmegaConf
 from sklearn import set_config
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from typeguard import typechecked
-from utils import Preparedata, save_model, select_features  # type: ignore
+
+from .logger import logger
+from .utils import Preparedata, save_model, select_features  # type: ignore
 
 pl.set_random_seed(42)
 
-root: Path = Path(__file__).absolute().parent
+root: Path = Path(__file__).absolute().parent.parent
 config: DictConfig = OmegaConf.load(f"{root}/params.yaml")
 
 # Set global scikit-learn configuration.

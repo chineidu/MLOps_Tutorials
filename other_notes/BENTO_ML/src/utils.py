@@ -5,15 +5,16 @@ import bentoml
 import joblib
 import pandas as pd
 import polars as pl
-from logger import logger
 from omegaconf import DictConfig, OmegaConf
 from sklearn.base import ClassifierMixin, TransformerMixin
 from sklearn.pipeline import Pipeline
 from typeguard import typechecked
 
+from .logger import logger
+
 pl.set_random_seed(42)
 
-root: Path = Path(__file__).absolute().parent
+root: Path = Path(__file__).absolute().parent.parent
 config: DictConfig = OmegaConf.load(f"{root}/params.yaml")
 columns: list[str] = (
     config.features.num_vars + config.features.cat_vars + [config.features.unique_id]

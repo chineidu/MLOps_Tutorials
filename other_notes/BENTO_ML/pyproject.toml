@@ -3,14 +3,14 @@
 # ----------------------------------
 [tool.poe.tasks]
 list-models = "bentoml models list"
-check-port = "lsof -i :3000"
+check-port = "lsof -i :3005"
 
 # Data pipelines #
-prep-data = "python prepare_data.py"
+prep-data = "python -m src.prepare_data"
 
 # Feature engineering and model training #
-train-processor = "python prepare_features.py"
-train-model = "python train.py"
+train-processor = "python -m src.prepare_features"
+train-model = "python -m src.train"
 
 # Model serving #
 pred-serve = "bentoml serve service:PredictionService  --port 3005"

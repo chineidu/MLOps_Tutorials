@@ -1,12 +1,13 @@
 from pathlib import Path
 
 import polars as pl
-from logger import logger
 from omegaconf import DictConfig, OmegaConf
 from sklearn.model_selection import train_test_split
 from typeguard import typechecked
 
-root: Path = Path(__file__).absolute().parent
+from .logger import logger
+
+root: Path = Path(__file__).absolute().parent.parent
 config: DictConfig = OmegaConf.load(f"{root}/params.yaml")
 uniq_id: str = config.features.unique_id
 

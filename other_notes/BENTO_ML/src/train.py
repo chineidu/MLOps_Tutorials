@@ -2,8 +2,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from eval import evaluate
-from logger import logger
 from omegaconf import DictConfig, OmegaConf
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -11,9 +9,12 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from tqdm import tqdm
 from typeguard import typechecked
-from utils import save_bento_model, save_model  # type: ignore
 
-root: Path = Path(__file__).absolute().parent
+from .eval import evaluate
+from .logger import logger
+from .utils import save_bento_model, save_model  # type: ignore
+
+root: Path = Path(__file__).absolute().parent.parent
 config: DictConfig = OmegaConf.load(f"{root}/params.yaml")
 
 penalty: str = config.train.penalty
