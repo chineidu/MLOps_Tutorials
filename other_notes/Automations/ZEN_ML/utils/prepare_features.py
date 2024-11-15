@@ -56,10 +56,13 @@ processor: Pipeline = Pipeline(
 
 
 @typechecked
-def prepare_features(config: DictConfig) -> None:
+def prepare_features(
+    config: DictConfig,
+    X_train: pl.DataFrame,
+    X_test: pl.DataFrame,
+    return_data: bool = False,
+) -> None | tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """This is used to prepare the data."""
-    X_train: pl.DataFrame = pl.read_parquet(source=config.data.train_save_path)
-    X_test: pl.DataFrame = pl.read_parquet(source=config.data.test_save_path)
 
     # The uniq_id is the Unique_id (Polars does NOT maintain order)
     y_train: pd.DataFrame = (
@@ -85,6 +88,9 @@ def prepare_features(config: DictConfig) -> None:
     logger.info(f"Data shape after SMOTE: {X_t_sampled.shape, y_t_sampled.shape}")
 
     try:
+        if return_data:
+            return X_t_sampled, X_test_tr, y_t_sampled, y_test
+
         # Save data
         X_t_sampled.to_parquet(path=config.features.train_features_save_path, index=False)
         X_test_tr.to_parquet(path=config.features.test_features_save_path, index=False)
@@ -92,10 +98,10 @@ def prepare_features(config: DictConfig) -> None:
         y_test.to_parquet(path=config.features.test_target_save_path, index=False)
         logger.info("`Train` and `Test` features saved!")
 
+        return None
+
     except Exception as err:
         logger.error(f"{err}")
-
-    finally:
         return None
 
 

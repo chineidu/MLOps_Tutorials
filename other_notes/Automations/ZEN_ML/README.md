@@ -16,6 +16,8 @@
     - [Deploy With Kubernetes](#deploy-with-kubernetes)
     - [Deploy With Hugging Face Spaces](#deploy-with-hugging-face-spaces)
   - [ZenML Concepts](#zenml-concepts)
+    - [Enforce Type Annotation](#enforce-type-annotation)
+    - [Start ZenML Local Server](#start-zenml-local-server)
 
 ## Installation
 
@@ -101,6 +103,15 @@ if __name__ == "__main__":
 python my_pipeline.py
 ```
 
+### Enforce Type Annotation
+
+- If you want to make sure you get all the benefits of type annotating your steps, you can set the environment variable `ZENML_ENFORCE_TYPE_ANNOTATIONS` to True.
+- ZenML will then raise an exception in case one of the steps you're trying to run is missing a type annotation.
+
+```sh
+export ZENML_ENFORCE_TYPE_ANNOTATIONS=True
+```
+
 - Artifacts:
   - Artifacts represent the data that goes through your steps as `inputs` and `outputs` and they are automatically tracked and stored by ZenML in the artifact store.
   - They are produced by and circulated among steps whenever your step returns an object or a value.
@@ -133,3 +144,9 @@ python my_pipeline.py
 - Secrets
 - Collaboration
 - Dashboard
+
+### Start ZenML Local Server
+
+```sh
+zenml login --local
+```

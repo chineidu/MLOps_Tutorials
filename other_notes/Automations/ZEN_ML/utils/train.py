@@ -38,13 +38,14 @@ model: LogisticRegression | RandomForestClassifier = log_model if use_log_model 
 
 
 @typechecked
-def train(config: DictConfig) -> None:
+def train(
+    config: DictConfig,
+    X_train: pd.DataFrame,
+    y_train: pd.DataFrame,
+    if_save_bento_model: bool = False,
+) -> None:
     """This is used to prepare the data."""
-    X_train: pd.DataFrame = pd.read_parquet(path=config.features.train_features_save_path)
-    y_train: pd.Series = pd.read_parquet(path=config.features.train_target_save_path)[
-        config.data.target
-    ]
-    # print(X_train.columns)
+    y_train: pd.Series = y_train[config.data.target]  # type: ignore
 
     auc_vals: list[float] | list = []  # type: ignore
 
@@ -82,7 +83,8 @@ def train(config: DictConfig) -> None:
     )
 
     logger.info("Training finished successfully")
-    save_bento_model(config=config, model=model)
+    if if_save_bento_model:
+        save_bento_model(config=config, model=model)
     save_model(config=config, model=model)
 
     # Evaluate the model
