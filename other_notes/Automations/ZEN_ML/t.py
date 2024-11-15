@@ -1,19 +1,21 @@
-from typing import Annotated
+# from typing import Any
 
-from typeguard import typechecked
+# import pandas as pd
+# import polars as pl
+# from typeguard import typechecked
 
+# df: pl.DataFrame = pl.DataFrame(data={"name": ["a", "b", "c"], "age": [1, 2, 3]})
 
-@typechecked
-def prepare_model_features() -> (
-    tuple[
-        Annotated[int, "X_train"],
-        Annotated[int, "X_test"],
-        Annotated[float, "y_train"],
-        Annotated[float, "y_test"],
-    ]
-):
-    X_train_tr, X_test_tr, y_train, y_test = 10, 5, 3.14, 1.618
-    return X_train_tr, X_test_tr, y_train, y_test
+# print(df.shape)
 
 
-prepare_model_features()
+# @typechecked
+# def _get_datatrame_metadata(data: pl.DataFrame | pd.DataFrame) -> dict[str, Any]:
+#     return {
+#         "shape": {"n_rows": data.shape[0], "n_columns": data.shape[1]},
+#         "columns": data.columns,
+#         "summary_stats": data.describe().to_dicts(),
+#     }
+
+
+# print(_get_datatrame_metadata(df))

@@ -26,6 +26,8 @@ max_depth: int = config.train.max_depth
 use_log_model: bool = config.train.use_log_model
 n_splits: int = config.train.n_splits
 
+np.random.seed(random_state)
+
 # Initialize StratifiedKFold
 folds = StratifiedKFold(n_splits=n_splits, random_state=random_state, shuffle=True)
 log_model: LogisticRegression = LogisticRegression(

@@ -51,8 +51,8 @@ train:
   penalty: l2
   C: 1.0
   solver: lbfgs
-  n_estimators: 35
-  max_depth: 20
+  n_estimators: 40
+  max_depth: 15
   n_splits: 10
   use_log_model: False
   model_name: model_v1

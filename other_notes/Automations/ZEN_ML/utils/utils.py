@@ -148,3 +148,14 @@ def select_features(data: pl.DataFrame | pd.DataFrame) -> pl.DataFrame:
     if uniq_id not in data.columns:
         data = data.with_columns(pl.int_range(0, len(data)).alias(uniq_id))
     return data.select(columns)
+
+
+@typechecked
+def _get_datatrame_metadata(data: pl.DataFrame | pd.DataFrame) -> dict[str, Any]:
+    if isinstance(data, pd.DataFrame):
+        data = pl.from_pandas(data)
+    return {
+        "shape": {"n_rows": data.shape[0], "n_columns": data.shape[1]},
+        "columns": data.columns,
+        "summary_stats": data.describe().to_dicts(),
+    }

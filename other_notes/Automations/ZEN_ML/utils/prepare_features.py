@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import polars as pl
 from feature_engine.imputation import CategoricalImputer, MeanMedianImputer
@@ -14,8 +15,6 @@ from typeguard import typechecked
 from .logger import logger
 from .utils import Preparedata, save_model, select_features  # type: ignore
 
-pl.set_random_seed(42)
-
 root: Path = Path(__file__).absolute().parent.parent
 config: DictConfig = OmegaConf.load(f"{root}/params.yaml")
 
@@ -28,6 +27,9 @@ preprocess_vars: list[str] = list(config.features.preprocess_vars)
 uniq_id: str = config.features.unique_id
 random_state: int = config.data.random_state
 num_vars: list[str] = list(config.features.num_vars)
+
+np.random.seed(random_state)
+pl.set_random_seed(42)
 
 col_transf: ColumnTransformer = ColumnTransformer(
     transformers=[

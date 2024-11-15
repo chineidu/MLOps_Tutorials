@@ -12,5 +12,5 @@ from zenml import pipeline
 def simple_pipeline() -> None:
     """This is used to run the pipeline."""
     train_data, test_data = load_train_test_data()
-    X_train, X_test, y_train, y_test = prepare_model_features(train_data, test_data)
+    X_train, _, y_train, _ = prepare_model_features(train_data, test_data)
     train_model(X_train, y_train)

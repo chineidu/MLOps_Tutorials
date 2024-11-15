@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import numpy as np
 import polars as pl
 from omegaconf import DictConfig, OmegaConf
 from sklearn.model_selection import train_test_split
@@ -10,6 +11,10 @@ from .logger import logger
 root: Path = Path(__file__).absolute().parent.parent
 config: DictConfig = OmegaConf.load(f"{root}/params.yaml")
 uniq_id: str = config.features.unique_id
+random_state: int = config.data.random_state
+
+np.random.seed(random_state)
+pl.set_random_seed(42)
 
 
 @typechecked
