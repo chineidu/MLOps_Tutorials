@@ -102,7 +102,7 @@ python my_pipeline.py
 ```
 
 - Artifacts:
-  - Artifacts represent the data that goes through your steps as inputs and outputs and they are automatically tracked and stored by ZenML in the artifact store.
+  - Artifacts represent the data that goes through your steps as `inputs` and `outputs` and they are automatically tracked and stored by ZenML in the artifact store.
   - They are produced by and circulated among steps whenever your step returns an object or a value.
 - Models:
   - Models are used to represent the outputs of a training process along with all metadata associated with that output.
@@ -111,7 +111,7 @@ python my_pipeline.py
   - Materializers define how artifacts live in between steps.
   - i.e., they define how data of a particular type can be serialized/deserialized, so that the steps are able to load the input data and store the output data.
 - Parameters and Settings:
-  - ZenML steps can receive both artifacts and parameters as input, and they produce artifacts as output. All these elements are stored and managed by ZenML.
+  - ZenML steps can receive both `artifacts` and `parameters` as input, and they produce artifacts as output. All these elements are stored and managed by ZenML.
 - Model and Model versioning:
   - ZenML exposes the concept of a Model, which consists of multiple different model versions.
   - A model version represents a unified view of the ML models that are created, tracked, and managed as part of a ZenML project.
@@ -133,4 +133,3 @@ python my_pipeline.py
 - Secrets
 - Collaboration
 - Dashboard
--

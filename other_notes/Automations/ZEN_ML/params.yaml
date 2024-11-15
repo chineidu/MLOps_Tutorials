@@ -1,0 +1,63 @@
+abs_path: .
+data:
+  csv_file_path: ${abs_path}/data/titanic_data.csv
+  test_size: 0.25
+  random_state: 20
+  target: survived
+  train_save_path: ${abs_path}/data/artifacts/train.parquet
+  test_save_path: ${abs_path}/data/artifacts/test.parquet
+
+features:
+  unique_id: u_id
+  cat_vars:
+    - embarked
+    - sex
+  cols_to_drop:
+    - boat
+    - body
+    - cabin
+    - home_dest
+  num_vars:
+    - age
+    - fare
+    - parch
+    - pclass
+    - sibsp
+    - ticket  # Preprocessed: str to
+  preprocess_vars:
+    - embarked
+    - sex
+    - ticket
+  inference_vars:
+    - num_vars__age
+    - num_vars__fare
+    - num_vars__parch
+    - num_vars__pclass
+    - num_vars__sibsp
+    - num_vars__ticket
+    - cat_vars__embarked_c
+    - cat_vars__embarked_q
+    - cat_vars__embarked_s
+    - cat_vars__sex_female
+    - cat_vars__sex_male
+
+  transform_output: pandas
+  train_features_save_path: ${abs_path}/data/artifacts/train_features.parquet
+  test_features_save_path: ${abs_path}/data/artifacts/test_features.parquet
+  train_target_save_path: ${abs_path}/data/artifacts/train_target.parquet
+  test_target_save_path: ${abs_path}/data/artifacts/test_target.parquet
+
+train:
+  penalty: l2
+  C: 1.0
+  solver: lbfgs
+  n_estimators: 35
+  max_depth: 20
+  n_splits: 10
+  use_log_model: False
+  model_name: model_v1
+  trained_model_save_path: ${abs_path}/data/models/model_v1.joblib
+  preprocessor_save_path: ${abs_path}/data/models/preprocessor.joblib
+
+evaluate:
+  metrics_save_path: ${abs_path}/data/metrics/results.yaml
