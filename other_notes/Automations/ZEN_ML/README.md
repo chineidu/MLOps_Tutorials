@@ -16,6 +16,7 @@
     - [Deploy With Kubernetes](#deploy-with-kubernetes)
     - [Deploy With Hugging Face Spaces](#deploy-with-hugging-face-spaces)
   - [ZenML Concepts](#zenml-concepts)
+    - [Add Retry To Steps](#add-retry-to-steps)
     - [Enforce Type Annotation](#enforce-type-annotation)
     - [Start ZenML Local Server](#start-zenml-local-server)
 
@@ -79,6 +80,22 @@ def step_2(input_one: str, input_two: str) -> str:
     """Combines the two strings passed in."""
     combined_str = f"{input_one} {input_two}"
     return combined_str
+```
+
+### [Add Retry To Steps](https://docs.zenml.io/how-to/pipeline-development/build-pipelines/retry-steps#using-the-step-decorator)
+
+```py
+from zenml.config.retry_config import StepRetryConfig
+
+@step(
+    retry=StepRetryConfig(
+        max_retries=3,
+        delay=10,
+        backoff=2
+    )
+)
+def my_step() -> None:
+    raise Exception("This is a test exception")
 ```
 
 - Pipelines:  pipeline consists of a series of steps, organized in any order that makes sense for your use case.
