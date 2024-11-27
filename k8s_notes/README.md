@@ -192,7 +192,7 @@ minikube start
 
 # If you already have kubectl installed, you can now use
 # it to access your new cluster:
-kubectl get po -A
+kubectl get pods -A
 
 # Launch the minikube dashboard
 minikube dashboard
