@@ -11,6 +11,9 @@
       - [1.)](#1)
       - [2.) Using An Existing FastAPI App](#2-using-an-existing-fastapi-app)
   - [Serve Deployment Using CLI](#serve-deployment-using-cli)
+    - [Get The Serve Status](#get-the-serve-status)
+    - [Build Serve Config Files For Production Deployment](#build-serve-config-files-for-production-deployment)
+    - [Run Serve Deployment Using Config File](#run-serve-deployment-using-config-file)
 
 ## [Installation](https://docs.ray.io/en/latest/ray-overview/installation.html)
 
@@ -159,4 +162,28 @@ serve run <filename>:<deployment_name>
 
 # E.g.
 serve run app:serve_app
+```
+
+### Get The Serve Status
+
+```sh
+serve status
+```
+
+### Build Serve Config Files For Production Deployment
+
+```sh
+serve build <filename>:<deployment_name> -o <config_file_name>
+
+# E.g.
+serve build app:serve_app -o config.yaml
+```
+
+### Run Serve Deployment Using Config File
+
+```sh
+serve run <config_file_name>
+
+# E.g.
+serve run config.yaml
 ```
