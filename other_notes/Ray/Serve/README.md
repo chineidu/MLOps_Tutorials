@@ -14,6 +14,7 @@
     - [Get The Serve Status](#get-the-serve-status)
     - [Build Serve Config Files For Production Deployment](#build-serve-config-files-for-production-deployment)
     - [Run Serve Deployment Using Config File](#run-serve-deployment-using-config-file)
+  - [Best Practices](#best-practices)
 
 ## [Installation](https://docs.ray.io/en/latest/ray-overview/installation.html)
 
@@ -186,4 +187,57 @@ serve run <config_file_name>
 
 # E.g.
 serve run config.yaml
+```
+
+## [Best Practices](https://docs.ray.io/en/latest/serve/production-guide/best-practices.html)
+
+- Use highly configurable serve `config files` for production deployments.
+
+```sh
+serve build ${filename}:${deployment_name} -o ${config_file_name}
+```
+
+- Use [serve deploy](https://docs.ray.io/en/latest/serve/advanced-guides/deploy-vm.html#deploy-on-vm) (especially for deployments on VMs) for production deployments.
+
+```sh
+# List all the files in the current directory
+ls
+text_ml.py
+serve_config.yaml  # This is the config file
+
+# Start Ray on the head node
+ray start --head
+...
+
+# Deploy the Serve application on the head node using the config file
+serve deploy ${config_file_name}
+```
+
+- You can also deploy to a remote VM by following the steps [here](https://docs.ray.io/en/latest/serve/advanced-guides/deploy-vm.html#using-a-remote-cluster)
+- Add [sutoscaling](https://docs.ray.io/en/latest/serve/autoscaling-guide.html) to your Serve deployment.
+
+```yaml
+# Manual autoscaling
+# Deploy with a single replica
+deployments:
+- name: Model
+  num_replicas: 1
+
+# Scale up to 10 replicas
+deployments:
+- name: Model
+  num_replicas: 10
+
+
+# Autoscaling Basic Configuration
+- name: Model
+  num_replicas: auto
+
+# Equivalent to:
+- name: Model
+  max_ongoing_requests: 5
+  autoscaling_config:
+    target_ongoing_requests: 2
+    min_replicas: 1
+    max_replicas: 100
 ```
