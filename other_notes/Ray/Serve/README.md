@@ -159,7 +159,11 @@ serve_app = FastAPIWrapper.bind()
 - To run a Serve deployment, you can use the `serve run` command.
 
 ```sh
-serve run <filename>:<deployment_name>
+FILE_NAME="your_filename"
+DEPLOYMENT_NAME="your_deployment_name"
+CONFIG_FILE_NAME="your_config.yaml"
+
+serve run $FILE_NAME:$DEPLOYMENT_NAME
 
 # E.g.
 serve run app:serve_app
@@ -174,7 +178,7 @@ serve status
 ### Build Serve Config Files For Production Deployment
 
 ```sh
-serve build <filename>:<deployment_name> -o <config_file_name>
+serve build $FILE_NAME:$DEPLOYMENT_NAME -o $CONFIG_FILE_NAME
 
 # E.g.
 serve build app:serve_app -o config.yaml
@@ -183,7 +187,7 @@ serve build app:serve_app -o config.yaml
 ### Run Serve Deployment Using Config File
 
 ```sh
-serve run <config_file_name>
+serve run $CONFIG_FILE_NAME
 
 # E.g.
 serve run config.yaml
@@ -210,7 +214,7 @@ ray start --head
 ...
 
 # Deploy the Serve application on the head node using the config file
-serve deploy ${config_file_name}
+serve deploy ${CONFIG_FILE_NAME}
 ```
 
 - You can also deploy to a remote VM by following the steps [here](https://docs.ray.io/en/latest/serve/advanced-guides/deploy-vm.html#using-a-remote-cluster)
