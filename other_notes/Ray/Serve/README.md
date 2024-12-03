@@ -218,7 +218,7 @@ serve deploy ${CONFIG_FILE_NAME}
 ```
 
 - You can also deploy to a remote VM by following the steps [here](https://docs.ray.io/en/latest/serve/advanced-guides/deploy-vm.html#using-a-remote-cluster)
-- Add [sutoscaling](https://docs.ray.io/en/latest/serve/autoscaling-guide.html) to your Serve deployment.
+- Add [autoscaling](https://docs.ray.io/en/latest/serve/autoscaling-guide.html) to your Serve deployment.
 
 ```yaml
 # Manual autoscaling
