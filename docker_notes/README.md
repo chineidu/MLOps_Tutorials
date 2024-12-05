@@ -64,6 +64,7 @@
         - [2. Using Fargate Launch Type](#2-using-fargate-launch-type)
       - [AWS ECR](#aws-ecr)
       - [Update The Deployed Application On ECS Using CLI](#update-the-deployed-application-on-ecs-using-cli)
+  - [Debugging](#debugging)
 
 ## Introduction
 
@@ -983,3 +984,25 @@ aws ecs describe-services --cluster ${CLUSTER_NAME} --services ${SERVICE_NAME}
 ```
 
 - Possible [gotchas](https://github.com/aws/containers-roadmap/issues/333)
+
+## Debugging
+
+- Try the following commands:
+
+```sh
+# List all containers
+docker ps -a
+# Stop all containers
+docker stop $(docker ps -a -q)
+# Remove stopped containers
+docker system prune -f
+
+# List all the Docker networks on your system
+docker network ls
+# Check if anything is bound to $PORT
+netstat -tuln | grep $PORT
+
+# Identify PID
+sudo lsof -i :$PORT
+sudo kill -9 [PID]
+```
