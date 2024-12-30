@@ -11,6 +11,7 @@
     - [Approach 2](#approach-2)
   - [Boilerplate 1](#boilerplate-1)
   - [Rich Customisations](#rich-customisations)
+  - [Custom Functions](#custom-functions)
   - [Jupyter Notebook Strip Output](#jupyter-notebook-strip-output)
 
 ## Check Installed Dependencies
@@ -187,6 +188,38 @@ def fancy_print(
 # Example usage
 console.print("hello, world!")
 fancy_print({"message": "Good morning!", "name": "John"})
+```
+
+## Custom Functions
+
+```py
+
+def go_up_from_current_directory(*, go_up: int = 1) -> None:
+    """This is used to up a number of directories.
+
+    Params:
+    -------
+    go_up: int, default=1
+        This indicates the number of times to go back up from the current directory.
+
+    Returns:
+    --------
+    None
+    """
+    import os
+    import sys
+
+    CONST: str = "../"
+    NUM: str = CONST * go_up
+
+    # Goto the previous directory
+    prev_directory = os.path.join(os.path.dirname(__name__), NUM)
+    # Get the 'absolute path' of the previous directory
+    abs_path_prev_directory = os.path.abspath(prev_directory)
+
+    # Add the path to the System paths
+    sys.path.insert(0, abs_path_prev_directory)
+    print(abs_path_prev_directory)
 ```
 
 ## [Jupyter Notebook Strip Output](https://github.com/kynan/nbstripout)
