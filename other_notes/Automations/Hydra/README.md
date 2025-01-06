@@ -13,6 +13,7 @@
     - [OmegaConf: Variable Interpolation](#omegaconf-variable-interpolation)
     - [Access Runtime Variables](#access-runtime-variables)
     - [Variable Interpolation With Env Variables](#variable-interpolation-with-env-variables)
+      - [Using Only OmegaConf](#using-only-omegaconf)
     - [OmegaConf: Merge Config Files](#omegaconf-merge-config-files)
   - [**Back To Top**](#back-to-top)
   - [Hydra](#hydra)
@@ -201,6 +202,32 @@ def main(config: DictConfig) -> None:
 
 if __name__ == "__main__":
     main()
+```
+
+- Output:
+
+```sh
+python main.py
+
+# Output
+# auth:
+#   type: basic
+#   username: neidu
+#   password: password123
+```
+
+#### Using Only OmegaConf
+
+```py
+import os
+from omegaconf import DictConfig, OmegaConf
+
+# Add env variables
+os.environ["ENV_NAME"] = "neidu"
+
+config: DictConfig = OmegaConf.load("./server.yaml")
+console.print(OmegaConf.to_yaml(config, resolve=True))
+
 ```
 
 - Output:
