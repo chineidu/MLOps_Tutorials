@@ -9,6 +9,9 @@
     - [Dockerfile: Example 2](#dockerfile-example-2)
   - [Docker-Compose](#docker-compose)
     - [Docker-Compose: Example 1](#docker-compose-example-1)
+  - [Example 2](#example-2)
+    - [Normal Build](#normal-build)
+    - [Multi-Stage Build](#multi-stage-build)
 
 ## Dockerfile
 
@@ -146,4 +149,141 @@ services:
 volumes:
   postgresql-data:
   artifact-store:
+```
+
+## Example 2
+
+- File Structure
+
+```text
+├── Dockerfile
+├── README.md
+├── api
+│   ├── init.py
+│   ├── config.py
+│   ├── main.py
+│   ├── routes
+│   │   ├── init.py
+│   │   └── v1
+│   │       ├── init.py
+│   │       ├── health.py
+│   │       └── prediction.py
+│   └── schemas
+│       ├── init.py
+│       ├── health_schema.py
+│       ├── input_schema.py
+│       └── output_schema.py
+├── config
+│   ├── init.py
+│   └── config.yaml
+├── constraints.txt
+├── data
+├── docker
+│   └── run.sh
+├── models
+│   └── lightning
+│       ├── income_model.ckpt
+│       └── model_dependency_2.joblib
+├── requirements.txt
+├── src
+│   ├── init.py
+│   ├── config.py
+│   ├── custom_datasets.py
+│   ├── custom_tokenizers.py
+│   ├── lit_train.py
+│   ├── ml.py
+│   ├── model.py
+│   └── utilities.py
+└── tokenizers
+    └── transactions_tokenizer.json
+```
+
+### Normal Build
+
+- Image size: ~ 2.84 GB
+
+```Dockerfile
+# Base image
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Copy requirements before the whole app directory, so
+# they are only updated when it changes
+COPY requirements.txt /app/
+
+# Install dependencies
+RUN pip install --no-cache-dir --upgrade pip \
+    # Install PyTorch (CPU) first
+    && pip install --no-cache-dir torch==2.2.2 \
+    --index-url https://download.pytorch.org/whl/cpu \
+    # Install other dependencies
+    && pip install --no-cache-dir -r requirements.txt
+
+
+COPY ./ /app/
+COPY ./docker/run.sh /run.sh
+RUN chmod +x /run.sh
+
+# Set environment variables
+ENV PORT=8000
+EXPOSE $PORT
+
+# Entrypoint
+CMD ["/run.sh"]
+```
+
+### Multi-Stage Build
+
+- Image size: ~ 1.8 GB
+
+```Dockerfile
+# Build stage
+FROM python:3.10-slim AS builder
+
+WORKDIR /app
+
+# Create and activate virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install build dependencies first
+COPY requirements.txt .
+
+# Install dependencies into the virtual environment
+RUN pip install --no-cache-dir --upgrade pip \
+    # Install PyTorch (CPU) first
+    && pip install --no-cache-dir torch==2.2.2 \
+    --index-url https://download.pytorch.org/whl/cpu \
+    # Install other dependencies
+    && pip install --no-cache-dir -r requirements.txt
+
+# Final stage
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Copy only the virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy only necessary application files
+COPY api/ ./api/
+COPY config/ ./config/
+COPY docker/run.sh /run.sh
+COPY models/ ./models/
+COPY src/ ./src/
+COPY tokenizers/ ./tokenizers/
+RUN chmod +x /run.sh
+
+# Set environment variables
+ENV PORT=8000
+EXPOSE $PORT
+
+# Use non-root user for security
+RUN useradd -m appuser && chown -R appuser:appuser /app
+USER appuser
+
+# Entrypoint
+CMD ["/run.sh"]
 ```
