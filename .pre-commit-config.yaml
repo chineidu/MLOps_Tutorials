@@ -18,7 +18,7 @@ repos:
       # Run the linter.
       - id: ruff
         args: [--fix]
-        exclude: ^other_notes/Automations/Hydra/SimpleProject/
+        exclude: ^(other_notes/Automations/Hydra/SimpleProject/|other_notes/Automations/Dagster/dagster_university)
       # Run the formatter.
       - id: ruff-format
 
