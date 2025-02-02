@@ -170,4 +170,5 @@ notepad.py
 **/*.env
 **/service_account
 !**/example_mlflow_prod.env
-**/**/tmp1ubuxb9r/
+**/**/tmp*/
+**/**/data/
