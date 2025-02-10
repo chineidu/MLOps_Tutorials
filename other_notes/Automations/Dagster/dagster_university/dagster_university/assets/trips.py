@@ -49,17 +49,17 @@ def taxi_trips() -> None:
     query: str = """
         CREATE OR REPLACE TABLE trips AS (
             SELECT
-                VendorID as vendor_id,
-                PULocationID as pickup_location_id,
-                RateCodeID as rate_code_id,
-                payment_type as payment_type,
-                tpep_dropoff_datetime as dropoff_datetime,
-                tpep_pickup_datetime as pickup_datetime,
-                trip_distance as trip_distance,
-                passenger_count as passenger_count,
-                total_amount as total_amount,
+                VendorID AS vendor_id,
+                PULocationID AS pickup_location_id,
+                RateCodeID AS rate_code_id,
+                payment_type AS payment_type,
+                tpep_dropoff_datetime AS dropoff_datetime,
+                tpep_pickup_datetime AS pickup_datetime,
+                trip_distance AS trip_distance,
+                passenger_count AS passenger_count,
+                total_amount AS total_amount,
 
-            from 'data/raw/taxi_trips_2023-03.parquet'
+            FROM 'data/raw/taxi_trips_2023-03.parquet'
         );
     """
     conn: duckdb.DuckDBPyConnection = backoff(
@@ -87,11 +87,11 @@ def taxi_zones() -> None:
     query: str = f"""
         CREATE OR REPLACE TABLE zones AS (
             SELECT
-                LocationID as zone_id,
-                Borough as borough,
-                Zone as zone,
-                the_geom as geometry,
-            from '{constants.TAXI_ZONES_FILE_PATH}'
+                LocationID AS zone_id,
+                Borough AS borough,
+                Zone AS zone,
+                the_geom AS geometry,
+            FROM '{constants.TAXI_ZONES_FILE_PATH}'
         );
     """
     conn: duckdb.DuckDBPyConnection = backoff(
