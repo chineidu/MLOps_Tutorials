@@ -31,3 +31,16 @@ You can specify new Python dependencies in `setup.py`.
 The easiest way to deploy your Dagster project is to use Dagster Cloud.
 
 Check out the [Dagster Cloud Documentation](https://docs.dagster.cloud) to learn more.
+
+## Extras
+
+### Test Database Connection
+
+```py
+import duckdb
+
+
+conn = duckdb.connect(database="data/staging/data.duckdb")
+query: str = "SELECT * FROM trips LIMIT 10"
+conn.execute(query).fetchall()
+```

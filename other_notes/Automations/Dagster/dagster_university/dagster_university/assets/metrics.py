@@ -1,8 +1,11 @@
+from datetime import datetime, timedelta
 import os
 from dagster import asset
-import matplotlib.pyplot as plt
-import geopandas as gpd
+from dagster._utils.backoff import backoff
 import duckdb
+import geopandas as gpd
+import matplotlib.pyplot as plt
+import polars as pl
 
 from . import constants
 
@@ -49,23 +52,74 @@ def manhattan_map() -> None:
 
 @asset(deps=["taxi_trips"])
 def trips_by_week() -> None:
-    fp: str = constants.TRIPS_BY_WEEK_FILE_PATH
-    # period, num_trips, passenger_count, total_amount, trip_distance
+    """Aggregate taxi trip data by week and save to CSV.
 
+    This function processes taxi trip data, aggregating metrics like number of trips,
+    total amount, trip distance, and passenger count on a weekly basis from March to
+    April 2023. Results are saved to a CSV file.
+
+    Returns
+    -------
+    None
+        Writes results to a CSV file specified by TRIPS_BY_WEEK_FILE_PATH.
+    """
+    fp: str = constants.TRIPS_BY_WEEK_FILE_PATH
+    conn: duckdb.DuckDBPyConnection = backoff(
+        fn=duckdb.connect,
+        retry_on=(RuntimeError, duckdb.IOException),
+        kwargs={"database": os.getenv("DUCKDB_DATABASE")},
+        max_retries=10,
+    )
+    current_date: datetime = datetime.strptime("2023-03-01", constants.DATE_FORMAT)
+    end_date: datetime = datetime.strptime("2023-04-01", constants.DATE_FORMAT)
+    result: pl.DataFrame = pl.DataFrame()
+
+    while current_date < end_date:
+        current_date_str: str = current_date.strftime(constants.DATE_FORMAT)
+        query: str = """
+        SELECT
+            vendor_id, total_amount, trip_distance, passenger_count
+        FROM trips
+        WHERE date_trunc('week', pickup_datetime) = date_trunc('week', '{current_date_str}'::date)
+        """
+        data_for_week: pl.DataFrame = conn.execute(query).pl()
+        aggregated_df: pl.DataFrame = data_for_week.select(
+            pl.col("vendor_id").count().cast(pl.Int64).alias("num_trips"),
+            pl.col("total_amount").sum().count().cast(pl.Float32).round(2),
+            pl.col("trip_distance").sum().count().cast(pl.Float32).round(2),
+            pl.col("passenger_count").sum().count().cast(pl.Int64),
+            pl.lit(current_date).alias("period"),
+        )
+        result = pl.concat([result, aggregated_df], how="vertical")
+        current_date = current_date + timedelta(days=7)
+    aggregated_df = aggregated_df.sort("period")
+    aggregated_df.write_csv(fp)
+
+
+def func_for_debugging():
     query: str = """
         SELECT
-            pickup_datetime AS period,
-            COUNT(1) AS num_trips,
-            SUM(passenger_count) AS passenger_count,
-            SUM(total_amount) AS total_amount,
-            SUM(trip_distance) AS trip_distance
+            vendor_id, total_amount, trip_distance, passenger_count
         FROM trips
-        WHERE pickup_datetime BETWEEN '2023-01-01' AND '2023-01-07'
-        GROUP BY period
+        LIMIT 100;
     """
-    conn = duckdb.connect(os.getenv("DUCKDB_DATABASE"))
-    trips_by_week = conn.execute(query).fetch_df()
-    trips_by_week.to_csv(fp, index=False)
+    conn = duckdb.connect(database="data/staging/data.duckdb")
+    df = conn.execute(query).pl()
+    current_date: datetime = datetime.strptime("2023-03-01", constants.DATE_FORMAT)
+    # print(df)
+    aggregated_df: pl.DataFrame = df.select(
+        pl.col("vendor_id").count().alias("num_trips"),
+        pl.col("total_amount").sum(),
+        pl.col("trip_distance").sum(),
+        pl.col("passenger_count").sum(),
+        period=pl.lit(current_date),
+    )
+    print(aggregated_df)
+
+
+if __name__ == "__main__":
+    # func_for_debugging()
+    pass
 
 
 # SELECT table_name
