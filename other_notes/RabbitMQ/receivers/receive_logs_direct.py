@@ -1,4 +1,5 @@
-import os
+# This module uses the direct exchange instead of the fanout exchange.
+# The direct exchange routes messages to queues based on the message routing key.
 import sys
 
 import pika
@@ -9,7 +10,7 @@ def main() -> None:
     connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
     channel = connection.channel()
 
-    channel.exchange_declare(exchange="logs", exchange_type="fanout")
+    channel.exchange_declare(exchange="direct_logs", exchange_type="direct")
 
     result = channel.queue_declare(
         # Auto generated queue name
@@ -18,8 +19,18 @@ def main() -> None:
         exclusive=True,
     )
     queue_name: str = result.method.queue
-    # Bind the queue to the exchange
-    channel.queue_bind(exchange="logs", queue=queue_name)
+    severities = sys.argv[1:]
+    if not severities:
+        sys.stderr.write("Usage: %s [info] [warning] [error]\n" % sys.argv[0])
+        sys.exit(1)
+    for severity in severities:
+        # Bind the queue to the exchange with the specified routing key
+        channel.queue_bind(
+            exchange="direct_logs",
+            queue=queue_name,
+            routing_key=severity,
+        )
+
     logger.info(" [*] Waiting for logs. To exit press CTRL+C")
 
     def callback(ch, method, properties, body: bytes) -> None:
@@ -30,19 +41,15 @@ def main() -> None:
     channel.basic_consume(
         queue=queue_name,
         on_message_callback=callback,
-        # Automatically acknowledge messages
-        # Note: The callback's ch.basic_ack and auto_ack=True are mutually exclusive
-        auto_ack=True,  # Automatically acknowledge messages
+        auto_ack=True,
     )
-
     channel.start_consuming()
+    connection.close()
 
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        try:
-            sys.exit(0)  # Gracefully exit
-        except SystemExit:
-            os._exit(0)
+        logger.info("Interrupted")
+        sys.exit(0)

@@ -5,9 +5,7 @@ from utilities import logger
 
 connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
 channel = connection.channel()
-
 channel.exchange_declare(exchange="logs", exchange_type="fanout")
-
 message: str = " ".join(sys.argv[1:]) or "info: Hello World!"
 
 # Publish the message to the exchange

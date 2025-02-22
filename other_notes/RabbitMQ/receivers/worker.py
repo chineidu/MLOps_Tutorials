@@ -49,6 +49,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.info("Interrupted")
         try:
-            sys.exit(0)
+            sys.exit(0)  # Gracefully exit
         except SystemExit:
             os._exit(0)

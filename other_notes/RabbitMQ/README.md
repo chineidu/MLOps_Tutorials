@@ -9,10 +9,12 @@
     - [Using Python Client](#using-python-client)
     - [General Terminologies](#general-terminologies)
     - [Listing Queues](#listing-queues)
+    - [Delete Queues](#delete-queues)
     - [List Forgotten Acknowledgements](#list-forgotten-acknowledgements)
     - [Listing Bindings](#listing-bindings)
     - [Types of Exchanges](#types-of-exchanges)
     - [Logging Example](#logging-example)
+    - [List](#list)
 
 ## [Installation](https://www.rabbitmq.com/docs/download#docker)
 
@@ -60,6 +62,16 @@ pip install pika
 rabbitmqctl list_queues
 ```
 
+### Delete Queues
+
+```sh
+rabbitmqctl delete_queue <queue_name>
+
+# E.g.
+
+rabbitmqctl delete_queue my_queue
+```
+
 ### List Forgotten Acknowledgements
 
 ```sh
@@ -101,3 +113,5 @@ python -m receivers.receive_logs > logs_from_rabbit.log
 ```sh
 python -m receivers.receive_logs
 ```
+
+### List
