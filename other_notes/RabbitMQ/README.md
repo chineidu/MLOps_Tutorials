@@ -9,6 +9,10 @@
     - [Using Python Client](#using-python-client)
     - [General Terminologies](#general-terminologies)
     - [Listing Queues](#listing-queues)
+    - [List Forgotten Acknowledgements](#list-forgotten-acknowledgements)
+    - [Listing Bindings](#listing-bindings)
+    - [Types of Exchanges](#types-of-exchanges)
+    - [Logging Example](#logging-example)
 
 ## [Installation](https://www.rabbitmq.com/docs/download#docker)
 
@@ -54,4 +58,46 @@ pip install pika
 
 ```sh
 rabbitmqctl list_queues
+```
+
+### List Forgotten Acknowledgements
+
+```sh
+rabbitmqctl list_queues name messages_ready messages_unacknowledged
+```
+
+### Listing Bindings
+
+- Bindings are used to connect queues to exchanges.
+- Bindings are used to route messages to queues based on their routing key.
+
+```sh
+rabbitmqctl list_bindings
+```
+
+### Types of Exchanges
+
+- RabbitMQ uses exchanges to route messages to queues. Here's a breakdown of the main exchange types:
+
+**1.) Direct Exchange**:  A direct exchange delivers messages based on a precise routing key match. i.e. (Like sending mail to a specific address.)
+
+**2.)Fanout Exchange**: A fanout exchange delivers messages to all queues bound to it, regardless of the routing key.  It's like broadcasting a message; everyone gets it.
+
+**3.) Topic Exchange**: Delivers messages based on pattern matching the routing key using wildcards (*, #). (Like subscribing to newspaper topics.)
+
+**4.) Headers Exchange**: A headers exchange delivers messages based on headers in the message, rather than the routing key. It's less common but can be useful in some scenarios.
+
+### Logging Example
+
+- The code can be found in `receivers/receive_log.py`
+- To store the logs in a file, use the following command:
+
+```sh
+python -m receivers.receive_logs > logs_from_rabbit.log
+```
+
+- To display the logs in the terminal, use the following command:
+
+```sh
+python -m receivers.receive_logs
 ```

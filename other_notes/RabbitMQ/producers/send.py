@@ -7,7 +7,9 @@ connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
 channel = connection.channel()
 
 # Create a queue
-channel.queue_declare(queue="hello")
+channel.queue_declare(
+    queue="hello",  # The name of the queue
+)
 
 # Send a message to the queue using the default exchange
 channel.basic_publish(
