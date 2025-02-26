@@ -1,32 +1,38 @@
 import asyncio
 import os
 import sys
+from datetime import datetime
 
-from aio_pika import Message, connect
+from aio_pika import DeliveryMode, Message, connect
 from utilities import logger
 
+queue_name: str = "task_queue"
 username: str = "guest"
 password: str = "guest"
 host: str = "localhost"
 URL: str = f"amqp://{username}:{password}@{host}/"
-queue_name: str = "hello"
 logger.info("Starting producer")
 
 
 async def main() -> None:
+    # Connect to a broker
     connection = await connect(URL)
 
     async with connection:
         # Create a channel
         channel = await connection.channel()
-        # Declare queue
-        queue = await channel.declare_queue(queue_name)
-        # Send a message
-        await channel.default_exchange.publish(
-            Message(b"Hello World!"),
-            routing_key=queue.name,
+        # Create the message
+        message_body: bytes = b" ".join(arg.encode() for arg in sys.argv[1:]) or b"Hello World!"
+        message = Message(
+            message_body,
+            # Make the message persistent
+            delivery_mode=DeliveryMode.PERSISTENT,
+            timestamp=datetime.now(),
         )
-        logger.info(" [x] Sent 'Hello World!'")
+        # Send the message
+        # Implicitly use the default exchange and declare the queue
+        await channel.default_exchange.publish(message=message, routing_key=queue_name)
+        logger.info(f" [x] Sent {message_body!r}")
 
 
 if __name__ == "__main__":
