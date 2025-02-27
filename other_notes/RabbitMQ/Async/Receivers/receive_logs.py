@@ -14,7 +14,7 @@ queue_name: str = "logs"
 logger.info("Starting consumer")
 
 
-async def on_messgae_callback(message: AbstractIncomingMessage) -> None:
+async def on_message_callback(message: AbstractIncomingMessage) -> None:
     async with message.process():
         logger.info(f" [x] Received message is {message.body.decode()!r}")
 
@@ -40,7 +40,7 @@ async def main() -> None:
         # Bind queue to exchange
         await queue.bind(logs_exchange)
         # Start listening
-        await queue.consume(on_messgae_callback)
+        await queue.consume(on_message_callback)
         logger.info(f" [*] Waiting for messages. To exit press CTRL+C")
         # Wait until the connection is terminated
         await asyncio.Future()
