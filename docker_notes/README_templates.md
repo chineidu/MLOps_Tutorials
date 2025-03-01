@@ -121,6 +121,8 @@ services:
     container_name: mlflow-backend-store # Also used as hostname
     env_file: # Location of file(s) containing the env vars. Only accessed by the container.
       - ./.envs/.postgres
+    ports:
+      - "5432:5432"
     volumes: # Persist the data volume
       - postgresql-data:/var/lib/postgresql/data
 
