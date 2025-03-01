@@ -146,6 +146,7 @@ services:
     ipc: host
 
 # Named volumes ONLY!
+# Persist data outside the lifecycle of the container.
 volumes:
   postgresql-data:
   artifact-store:
