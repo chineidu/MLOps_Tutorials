@@ -34,7 +34,7 @@ def print_runtime(input_data: list[tuple[int, str]], start_time: float) -> None:
 
 @ray.remote
 def retrieve_task(item: int, db: list[str]) -> tuple[int, str]:
-    time.sleep(item / 10)
+    time.sleep(item / 10.0)
     return item, db[item]
 
 
