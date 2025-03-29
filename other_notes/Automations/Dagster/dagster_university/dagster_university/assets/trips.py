@@ -24,7 +24,7 @@ def taxi_trips_file() -> None:
 
 @asset
 def taxi_zones_file() -> None:
-    """Download NYC taxi zones data rom NYC Open Data Portal and save to local file."""
+    """Download NYC taxi zones data from NYC Open Data Portal and save to local file."""
     # taxi_zones: requests.Response = requests.get(
     #     "https://data.cityofnewyork.us/api/views/755u-8jsi/rows.csv?accessType=DOWNLOAD"
     # )
