@@ -9,9 +9,17 @@
   - [Installation of Kubernetes \[Locally\]](#installation-of-kubernetes-locally)
     - [Install Kubectl](#install-kubectl)
     - [Install Minikube](#install-minikube)
+    - [Starting Minikube](#starting-minikube)
   - [Objects In K8s](#objects-in-k8s)
     - [Pod Object](#pod-object)
+    - [Node Object](#node-object)
+    - [Namespace Object](#namespace-object)
     - [Deployment Object](#deployment-object)
+    - [ReplicaSet](#replicaset)
+    - [Service](#service)
+    - [Job](#job)
+    - [StatefulSet](#statefulset)
+    - [DaemonSet](#daemonset)
       - [Deployment \[Imperative Approach\]](#deployment-imperative-approach)
       - [View Pods](#view-pods)
       - [View Specific Pod Details](#view-specific-pod-details)
@@ -201,6 +209,21 @@ minikube dashboard
 minikube --help
 ```
 
+### Starting Minikube
+
+```bash
+minikube start --driver=hyperkit --cpus=4 --memory=4096MB --disk-size=10GB --nodes=3
+```
+
+```text
+minikube start              # Launch minikube
+  --driver=hyperkit         # Use the hyperkit driver for virtualization (on macOS).
+  --cpus=4                  # Set up a VM with 4 CPU cores
+  --memory=4096MB           # VM with 4GB of RAM
+  --disk-size=10GB          # VM with 10GB disk.
+  --nodes=3                 # k8s cluster with 3 nodes within that VM.
+```
+
 ## Objects In K8s
 
 ### Pod Object
@@ -208,29 +231,213 @@ minikube --help
 ```text
 - A pod is the smallest and most basic unit of deployment.
 
-- Containers within a pod share the same network namespace, allowing them to communicate with each other over the `localhost` interface. They can also share storage volumes, which are mounted into the containers' file systems.
+- It represents a single instance of a running process in your cluster.
+
+- A Pod can contain one or more containers (like Docker containers) that are tightly coupled and share resources like network and storage.
 
 - Pods are considered to be ephemeral and disposable. If a pod fails or needs to be rescheduled due to node failures or scaling events, a new pod can be created to replace it.
+```
 
-- It's important to note that pods are not intended to be directly exposed to external network traffic. Instead, Kubernetes introduces other higher-level abstractions, such as `services`, to provide stable network endpoints and load balancing for pods.
+```sh
+# List all pods in the default namespace
+kubectl get pods
+
+# List all pods in the specified namespace
+kubectl get pods -n <namespace>
+# e.g., kubectl get pods -n staging
+
+# Describe a specific pod
+kubectl describe pod <pod-name>
+# e.g., kubectl describe pod my-pod
+
+# Get detailed information about a pod
+kubectl get pod <pod-name> -o yaml
+# e.g., kubectl get pod my-pod -o yaml
+
+# Get logs of a specific pod
+kubectl logs <pod-name>
+# e.g., kubectl logs my-pod
+
+# Get events related to a specific pod
+kubectl get events --field-selector involvedObject.name=<pod-name>
+# e.g., kubectl get events --field-selector involvedObject.name=my-pod
+
+# Delete a specific pod
+kubectl delete pod <pod-name>
+# e.g., kubectl delete pod my-pod
+```
+
+### Node Object
+
+```text
+- It's a worker machine in Kubernetes. It can be a physical or virtual machine.
+
+- The Kubernetes control plane manages the nodes, and the pods run on these nodes.
+```
+
+### Namespace Object
+
+```text
+- It's a way to organize and isolate resources within a Kubernetes cluster.
+
+- It can be thought of as a virtual cluster within your physical cluster, allowing multiple teams or projects to share the same underlying infrastructure without interfering with each other.
+```
+
+```sh
+# List all namespaces
+kubectl get namespaces
+
+# Create a new namespace
+kubectl create namespace <namespace-name>
+# e.g., kubectl create namespace staging
+
+# Describe a specific namespace
+kubectl describe namespace <namespace-name>
+# e.g., kubectl describe namespace staging
+
+# Delete a namespace
+kubectl delete namespace <namespace-name>
+# e.g., kubectl delete namespace staging
+
+# List all resources in a namespace
+kubectl get all -n <namespace-name>
+# e.g., kubectl get all -n staging
 ```
 
 ### Deployment Object
 
 ```text
-- Deployment objects are a way to manage applications declaratively.
+- It's a higher-level object that manages a set of identical Pods.
 
-- Deployment objects describe the desired state of an application and K8s takes care of the details of how to update the pods that make up the application.
+- Deployments ensure that a specified number of Pod "replicas" are running at any given time.
 
-- Deployment objects can be used to scale applications up or down, and they can also be rolled back if an update fails.
+- If a Pod fails, the Deployment will automatically create a new one to maintain the desired state.
 
-Create A K8s Deployment (Imperative Approaach)
------------------------
-1. Build an image and push to a Docker repository like Dockerhub.
-2. Start a K8s cluster. e.g. using minikube for local K8s deployment.
-3. Create a deployment object using `kubectl`.
-4. Expose the pod(s) to the outside world using a K8s `service`.
+- Deployments also handle rolling updates and rollbacks of your application.
 
+- e.g. a web application deployment that consists of multiple instances of a web server that runs continuously unlike a Job that runs once until completion.
+```
+
+```sh
+# List all deployments
+kubectl get deployments
+
+# List all deployments in a specific namespace
+kubectl get deployments -n <namespace-name>
+# e.g., kubectl get deployments -n staging
+
+# Describe a specific deployment
+kubectl describe deployment <deployment-name>
+# e.g., kubectl describe deployment my-deployment
+
+# Get detailed information about a deployment
+kubectl get deployment <deployment-name> -o yaml
+# e.g., kubectl get deployment my-deployment -o yaml
+
+# Delete a specific deployment
+kubectl delete deployment <deployment-name>
+# e.g., kubectl delete deployment my-deployment
+```
+
+### ReplicaSet
+
+```text
+- It's the underlying mechanism used by Deployments to maintain the desired number of Pod replicas.
+- You typically don't interact with ReplicaSets directly as a user; Deployments manage them for you.
+```
+
+### Service
+
+```text
+- It provides a stable IP address and DNS name to access a set of Pods.
+
+- Services act as an abstraction layer, allowing you to access your application without needing to know the specific IP addresses of the individual Pods, which can be dynamic.
+
+- Common service types include:
+  - ClusterIP (internal access)
+  - NodePort (access via each node's IP and a port)
+  - LoadBalancer (external access via a cloud provider's load balancer)
+```
+
+```sh
+# List all services
+kubectl get services
+
+# List all services in a specific namespace
+kubectl get services -n <namespace-name>
+# e.g., kubectl get services -n staging
+
+# Describe a specific service
+kubectl describe service <service-name>
+# e.g., kubectl describe service my-service
+
+# Get detailed information about a service
+kubectl get service <service-name> -o yaml
+# e.g., kubectl get service my-service -o yaml
+
+# Delete a specific service
+kubectl delete service <service-name>
+# e.g., kubectl delete service my-service
+```
+
+### Job
+
+```text
+- It represents a finite task that runs to completion.
+
+- Unlike Deployments that ensure continuous running, Jobs are for batch-oriented workloads that have a defined start and end.
+
+- e.g. a data processing task or a one-time setup script.
+```
+
+```sh
+# List all jobs
+kubectl get jobs
+
+# List all jobs in a specific namespace
+kubectl get jobs -n <namespace-name>
+# e.g., kubectl get jobs -n staging
+
+# Describe a specific job
+kubectl describe job <job-name>
+# e.g., kubectl describe job my-job
+
+# Delete a specific job
+kubectl delete job <job-name>
+# e.g., kubectl delete job my-job
+```
+
+### StatefulSet
+
+```text
+- It's similar to Deployments, but designed for stateful applications that require stable, persistent storage and unique network identifiers for their Pods.
+
+- Examples include databases like PostgreSQL or Cassandra.
+```
+
+```sh
+# List all statefulsets
+kubectl get statefulsets
+
+# List all statefulsets in a specific namespace
+kubectl get statefulsets -n <namespace-name>
+# e.g., kubectl get statefulsets -n staging
+
+# Describe a specific statefulset
+kubectl describe statefulset <statefulset-name>
+# e.g., kubectl describe statefulset my-statefulset
+
+# Delete a specific statefulset
+kubectl delete statefulset <statefulset-name>
+# e.g., kubectl delete statefulset my-statefulset
+```
+
+### DaemonSet
+
+```text
+- It ensures that a copy of a Pod runs on each Node in the cluster.
+
+- DaemonSets are useful for deploying cluster-level agents, such as log collectors (like Fluentd or Logstash) or monitoring agents.
 ```
 
 #### Deployment [Imperative Approach]
