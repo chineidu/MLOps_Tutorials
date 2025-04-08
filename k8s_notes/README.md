@@ -42,6 +42,7 @@
     - [Service Object](#service-object)
       - [Create A Service](#create-a-service)
       - [Describe A Service](#describe-a-service)
+      - [Port Forwarding A Service](#port-forwarding-a-service)
       - [List All The Resources In A K8s Cluster](#list-all-the-resources-in-a-k8s-cluster)
       - [Node Port](#node-port)
       - [Load Balancer](#load-balancer)
@@ -880,6 +881,15 @@ minikube service first-deployment
 kubectl describe service <service-name>
 # e.g.
 kubectl describe service backend
+```
+
+#### Port Forwarding A Service
+
+```sh
+kubectl port-forward <service-name> <local-port>:<service-port> -n <your-namespace>
+
+# e.g.
+kubectl port-forward service/backend 8080:80
 ```
 
 #### List All The Resources In A K8s Cluster
