@@ -5,17 +5,19 @@
 - [Docker And Docker-Compose Templates](#docker-and-docker-compose-templates)
   - [Table of Content](#table-of-content)
   - [Dockerfile](#dockerfile)
-    - [Poetry Example 1](#poetry-example-1)
+    - [Poetry: Example 1](#poetry-example-1)
     - [Dockerfile: Example 2](#dockerfile-example-2)
+    - [UV: Ex 3](#uv-ex-3)
   - [Docker-Compose](#docker-compose)
-    - [Docker-Compose: Example 1](#docker-compose-example-1)
+    - [DC: Ex 1](#dc-ex-1)
+    - [DC: Ex 2](#dc-ex-2)
   - [Example 2](#example-2)
     - [Normal Build](#normal-build)
     - [Multi-Stage Build](#multi-stage-build)
 
 ## Dockerfile
 
-### Poetry Example 1
+### Poetry: Example 1
 
 ```Dockerfile
 # Use an official Python runtime as a parent image
@@ -105,9 +107,48 @@ COPY . /app/
 CMD ["/startup-script.sh"]
 ```
 
+### UV: Ex 3
+
+```Dockerfile
+# Use a Python image with uv pre-installed
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+
+# Install the project into `/app`
+WORKDIR /app
+
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
+
+# Copy from the cache instead of linking since it's a mounted volume
+ENV UV_LINK_MODE=copy
+
+# Install the project's dependencies using the lockfile and settings
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
+
+# Then, add the rest of the project source code and install it
+# Installing separately from its dependencies allows optimal layer caching
+COPY . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
+
+# Make the script executable
+RUN chmod +x ./docker/run-producer.sh
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Reset the entrypoint, don't invoke `uv`
+ENTRYPOINT []
+
+CMD ["bash", "docker/run-producer.sh"]
+
+```
+
 ## Docker-Compose
 
-### Docker-Compose: Example 1
+### DC: Ex 1
 
 ```yaml
 # ===========================
@@ -152,6 +193,88 @@ services:
 volumes:
   postgresql-data:
   artifact-store:
+```
+
+### DC: Ex 2
+
+```yaml
+services:
+  local-rabbitmq: # 1st service
+    image: rabbitmq:4.0-management
+    container_name: local-rabbitmq # Also used as hostname
+    env_file: # Location of file(s) containing the env vars. Only accessed by the container.
+      - .env
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes: # Persist the data volume
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  worker: # 2nd service
+    image: rmq-worker:v1
+    build:
+      context: ./
+      dockerfile: Dockerfile.worker
+    # Remove name to allow Docker to automatically generate a name
+    # when you have more than one replica
+    # container_name: local-rmq-worker
+    environment:
+      # Env for local deployment
+      - RABBITMQ_HOST=local-rabbitmq
+    env_file:
+      - .env
+    volumes:
+      - ./db:/app/db  # Bind mount for the data folder
+    deploy:
+      replicas: 1  # Number of replicas
+    develop:
+    # Create a `watch` configuration to update the app
+      watch:
+        - action: sync
+          path: ./
+          target: /app
+          # Folders and files to ignore
+          ignore:
+            - .venv
+        # Rebuild image if any of these files change
+        - action: rebuild
+          path: ./pyproject.toml
+    depends_on:
+      - local-rabbitmq
+
+  producer: # 3rd service
+    image: rmq-producer:v1
+    build:
+      context: ./
+      dockerfile: Dockerfile.producer
+    container_name: local-rmq-producer
+    environment:
+      - RABBITMQ_HOST=local-rabbitmq
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data  # Bind mount for the data folder
+    develop:
+    # Create a `watch` configuration to update the app
+      watch:
+        - action: sync
+          path: ./
+          target: /app
+          # Folders and files to ignore
+          ignore:
+            - .venv
+        # Rebuild image if any of these files change
+        - action: rebuild
+          path: ./pyproject.toml
+    depends_on:
+      - local-rabbitmq
+
+
+# Named volumes ONLY!
+# Persist data outside the lifecycle of the container.
+volumes:
+  rabbitmq-data:
+
 ```
 
 ## Example 2
