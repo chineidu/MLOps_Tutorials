@@ -11,6 +11,7 @@
     - [Install Minikube](#install-minikube)
     - [Starting Minikube](#starting-minikube)
     - [With Docker Backend](#with-docker-backend)
+    - [With HyperKit Backend](#with-hyperkit-backend)
   - [Objects In K8s](#objects-in-k8s)
     - [Pod Object](#pod-object)
     - [Node Object](#node-object)
@@ -218,6 +219,8 @@ minikube --help
 ```sh
 minikube start --driver=docker --cpus=4 --memory=4096MB --disk-size=10GB --nodes=3
 ```
+
+### With HyperKit Backend
 
 ```bash
 minikube start --driver=hyperkit --cpus=4 --memory=4096MB --disk-size=10GB --nodes=3
