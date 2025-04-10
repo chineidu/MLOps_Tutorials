@@ -232,9 +232,77 @@ spec:
       storage: {{ .Values.rabbitmq.storage.size }}
 ```
 
-#### 6.) Add Other Deployments
+#### 6.) Add Other Deployments/Jobs/Services
 
-- Depending on your application, you may need to add other deployments, services, and other resources.
+- Depending on your application, you may need to add other deployments, jobs, services, and other resources.
+
+```yaml
+# prouducer-job.yaml
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-producer
+spec:
+  ttlSecondsAfterFinished: 600  # Auto-delete job 10 minutes after completion
+  backoffLimit: 3  # Number of retries before considering the job failed
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-producer
+    spec:
+      restartPolicy: OnFailure  # OnFailure or Never, but not Always (default for deployments)
+      containers:
+      - name: producer
+        image: {{ .Values.producer.image }}
+        resources:
+          limits:
+            cpu: {{ .Values.producer.resources.limits.cpu }}
+            memory: {{ .Values.producer.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.producer.resources.requests.cpu }}
+            memory: {{ .Values.producer.resources.requests.memory }}
+        env:
+        - name: RABBITMQ_HOST
+          value: {{ .Release.Name }}-rabbitmq
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-config
+
+# worker-job.yaml
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-worker
+spec:
+  ttlSecondsAfterFinished: 600  # Auto-delete job 10 minutes after completion
+  backoffLimit: 3  # Number of retries before considering the job failed
+  completions: {{ .Values.worker.replicas }}  # Number of successful pod completions required
+  parallelism: {{ .Values.worker.replicas }}  # How many pods to run in parallel
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-worker
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: worker
+        image: {{ .Values.worker.image }}
+        resources:
+          limits:
+            cpu: {{ .Values.worker.resources.limits.cpu }}
+            memory: {{ .Values.worker.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.worker.resources.requests.cpu }}
+            memory: {{ .Values.worker.resources.requests.memory }}
+        env:
+        - name: RABBITMQ_HOST
+          value: {{ .Release.Name }}-rabbitmq
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-config
+```
 
 #### 7.) Add the ConfigMap
 
