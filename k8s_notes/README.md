@@ -10,6 +10,7 @@
     - [Install Kubectl](#install-kubectl)
     - [Install Minikube](#install-minikube)
     - [Starting Minikube](#starting-minikube)
+    - [With Docker Backend](#with-docker-backend)
   - [Objects In K8s](#objects-in-k8s)
     - [Pod Object](#pod-object)
     - [Node Object](#node-object)
@@ -211,6 +212,12 @@ minikube --help
 ```
 
 ### Starting Minikube
+
+### With Docker Backend
+
+```sh
+minikube start --driver=docker --cpus=4 --memory=4096MB --disk-size=10GB --nodes=3
+```
 
 ```bash
 minikube start --driver=hyperkit --cpus=4 --memory=4096MB --disk-size=10GB --nodes=3
