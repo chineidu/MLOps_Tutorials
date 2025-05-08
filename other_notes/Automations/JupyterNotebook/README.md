@@ -12,6 +12,7 @@
   - [Boilerplate 1](#boilerplate-1)
   - [Rich Customisations](#rich-customisations)
   - [Custom Functions](#custom-functions)
+  - [Run Ollama](#run-ollama)
   - [Jupyter Notebook Strip Output](#jupyter-notebook-strip-output)
 
 ## Check Installed Dependencies
@@ -220,6 +221,14 @@ def go_up_from_current_directory(*, go_up: int = 1) -> None:
     # Add the path to the System paths
     sys.path.insert(0, abs_path_prev_directory)
     print(abs_path_prev_directory)
+```
+
+## Run Ollama
+
+```sh
+export OLLAMA_FLASH_ATTENTION=1 OLLAMA_KEEP_ALIVE="15m" \
+    OLLAMA_NUM_THREADS=8 OLLAMA_MAX_LOADED=2 OLLAMA_NUM_PARALLEL=2 \
+    && ollama serve > logs.txt 2>&1
 ```
 
 ## [Jupyter Notebook Strip Output](https://github.com/kynan/nbstripout)
