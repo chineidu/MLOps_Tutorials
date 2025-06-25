@@ -1,8 +1,8 @@
-# Python Classes
+# Python Tutorials
 
 ## Table of Content
 
-- [Python Classes](#python-classes)
+- [Python Tutorials](#python-tutorials)
   - [Table of Content](#table-of-content)
   - [Class Methods](#class-methods)
   - [Types](#types)
@@ -12,6 +12,7 @@
     - [A Simple Example](#a-simple-example)
   - [Abstract Factory](#abstract-factory)
   - [PyDantic BaseSettings (For Configurations)](#pydantic-basesettings-for-configurations)
+  - [Singleton Pattern](#singleton-pattern)
 
 ## Class Methods
 
@@ -474,4 +475,42 @@ print(settings_1)
 # Approach 2: Manually initialize the config variables
 settings_2 = MySettings(name="my app name", url="http://www.myapp.com")
 print(settings_2)
+```
+
+## Singleton Pattern
+
+- The `Singleton Pattern` ensures that a class has only one instance and provides a global point of access to it.
+
+```py
+class MySingleton:
+    """A simple implementation of the Singleton Pattern."""
+    _instance: "None | MySingleton" = None
+    _is_initialized: bool = False
+
+    def __new__(cls, name: str, age: int) -> "MySingleton":
+        # If instance is not created, create it
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._name = name
+            cls._instance._age = age
+        return cls._instance
+
+    def __init__(self, name: str, age: int) -> None:
+        # Only initialize if not already initialized
+        if not self._is_initialized:
+            self._age: int = age
+            self._name: str = name
+            self._is_initialized = True
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(name={self._name}, age={self._age})"
+
+# Usage
+my_singleton_1 = MySingleton(name="Mike", age=37)
+my_singleton_2 = MySingleton(name="Ada", age=29)
+
+print(my_singleton_1)  # Output: MySingleton(name=Mike, age=37)
+print(my_singleton_2)  # Output: MySingleton(name=Mike, age=37)
+
+print(my_singleton_1 == my_singleton_2)  # Output: True
 ```
