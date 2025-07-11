@@ -11,6 +11,7 @@
     - [Benefits of OmegaConf](#benefits-of-omegaconf)
     - [Load A Config (YAML) File Using OmegaConf](#load-a-config-yaml-file-using-omegaconf)
     - [OmegaConf: Variable Interpolation](#omegaconf-variable-interpolation)
+    - [Resolve All Variables When Using Interpolation](#resolve-all-variables-when-using-interpolation)
     - [Access Runtime Variables](#access-runtime-variables)
     - [Variable Interpolation With Env Variables](#variable-interpolation-with-env-variables)
       - [Using Only OmegaConf](#using-only-omegaconf)
@@ -164,6 +165,25 @@ network:
 network2:
   address: 192.168.1.100
   description: Description of 192.168.1.100
+```
+
+### Resolve All Variables When Using Interpolation
+
+```py
+class Config(BaseModel):
+  # Define the fields/attributes
+  pass
+
+
+# Load the config
+config_path: Path = ROOT / "config/config.yaml"
+config: DictConfig = OmegaConf.load(config_path)  # type: ignore
+
+# Resolve all the variables
+resolved_cfg = OmegaConf.to_container(config, resolve=True)
+
+# Validate the config using a Pydantic Model (Config)
+app_config: AppConfig = Config(**dict(resolved_cfg)).app_config 
 ```
 
 ### Access Runtime Variables
