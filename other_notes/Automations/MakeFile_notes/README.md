@@ -18,6 +18,7 @@
     - [Makefile: If Statement](#makefile-if-statement)
     - [Makefile: `.PHONY`](#makefile-phony)
     - [Include Keyword](#include-keyword)
+    - [Access Environment Variables Loaded From A File](#access-environment-variables-loaded-from-a-file)
     - [Run A Specific Makefile](#run-a-specific-makefile)
 
 ## Make
@@ -177,12 +178,22 @@ clean:
 
 ### Include Keyword
 
-- This is used to include files, diretories.
+- This is used to include files, directories.
 
 ```makefile
 include dependencies.mk
 include my_envs_dir/.env
 export # export the env vars
+```
+
+### Access Environment Variables Loaded From A File
+
+```makefile
+flower:
+  # Load environment variables stored in .env
+  @set -a && . ./.env && set +a && \
+  echo "Running Celery flower..."
+  @bash -c "uv run celery -A src.celery.app flower --basic_auth=$$CELERY_FLOWER_USER:$$CELERY_FLOWER_PASSWORD"
 ```
 
 ### Run A Specific Makefile
