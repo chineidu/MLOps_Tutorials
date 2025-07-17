@@ -316,6 +316,7 @@ services:
           # Folders and files to ignore
           ignore:
             - .venv
+            - "**/**/*.ipynb"
         # Rebuild image if any of these files change
         - action: rebuild
           path: ./pyproject.toml
