@@ -219,6 +219,7 @@ services:
       - "5432:5432"
     volumes: # Persist the data volume
       - postgresql-data:/var/lib/postgresql/data
+    restart: unless-stopped
 
   mlflow-server: # 2nd service
     image: local-mlflow-tracking-server
@@ -240,6 +241,7 @@ services:
       - ./:/app
       - artifact-store:/${MLFLOW_ARTIFACT_STORE} # Named volume
     ipc: host
+    restart: unless-stopped
 
 # Named volumes ONLY!
 # Persist data outside the lifecycle of the container.
@@ -262,6 +264,7 @@ services:
       - 15672:15672
     volumes: # Persist the data volume
       - rabbitmq-data:/var/lib/rabbitmq
+    restart: unless-stopped
 
   worker: # 2nd service
     image: rmq-worker:v1
@@ -294,6 +297,7 @@ services:
           path: ./pyproject.toml
     depends_on:
       - local-rabbitmq
+    restart: unless-stopped
 
   producer: # 3rd service
     image: rmq-producer:v1
@@ -322,6 +326,7 @@ services:
           path: ./pyproject.toml
     depends_on:
       - local-rabbitmq
+    restart: unless-stopped
 
 
 # Named volumes ONLY!
