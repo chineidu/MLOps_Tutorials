@@ -102,7 +102,7 @@ kubectl config use-context <your-cluster-name>
 ## Add kubernetes-dashboard repository
 
 ```sh
-# helm repo add kubernetes-dashboard <https://kubernetes.github.io/dashboard/>
+helm repo add kubernetes-dashboard <https://kubernetes.github.io/dashboard/>
 ```
 
 ## Deploy the Kubernetes Dashboard
@@ -114,11 +114,11 @@ helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dash
 ## Deploy a Helm Chart
 
 ```sh
-# helm install <release-name> <chart> [flags] --namespace <namespace>
+helm install <release-name> <chart> [flags] --namespace <namespace>
 
 # E.g
 
-# helm install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --namespace kubernetes-dashboard
+helm install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --namespace kubernetes-dashboard
 ```
 
 ## List helm repositories
