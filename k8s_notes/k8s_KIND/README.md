@@ -24,6 +24,11 @@ Docs can be found at this [KIND Quick Start Guide](https://kind.sigs.k8s.io/docs
       - [Create A Long-Lived Token](#create-a-long-lived-token)
     - [Command Line Proxy](#command-line-proxy)
     - [Access the Dashboard](#access-the-dashboard)
+  - [Create A Deployment](#create-a-deployment)
+    - [View the Deployment](#view-the-deployment)
+  - [View the Pods](#view-the-pods)
+  - [View the Namespaces](#view-the-namespaces)
+  - [Port Forwarding](#port-forwarding)
 
 <!-- /TOC -->
 
@@ -182,8 +187,10 @@ kubectl -n kubernetes-dashboard create token kubernetes-dashboard
 
 #### Create A Long-Lived Token
 
+- Add this to the earlier created `dashboard-adminuser.yaml` file.
+
 ```yaml
-# dashboard-adminuser-long-lived.yaml
+# dashboard-adminuser.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -194,10 +201,16 @@ metadata:
 type: kubernetes.io/service-account-token
 ```
 
+- Apply the changes
+
+```sh
+kubectl apply -f dashboard-adminuser.yaml
+```
+
 - Create the long-lived token
 
 ```sh
-kubectl get secret kubernetes-dashboard -n kubernetes-dashboard -o jsonpath="{.data.token}" | base64 -d
+kubectl -n kubernetes-dashboard get secret kubernetes-dashboard-token -o jsonpath='{.data.token}' | base64 -d
 ```
 
 ### Command Line Proxy
@@ -216,3 +229,47 @@ kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy
 - Use the token created in step 3 to log in to the dashboard
 
 - Note: Use `https` and not `http`
+
+## Create A Deployment
+
+```sh
+kubectl create deployment <deployment_name> --image=<image_name:tag>
+
+# E.g
+kubectl create deployment nginx --image=nginx
+```
+
+### View the Deployment
+
+```sh
+kubectl get deployments -n <namespace>
+# E.g
+kubectl get deployments -n default
+```
+
+## View the Pods
+
+```sh
+kubectl get pods -n <namespace>
+# E.g
+kubectl get pods -n default
+```
+
+## View the Namespaces
+
+```sh
+kubectl get namespaces
+```
+
+## Port Forwarding
+
+```sh
+kubectl port-forward <pod_name> <local_port>:<pod_port> -n <namespace>
+# E.g
+kubectl port-forward nginx-xxxxxx-xxxxx 8080:80 -n default
+
+# Service
+kubectl port-forward svc/<service_name> <local_port>:<service_port> -n <namespace>
+# E.g
+kubectl port-forward svc/nginx 8080:80 -n default
+```

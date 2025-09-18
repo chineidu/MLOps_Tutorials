@@ -15,6 +15,16 @@ roleRef:
   kind: ClusterRole
   name: cluster-admin
 subjects:
-- kind: ServiceAccount
-  name: kubernetes-dashboard
+  - kind: ServiceAccount
+    name: kubernetes-dashboard
+    namespace: kubernetes-dashboard
+---
+# Manually create a token secret for the ServiceAccount
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kubernetes-dashboard-token
   namespace: kubernetes-dashboard
+  annotations:
+    kubernetes.io/service-account.name: "kubernetes-dashboard"
+type: kubernetes.io/service-account-token
