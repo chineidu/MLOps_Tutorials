@@ -17,7 +17,6 @@ Docs can be found at this [KIND Quick Start Guide](https://kind.sigs.k8s.io/docs
   - [Deploy the Kubernetes Dashboard](#deploy-the-kubernetes-dashboard)
   - [Deploy a Helm Chart](#deploy-a-helm-chart)
   - [List helm repositories](#list-helm-repositories)
-  - [Update helm repositories](#update-helm-repositories)
   - [Delete a Helm release](#delete-a-helm-release)
   - [Access the Kubernetes Dashboard](#access-the-kubernetes-dashboard)
     - [Create a Service Account And ClusterRoleBinding](#create-a-service-account-and-clusterrolebinding)
@@ -127,12 +126,6 @@ helm install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --na
 helm repo list
 ```
 
-## Update helm repositories
-
-```sh
-helm repo update
-```
-
 ## Delete a Helm release
 
 ```sh
@@ -171,6 +164,10 @@ subjects:
 - Create the Service Account and ClusterRoleBinding
 
 ```sh
+# Delete if already exists before creating
+kubectl delete -f dashboard-adminuser.yaml --ignore-not-found
+
+# Create the Service Account and ClusterRoleBinding
 kubectl create -f dashboard-adminuser.yaml
 ```
 
@@ -217,3 +214,5 @@ kubectl -n kubernetes-dashboard port-forward svc/kubernetes-dashboard-kong-proxy
   <https://localhost:8443/>
 
 - Use the token created in step 3 to log in to the dashboard
+
+- Note: Use `https` and not `http`
