@@ -1,5 +1,13 @@
 # Kafka Docker Compose
 
+## Table of Contents
+<!-- TOC -->
+
+- [Kafka Docker Compose](#kafka-docker-compose)
+  - [Table of Contents](#table-of-contents)
+  - [Compose File](#compose-file)
+
+<!-- /TOC -->
 ## Compose File
 
 - This compose file:
