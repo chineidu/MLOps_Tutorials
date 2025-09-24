@@ -4,20 +4,33 @@
 - This contains pre-commit configurations
 
 ## Table of Content
+<!-- TOC -->
 
 - [Pre-Commit Hooks](#pre-commit-hooks)
   - [Table of Content](#table-of-content)
-  - [Setup](#setup)
-    - [1. Installation](#1-installation)
-    - [2. Add a Pre-Commit Configuration](#2-add-a-pre-commit-configuration)
-    - [3. Install The Git Hook Scripts](#3-install-the-git-hook-scripts)
-    - [4. (Optional) Run Against All The Files](#4-optional-run-against-all-the-files)
-  - [Version 1](#version-1)
-  - [Version 1.1](#version-11)
+  - [Pre-Commit Setup](#pre-commit-setup)
+    - [Installation Pre-Commit](#installation-pre-commit)
+    - [Add a Pre-Commit Configuration Pre-Commit](#add-a-pre-commit-configuration-pre-commit)
+    - [Install The Git Hook Scripts Pre-Commit](#install-the-git-hook-scripts-pre-commit)
+    - [Optional Run Against All The Files Pre-Commit](#optional-run-against-all-the-files-pre-commit)
+    - [Update Pre-commit hooks Pre-Commit](#update-pre-commit-hooks-pre-commit)
+  - [Preq Setup](#preq-setup)
+    - [Installation](#installation)
+    - [Add a Pre-Commit Configuration](#add-a-pre-commit-configuration)
+    - [Install The Git Hook Scripts](#install-the-git-hook-scripts)
+    - [Optional Run Against All The Files](#optional-run-against-all-the-files)
+    - [Update all hooks](#update-all-hooks)
+    - [List all available hooks](#list-all-available-hooks)
+    - [Clean unused cached repositories](#clean-unused-cached-repositories)
+  - [Configs](#configs)
+    - [Version 1](#version-1)
+    - [Version 1.1](#version-11)
 
-## Setup
+<!-- /TOC -->
 
-### 1. Installation
+## Pre-Commit Setup
+
+### Installation (Pre-Commit)
 
 ```sh
 pip install pre-commit
@@ -26,23 +39,76 @@ pip install pre-commit
 pre-commit --version
 ```
 
-### 2. Add a Pre-Commit Configuration
+### Add a Pre-Commit Configuration (Pre-Commit)
 
 - Create a file named `.pre-commit-config.yaml`
 
-### 3. Install The Git Hook Scripts
+### Install The Git Hook Scripts (Pre-Commit)
 
 ```sh
 pre-commit install
 ```
 
-### 4. (Optional) Run Against All The Files
+### (Optional) Run Against All The Files (Pre-Commit)
 
 ```sh
 pre-commit run --all-files
 ```
 
-## Version 1
+### Update Pre-commit hooks (Pre-Commit)
+
+```sh
+pre-commit autoupdate
+```
+
+## Preq Setup
+
+- [Official Docs](https://prek.j178.dev/)
+
+### Installation
+
+```sh
+# Using uv (recommended)
+uv tool install prek
+```
+
+### Add a Pre-Commit Configuration
+
+- Create a file named `.pre-commit-config.yaml` or `.pre-commit-config.yml`
+
+### Install The Git Hook Scripts
+
+```sh
+prek install
+```
+
+### (Optional) Run Against All The Files
+
+```sh
+prek run --all-files
+```
+
+### Update all hooks
+
+```sh
+prek auto-update
+```
+
+### List all available hooks
+
+```sh
+prek list
+```
+
+### Clean unused cached repositories
+
+```sh
+prek gc
+```
+
+## Configs
+
+### Version 1
 
 ```yaml
 # See https://pre-commit.com for more information
@@ -86,7 +152,7 @@ repos:
 
 ```
 
-## Version 1.1
+### Version 1.1
 
 ```yaml
 ---
