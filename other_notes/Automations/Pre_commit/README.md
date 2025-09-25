@@ -14,7 +14,7 @@
     - [Install The Git Hook Scripts Pre-Commit](#install-the-git-hook-scripts-pre-commit)
     - [Optional Run Against All The Files Pre-Commit](#optional-run-against-all-the-files-pre-commit)
     - [Update Pre-commit hooks Pre-Commit](#update-pre-commit-hooks-pre-commit)
-  - [Preq Setup](#preq-setup)
+  - [Prek Setup](#prek-setup)
     - [Installation](#installation)
     - [Add a Pre-Commit Configuration](#add-a-pre-commit-configuration)
     - [Install The Git Hook Scripts](#install-the-git-hook-scripts)
@@ -61,7 +61,7 @@ pre-commit run --all-files
 pre-commit autoupdate
 ```
 
-## Preq Setup
+## Prek Setup
 
 - [Official Docs](https://prek.j178.dev/)
 
