@@ -158,15 +158,15 @@ repos:
 ---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
+        args:
+          - --maxkb=5000 # Allow files up to 5MB
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-docstring-first
-        args:
-          - --maxkb=5000
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.3.4
