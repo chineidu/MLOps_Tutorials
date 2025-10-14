@@ -10,6 +10,7 @@
     - [Space Complexity](#space-complexity)
     - [Complexity Chart](#complexity-chart)
   - [Framework For Solving DSA Problems](#framework-for-solving-dsa-problems)
+  - [Important Topics to Cover](#important-topics-to-cover)
 
 <!-- /TOC -->
 ## Big O Notation
@@ -64,3 +65,13 @@
 6. **Check Other Solutions**: After solving the problem, look at other people's solutions. This can provide new insights and techniques that you can learn from.
 
 7. **Practice Regularly**: Practice solving different types of problems regularly. Repeat previously solved problems to reinforce your understanding and improve your problem-solving skills.
+
+## Important Topics to Cover
+
+- Arrays and Hashing
+- Two Pointers
+- Stacks and Queues
+- Binary Search
+- Sliding Window
+- Linked List
+- Trees
