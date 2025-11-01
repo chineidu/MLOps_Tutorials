@@ -89,7 +89,16 @@ sqlalchemy.url =
 
 SQLALCHEMY_DATABASE_URL: str = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
-# Set the url
+# =============================================================
+# ==================== Add DB Config ==========================
+# =============================================================
+config.set_main_option(
+    "sqlalchemy.url",
+    f"postgresql+psycopg2://{app_settings.POSTGRES_USER}:{app_settings.POSTGRES_PASSWORD.get_secret_value()}"
+    f"@{app_settings.POSTGRES_HOST}:{app_settings.POSTGRES_PORT}/{app_settings.API_DB_NAME}",
+)
+
+# OR
 config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)   # NEW!
 
 ```
