@@ -172,3 +172,4 @@ notepad.py
 !**/example_mlflow_prod.env
 **/**/tmp*/
 **/**/data/
+**/**/.DS_Store
