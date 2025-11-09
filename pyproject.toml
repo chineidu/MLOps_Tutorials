@@ -5,6 +5,7 @@ description = "Repository for MLOps and other tutorials"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiofiles>=25.1.0",
     "ddgs>=9.8.0",
     "fastmcp>=2.13.0.2",
     "httpx>=0.28.1",
@@ -16,7 +17,9 @@ dependencies = [
     "pydantic>=2.11.7",
     "pydantic-settings>=2.11.0",
     "rich>=14.1.0",
+    "scalene>=1.5.55",
     "streamlit>=1.50.0",
+    "tqdm>=4.67.1",
 ]
 
 [dependency-groups]
