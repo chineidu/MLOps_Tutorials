@@ -83,7 +83,6 @@ OpenRouterClient/AsyncOpenRouterClient
 ├── chat (ChatSyncResource/ChatAsyncResource)
 │   └── completions (ChatSyncSubResource/ChatAsyncSubResource)
 ├── completions (CompletionsSyncResource/CompletionsAsyncResource)
-│   └── completions (CompletionsResourceSyncSubResource/CompletionsResourceAsyncSubResource)
 ├── embeddings (EmbeddingsSyncResource/EmbeddingsAsyncResource)
 ├── models (ModelsSyncResource/ModelsAsyncResource)
 ├── generations (GenerationMetadataSyncResource/GenerationMetadataAsyncResource)
@@ -233,7 +232,7 @@ response = client.chat.completions.create(
 
 ### Text Completions
 
-The `completions` resource is for legacy text completions. Note the nested structure due to the resource naming.
+The `completions` resource is for legacy text completions with a direct `create()` method.
 
 ```python
 # Async
