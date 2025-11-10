@@ -17,8 +17,11 @@ This SDK provides a convenient way to interact with the OpenRouter API. It featu
   - [Overview](#overview)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
+  - [Architecture](#architecture)
   - [Installation](#installation)
   - [Getting Started](#getting-started)
+    - [Using Context Manager (Recommended)](#using-context-manager-recommended)
+    - [Manual Resource Management](#manual-resource-management)
   - [Client Initialization](#client-initialization)
     - [Synchronous Client](#synchronous-client)
     - [Asynchronous Client](#asynchronous-client)
@@ -37,15 +40,70 @@ This SDK provides a convenient way to interact with the OpenRouter API. It featu
     - [Custom Configuration](#custom-configuration)
   - [License](#license)
 
+## Architecture
+
+The SDK follows a clean, modular architecture with the following design principles:
+
+### Separation of Sync and Async Resources
+
+Each resource has separate sync and async implementations:
+
+- **Sync Resources**: `ChatSyncResource`, `ModelsSyncResource`, `CreditsSyncResource`, etc.
+- **Async Resources**: `ChatAsyncResource`, `ModelsAsyncResource`, `CreditsAsyncResource`, etc.
+
+This separation ensures:
+
+- Clear distinction between synchronous and asynchronous operations
+- No method name conflicts
+- Better type safety and IDE support
+
+### Sub-Resource Pattern
+
+Resources use a sub-resource pattern for better organization:
+
+```python
+# Old pattern (deprecated)
+client.chat.completions(messages=[...])
+
+# New pattern (current)
+client.chat.completions.create(messages=[...])
+```
+
+Benefits:
+
+- More RESTful API design
+- Consistent naming across all resources
+- Room for future expansion (e.g., `update()`, `delete()`)
+- Better discoverability through IDE autocomplete
+
+### Resource Hierarchy
+
+```text
+OpenRouterClient/AsyncOpenRouterClient
+├── chat (ChatSyncResource/ChatAsyncResource)
+│   └── completions (ChatSyncSubResource/ChatAsyncSubResource)
+├── completions (CompletionsSyncResource/CompletionsAsyncResource)
+│   └── completions (CompletionsResourceSyncSubResource/CompletionsResourceAsyncSubResource)
+├── embeddings (EmbeddingsSyncResource/EmbeddingsAsyncResource)
+├── models (ModelsSyncResource/ModelsAsyncResource)
+├── generations (GenerationMetadataSyncResource/GenerationMetadataAsyncResource)
+├── credits (CreditsSyncResource/CreditsAsyncResource)
+├── providers (ProvidersSyncResource/ProvidersAsyncResource)
+├── parameters (SupportedParametersSyncResource/SupportedParametersAsyncResource)
+└── analytics (AnalyticsSyncResource/AnalyticsAsyncResource)
+```
+
 ## Features
 
 - **Dual Client Support**: Both synchronous (`OpenRouterClient`) and asynchronous (`AsyncOpenRouterClient`) implementations.
-- **Resource-Based Architecture**: API endpoints are organized into logical resource classes.
+- **Resource-Based Architecture**: API endpoints are organized into logical resource classes with dedicated sync/async implementations.
+- **Sub-Resource Pattern**: Resources use sub-resources for better organization (e.g., `client.chat.completions.create()` instead of `client.chat.completions()`).
 - **Type Safety**: Full type hints throughout the codebase.
 - **Comprehensive Error Handling**: Specific exception types for different error scenarios.
 - **Flexible Configuration**: Customizable base URLs, timeouts, and default models.
 - **HTTP/2 Support**: Uses `httpx` for efficient HTTP requests.
 - **Context Manager Support**: Proper resource management with context managers.
+- **Environment Variable Support**: Automatic API key detection from environment variables.
 
 ## Installation
 
@@ -77,7 +135,7 @@ async def main():
     # It's recommended to use an environment variable for the API key
     async with AsyncOpenRouterClient() as client:
         try:
-            response = await client.chat.acompletions(
+            response = await client.chat.acompletions.create(
                 messages=[{"role": "user", "content": "Hello, how are you?"}],
                 model="anthropic/claude-3-haiku"
             )
@@ -101,7 +159,7 @@ async def main():
     client = AsyncOpenRouterClient()
 
     try:
-        response = await client.chat.acompletions(
+        response = await client.chat.acompletions.create(
             messages=[{"role": "user", "content": "Hello, how are you?"}],
             model="anthropic/claude-3-haiku"
         )
@@ -155,18 +213,18 @@ The client provides access to various API resources.
 
 ### Chat Completions
 
-The `chat` resource is used to generate chat-based completions.
+The `chat` resource is used to generate chat-based completions. Use the `completions` sub-resource to create completions.
 
 ```python
 # Async
-response = await client.chat.acompletions(
+response = await client.chat.acompletions.create(
     messages=[{"role": "user", "content": "Hello!"}],
     model="anthropic/claude-3-haiku",
     temperature=0.7
 )
 
 # Sync
-response = client.chat.completions(
+response = client.chat.completions.create(
     messages=[{"role": "user", "content": "Hello!"}],
     model="anthropic/claude-3-haiku",
     temperature=0.7
@@ -175,17 +233,17 @@ response = client.chat.completions(
 
 ### Text Completions
 
-The `completions` resource is for legacy text completions.
+The `completions` resource is for legacy text completions. Note the nested structure due to the resource naming.
 
 ```python
 # Async
-response = await client.acompletions(
+response = await client.acompletions.create(
     prompt="Write a haiku about programming",
     model="anthropic/claude-3-haiku"
 )
 
 # Sync
-response = client.completions(
+response = client.completions.create(
     prompt="Write a haiku about programming",
     model="anthropic/claude-3-haiku"
 )
@@ -197,7 +255,7 @@ Create embeddings for text using the `embeddings` resource.
 
 ```python
 # Async
-response = await client.embeddings.acreate(
+response = await client.aembeddings.create(
     input="Hello, world!",
     model="openai/text-embedding-3-small"
 )
@@ -223,8 +281,8 @@ ai_models = client.models.list_models(category=["programming", "technology"])
 # Async: Count models
 count = await client.models.acount()
 
-# Sync: List embedding models
-embeddings = client.models.embeddings()
+# Sync: Count models
+count = client.models.count()
 ```
 
 ### Credits
@@ -233,11 +291,11 @@ Check your remaining credits and usage.
 
 ```python
 # Async
-credits_data = await client.aget_credits_data()
+credits_data = await client.credits.asummary()
 print(f"Credits remaining: {credits_data.get('credits', 'N/A')}")
 
 # Sync
-credits_data = client.get_credits_data()
+credits_data = client.credits.summary()
 print(f"Total usage: {credits_data.get('total_usage', 'N/A')}")
 ```
 
@@ -247,10 +305,10 @@ Retrieve metadata for a specific generation.
 
 ```python
 # Async
-metadata = await client.ageneration_metadata(id="gen-1234567890")
+metadata = await client.generations.aretrieve(id="gen-1234567890")
 
 # Sync
-metadata = client.generation_metadata(id="gen-1234567890")
+metadata = client.generations.retrieve(id="gen-1234567890")
 ```
 
 ### Providers
@@ -259,10 +317,10 @@ List all available providers.
 
 ```python
 # Async
-providers = await client.alist_providers()
+providers = await client.providers.alist_providers()
 
 # Sync
-providers = client.list_providers()
+providers = client.providers.list_providers()
 ```
 
 ### Supported Parameters
@@ -301,7 +359,7 @@ from src.utilities.openrouter.exceptions import AuthenticationError, RateLimitEr
 async def error_handling_example():
     client = AsyncOpenRouterClient(api_key="invalid-key")
     try:
-        await client.chat.acompletions(messages=[{"role": "user", "content": "Hello!"}])
+        await client.chat.acompletions.create(messages=[{"role": "user", "content": "Hello!"}])
     except AuthenticationError:
         print("Authentication failed: Please check your API key.")
     except RateLimitError:

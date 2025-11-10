@@ -16,7 +16,9 @@ type ChatResourceClient = OpenRouterClient | AsyncOpenRouterClient
 type EmbeddingInput = str | list[str] | list[float] | list[list[float]]
 
 
-class EmbeddingsResource:
+class EmbeddingsSyncResource:
+    """Embeddings resource for interacting with OpenRouter embeddings.""" ""
+
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
@@ -50,6 +52,11 @@ class EmbeddingsResource:
         sync_client: "OpenRouterClient" = _validate_request_attribute(self.client)
 
         return sync_client._request(RequestMethods.POST, path, json=payload)
+
+
+class EmbeddingsAsyncResource:
+    def __init__(self, client: ChatResourceClient) -> None:
+        self.client: ChatResourceClient = _validate_client(client)
 
     async def acreate(
         self, input: EmbeddingInput, model: str | None = None, **kwargs: dict[str, Any]

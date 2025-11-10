@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING, Any
 
-from src.utilities.openrouter.exceptions import InvalidClientError
 from src.utilities.openrouter.types import OpenRouterClientPaths, RequestMethods
 from src.utilities.openrouter.utils import (
     _validate_arequest_attribute,
@@ -17,19 +16,19 @@ type ChatResourceClient = OpenRouterClient | AsyncOpenRouterClient
 type CompletionsInput = str | list[str] | list[float] | list[list[float]]
 
 
-class ChatResource:
+class ChatSyncSubResource:
     """Chat resource for interacting with OpenRouter chat completions."""
 
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
-    def completions(
+    def create(
         self,
         messages: list[dict[str, str]],
         model: str | None = None,
         **kwargs: dict[str, Any],
     ) -> dict[str, Any]:
-        """Get chat completions from OpenRouter API.
+        """Create a new chat completion.
 
         Parameters
         ----------
@@ -54,56 +53,60 @@ class ChatResource:
 
         return sync_client._request(RequestMethods.POST, path, json=payload)
 
-    async def acompletions(
-        self,
-        messages: list[dict[str, str]],
-        model: str | None = None,
-        **kwargs: dict[str, Any],
-    ) -> dict[str, Any]:
-        """Get chat completions asyncronously from OpenRouter API.
 
-        Parameters
-        ----------
-        messages : list[dict[str, str]]
-            The list of messages for the chat completion.
-        model : str | None, optional
-            The model to use for chat completion. If None, the client's default model is used.
-        **kwargs : dict[str, Any]
-            Additional keyword arguments to pass to the API.
+class ChatAsyncSubResource:
+    """Chat resource for interacting with OpenRouter chat completions asynchronously."""
 
-        Returns
-        -------
-            dict[str, Any]
-                The response from the OpenRouter API containing the chat completions.
-        """
-        model = _validate_model(self.client, model)
-
-        payload: dict[str, Any] = {"model": model, "messages": messages, **kwargs}
-        base_url: str = _validate_base_url_attribute(self.client)
-        path: str = f"{base_url}/{OpenRouterClientPaths.CHAT_COMPLETIONS.value}"
-        async_client: "AsyncOpenRouterClient" = _validate_arequest_attribute(
-            self.client
-        )
-
-        return await async_client._arequest(RequestMethods.POST, path, json=payload)
-
-
-class CompletionsResource:
     def __init__(self, client: ChatResourceClient) -> None:
-        if not (hasattr(client, "_request") or hasattr(client, "_arequest")):
-            raise InvalidClientError(
-                "Client must be an instance of OpenRouterClient or AsyncOpenRouterClient."
-            )
+        self.client: ChatResourceClient = _validate_client(client)
 
-        self.client: ChatResourceClient = client
+    async def create(
+        self,
+        messages: list[dict[str, str]],
+        model: str | None = None,
+        **kwargs: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Asynchronously create a new chat completion.
 
-    def completions(
+        Parameters
+        ----------
+        messages : list[dict[str, str]]
+            The list of messages for the chat completion.
+        model : str | None, optional
+            The model to use for chat completion. If None, the client's default model is used.
+        **kwargs : dict[str, Any]
+            Additional keyword arguments to pass to the API.
+
+        Returns
+        -------
+            dict[str, Any]
+                The response from the OpenRouter API containing the chat completions.
+        """
+        model = _validate_model(self.client, model)
+
+        payload: dict[str, Any] = {"model": model, "messages": messages, **kwargs}
+        base_url: str = _validate_base_url_attribute(self.client)
+        path: str = f"{base_url}/{OpenRouterClientPaths.CHAT_COMPLETIONS.value}"
+        async_client: "AsyncOpenRouterClient" = _validate_arequest_attribute(
+            self.client
+        )
+
+        return await async_client._arequest(RequestMethods.POST, path, json=payload)
+
+
+class CompletionsSyncResource:
+    """Chat resource for interacting with OpenRouter completions."""
+
+    def __init__(self, client: ChatResourceClient) -> None:
+        self.client: ChatResourceClient = _validate_client(client)
+
+    def create(
         self,
         prompt: CompletionsInput,
         model: str | None = None,
         **kwargs: dict[str, Any],
     ) -> dict[str, Any]:
-        """Get chat completions from OpenRouter API.
+        """Create a new completion.
 
         Parameters
         ----------
@@ -132,13 +135,20 @@ class CompletionsResource:
 
         return sync_client._request(RequestMethods.POST, path, json=payload)
 
-    async def acompletions(
+
+class CompletionsAsyncResource:
+    """Chat resource for interacting with OpenRouter completions asynchronously."""
+
+    def __init__(self, client: ChatResourceClient) -> None:
+        self.client: ChatResourceClient = _validate_client(client)
+
+    async def create(
         self,
         prompt: CompletionsInput,
         model: str | None = None,
         **kwargs: dict[str, Any],
     ) -> dict[str, Any]:
-        """Get chat completions asyncronously from OpenRouter API.
+        """Create a new completion asynchronously.
 
         Parameters
         ----------
@@ -168,3 +178,19 @@ class CompletionsResource:
         )
 
         return await async_client._arequest(RequestMethods.POST, path, json=payload)
+
+
+class ChatSyncResource:
+    """Chat resource for interacting with OpenRouter chat completions."""
+
+    def __init__(self, client: ChatResourceClient) -> None:
+        self.client: ChatResourceClient = _validate_client(client)
+        self.completions = ChatSyncSubResource(client=self.client)
+
+
+class ChatAsyncResource:
+    """Chat resource for interacting with OpenRouter chat completions."""
+
+    def __init__(self, client: ChatResourceClient) -> None:
+        self.client: ChatResourceClient = _validate_client(client)
+        self.acompletions = ChatAsyncSubResource(client=self.client)

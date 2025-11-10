@@ -54,7 +54,7 @@ type SupportedParameters = Literal[
 ]
 
 
-class ModelsResource:
+class ModelsSyncResource:
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
@@ -65,16 +65,6 @@ class ModelsResource:
         sync_client: "OpenRouterClient" = _validate_request_attribute(self.client)
 
         return sync_client._request(RequestMethods.GET, path)
-
-    async def acount(self) -> dict[str, Any]:
-        """Asynchronously count available models from OpenRouter API."""
-        base_url: str = _validate_base_url_attribute(self.client)
-        path: str = f"{base_url}/{OpenRouterClientPaths.MODEL_COUNT.value}"
-        async_client: "AsyncOpenRouterClient" = _validate_arequest_attribute(
-            self.client
-        )
-
-        return await async_client._arequest(RequestMethods.GET, path)
 
     def list_models(
         self,
@@ -98,6 +88,21 @@ class ModelsResource:
         sync_client: "OpenRouterClient" = _validate_request_attribute(self.client)
 
         return sync_client._request(RequestMethods.GET, path, params=params)
+
+
+class ModelsAsyncResource:
+    def __init__(self, client: ChatResourceClient) -> None:
+        self.client: ChatResourceClient = _validate_client(client)
+
+    async def acount(self) -> dict[str, Any]:
+        """Asynchronously count available models from OpenRouter API."""
+        base_url: str = _validate_base_url_attribute(self.client)
+        path: str = f"{base_url}/{OpenRouterClientPaths.MODEL_COUNT.value}"
+        async_client: "AsyncOpenRouterClient" = _validate_arequest_attribute(
+            self.client
+        )
+
+        return await async_client._arequest(RequestMethods.GET, path)
 
     async def alist_models(
         self,
@@ -123,25 +128,3 @@ class ModelsResource:
         )
 
         return await async_client._arequest(RequestMethods.GET, path, params=params)
-
-    def embeddings(self) -> dict[str, Any]:
-        """List available embedding models from OpenRouter API."""
-        base_url: str = _validate_base_url_attribute(self.client)
-        path: str = (
-            f"{base_url}/{OpenRouterClientPaths.LIST_ALL_EMBEDDING_MODELS.value}"
-        )
-        sync_client: "OpenRouterClient" = _validate_request_attribute(self.client)
-
-        return sync_client._request(RequestMethods.GET, path)
-
-    async def aembeddings(self) -> dict[str, Any]:
-        """Asynchronously list available embedding models from OpenRouter API."""
-        base_url: str = _validate_base_url_attribute(self.client)
-        path: str = (
-            f"{base_url}/{OpenRouterClientPaths.LIST_ALL_EMBEDDING_MODELS.value}"
-        )
-        async_client: "AsyncOpenRouterClient" = _validate_arequest_attribute(
-            self.client
-        )
-
-        return await async_client._arequest(RequestMethods.GET, path)

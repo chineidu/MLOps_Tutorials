@@ -105,6 +105,9 @@ def get_openrouter_api_keys(api_key: str | None = None) -> str:
         dict[str, str]
             A dictionary containing the OpenRouter API key.
     """
+    from dotenv import load_dotenv  # type: ignore
+
+    load_dotenv(override=True)
 
     if api_key is not None:
         return api_key

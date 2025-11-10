@@ -72,12 +72,14 @@ type AuthorTypes = Literal[
 ]
 
 
-class GenerationMetadataResource:
+class GenerationMetadataSyncResource:
+    """Metadata generation resource for OpenRouter API."""
+
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
-    def get_metadata(self, id: str) -> dict[str, Any]:
-        """Get generation metadata from OpenRouter API.
+    def retrieve(self, id: str) -> dict[str, Any]:
+        """Retrieve generation metadata from OpenRouter API.
 
         Parameters
         ----------
@@ -96,8 +98,15 @@ class GenerationMetadataResource:
 
         return sync_client._request(RequestMethods.GET, path, params=params)
 
-    async def aget_metadata(self, id: str) -> dict[str, Any]:
-        """Get generation metadata from OpenRouter API.
+
+class GenerationMetadataAsyncResource:
+    """Metadata generation resource for OpenRouter API."""
+
+    def __init__(self, client: ChatResourceClient) -> None:
+        self.client: ChatResourceClient = _validate_client(client)
+
+    async def aretrieve(self, id: str) -> dict[str, Any]:
+        """Retrieve generation metadata from OpenRouter API.
 
         Parameters
         ----------
@@ -119,7 +128,9 @@ class GenerationMetadataResource:
         return await async_client._arequest(RequestMethods.GET, path, params=params)
 
 
-class SupportedParametersResource:
+class SupportedParametersSyncResource:
+    """Supported parameters resource for OpenRouter API."""
+
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
@@ -143,6 +154,13 @@ class SupportedParametersResource:
         sync_client: "OpenRouterClient" = _validate_request_attribute(self.client)
 
         return sync_client._request(RequestMethods.GET, path)
+
+
+class SupportedParametersAsyncResource:
+    """Supported parameters resource for OpenRouter API."""
+
+    def __init__(self, client: ChatResourceClient) -> None:
+        self.client: ChatResourceClient = _validate_client(client)
 
     async def alist_supported(
         self, author: AuthorTypes | str, slug: str
@@ -170,7 +188,9 @@ class SupportedParametersResource:
         return await async_client._arequest(RequestMethods.GET, path)
 
 
-class ProvidersResource:
+class ProvidersSyncResource:
+    """Providers resource for OpenRouter API."""
+
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
@@ -182,6 +202,13 @@ class ProvidersResource:
 
         return sync_client._request(RequestMethods.GET, path)
 
+
+class ProvidersAsyncResource:
+    """Providers resource for OpenRouter API."""
+
+    def __init__(self, client: ChatResourceClient) -> None:
+        self.client: ChatResourceClient = _validate_client(client)
+
     async def alist_providers(self) -> dict[str, Any]:
         """Asynchronously list available providers from OpenRouter API."""
         base_url: str = _validate_base_url_attribute(self.client)
@@ -193,18 +220,18 @@ class ProvidersResource:
         return await async_client._arequest(RequestMethods.GET, path)
 
 
-class AnalyticsResource:
+class AnalyticsSyncResource:
     """Analytics resource for OpenRouter API.
 
     NOTE
     ----
-    This resource requires `provisioning keys` (special permissions) to access
+    This resource requires `provisioning keys` (special permissions) to access.
     """
 
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
-    def user_activity(self) -> dict[str, Any]:
+    def summary(self) -> dict[str, Any]:
         """Get user activity from OpenRouter API."""
         base_url: str = _validate_base_url_attribute(self.client)
         path: str = f"{base_url}/{OpenRouterClientPaths.USER_ACTIVITY.value}"
@@ -212,10 +239,22 @@ class AnalyticsResource:
 
         return sync_client._request(RequestMethods.GET, path)
 
-    async def alist_providers(self) -> dict[str, Any]:
-        """Asynchronously list available providers from OpenRouter API."""
+
+class AnalyticsAsyncResource:
+    """Asynchronous analytics resource for OpenRouter API.
+
+    NOTE
+    ----
+    This resource requires `provisioning keys` (special permissions) to access.
+    """
+
+    def __init__(self, client: ChatResourceClient) -> None:
+        self.client: ChatResourceClient = _validate_client(client)
+
+    async def asummary(self) -> dict[str, Any]:
+        """Asynchronously get user activity from OpenRouter API."""
         base_url: str = _validate_base_url_attribute(self.client)
-        path: str = f"{base_url}/{OpenRouterClientPaths.LIST_ALL_PROVIDERS.value}"
+        path: str = f"{base_url}/{OpenRouterClientPaths.USER_ACTIVITY.value}"
         async_client: "AsyncOpenRouterClient" = _validate_arequest_attribute(
             self.client
         )
@@ -223,13 +262,13 @@ class AnalyticsResource:
         return await async_client._arequest(RequestMethods.GET, path)
 
 
-class CreditsResource:
+class CreditsSyncResource:
     """Credits resource for OpenRouter API."""
 
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
-    def get_credits_data(self) -> dict[str, Any]:
+    def summary(self) -> dict[str, Any]:
         """Get the total credits and usage from OpenRouter API."""
         base_url: str = _validate_base_url_attribute(self.client)
         path: str = f"{base_url}/{OpenRouterClientPaths.REMAINING_CREDITS.value}"
@@ -237,7 +276,14 @@ class CreditsResource:
 
         return sync_client._request(RequestMethods.GET, path)
 
-    async def aget_credits_data(self) -> dict[str, Any]:
+
+class CreditsAsyncResource:
+    """Credits resource for OpenRouter API."""
+
+    def __init__(self, client: ChatResourceClient) -> None:
+        self.client: ChatResourceClient = _validate_client(client)
+
+    async def asummary(self) -> dict[str, Any]:
         """Asynchronously get the total credits and usage from OpenRouter API."""
         base_url: str = _validate_base_url_attribute(self.client)
         path: str = f"{base_url}/{OpenRouterClientPaths.REMAINING_CREDITS.value}"
