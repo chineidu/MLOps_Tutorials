@@ -159,9 +159,7 @@ async def fetch_with_error_handling(urls: List[str]) -> List:
 - **Solution:** Wrap each request within an `asyncio.Semaphore` context to cap concurrency.
 
 ```python
-async def fetch_with_limit(session: aiohttp.ClientSession, 
-                           url: str, 
-                           semaphore: asyncio.Semaphore) -> Dict:
+async def fetch_with_limit(session: aiohttp.ClientSession, url: str, semaphore: asyncio.Semaphore) -> Dict:
     """Fetch with concurrency control."""
     async with semaphore:  # Only N concurrent requests
         async with session.get(url) as resp:
@@ -390,9 +388,7 @@ class Article:
     url: str
     fetched_at: datetime
 
-async def scrape_article(session: aiohttp.ClientSession, 
-                        url: str,
-                        semaphore: asyncio.Semaphore) -> Article:
+async def scrape_article(session: aiohttp.ClientSession, url: str, semaphore: asyncio.Semaphore) -> Article:
     """Scrape single article with rate limiting."""
     async with semaphore:
         try:
