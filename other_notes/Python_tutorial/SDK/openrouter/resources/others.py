@@ -105,7 +105,7 @@ class GenerationMetadataAsyncResource:
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
-    async def aretrieve(self, id: str) -> dict[str, Any]:
+    async def retrieve(self, id: str) -> dict[str, Any]:
         """Retrieve generation metadata from OpenRouter API.
 
         Parameters
@@ -162,7 +162,7 @@ class SupportedParametersAsyncResource:
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
-    async def alist_supported(
+    async def list_supported(
         self, author: AuthorTypes | str, slug: str
     ) -> dict[str, Any]:
         """Asynchronously get supported parameters from OpenRouter API.
@@ -209,7 +209,7 @@ class ProvidersAsyncResource:
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
-    async def alist_providers(self) -> dict[str, Any]:
+    async def list_providers(self) -> dict[str, Any]:
         """Asynchronously list available providers from OpenRouter API."""
         base_url: str = _validate_base_url_attribute(self.client)
         path: str = f"{base_url}/{OpenRouterClientPaths.LIST_ALL_PROVIDERS.value}"
@@ -251,7 +251,7 @@ class AnalyticsAsyncResource:
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
-    async def asummary(self) -> dict[str, Any]:
+    async def summary(self) -> dict[str, Any]:
         """Asynchronously get user activity from OpenRouter API."""
         base_url: str = _validate_base_url_attribute(self.client)
         path: str = f"{base_url}/{OpenRouterClientPaths.USER_ACTIVITY.value}"
@@ -283,7 +283,7 @@ class CreditsAsyncResource:
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
-    async def asummary(self) -> dict[str, Any]:
+    async def summary(self) -> dict[str, Any]:
         """Asynchronously get the total credits and usage from OpenRouter API."""
         base_url: str = _validate_base_url_attribute(self.client)
         path: str = f"{base_url}/{OpenRouterClientPaths.REMAINING_CREDITS.value}"

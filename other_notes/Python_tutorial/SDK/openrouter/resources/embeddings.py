@@ -58,7 +58,7 @@ class EmbeddingsAsyncResource:
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
-    async def acreate(
+    async def create(
         self, input: EmbeddingInput, model: str | None = None, **kwargs: dict[str, Any]
     ) -> dict[str, Any]:
         """Create embeddings asyncronously from OpenRouter API.

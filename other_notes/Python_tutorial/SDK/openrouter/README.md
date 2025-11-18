@@ -134,7 +134,7 @@ async def main():
     # It's recommended to use an environment variable for the API key
     async with AsyncOpenRouterClient() as client:
         try:
-            response = await client.chat.acompletions.create(
+            response = await client.chat.completions.create(
                 messages=[{"role": "user", "content": "Hello, how are you?"}],
                 model="anthropic/claude-3-haiku"
             )
@@ -158,7 +158,7 @@ async def main():
     client = AsyncOpenRouterClient()
 
     try:
-        response = await client.chat.acompletions.create(
+        response = await client.chat.completions.create(
             messages=[{"role": "user", "content": "Hello, how are you?"}],
             model="anthropic/claude-3-haiku"
         )
@@ -200,7 +200,7 @@ client = AsyncOpenRouterClient(api_key="your-openrouter-api-key")
 
 async def use_async_client():
     async with client:
-        response = await client.models.alist_models()
+        response = await client.models.list_models()
         print(response)
 
 asyncio.run(use_async_client())
@@ -216,7 +216,7 @@ The `chat` resource is used to generate chat-based completions. Use the `complet
 
 ```python
 # Async
-response = await client.chat.acompletions.create(
+response = await client.chat.completions.create(
     messages=[{"role": "user", "content": "Hello!"}],
     model="anthropic/claude-3-haiku",
     temperature=0.7
@@ -236,7 +236,7 @@ The `completions` resource is for legacy text completions with a direct `create(
 
 ```python
 # Async
-response = await client.acompletions.create(
+response = await client.completions.create(
     prompt="Write a haiku about programming",
     model="anthropic/claude-3-haiku"
 )
@@ -254,7 +254,7 @@ Create embeddings for text using the `embeddings` resource.
 
 ```python
 # Async
-response = await client.aembeddings.create(
+response = await client.embeddings.create(
     input="Hello, world!",
     model="openai/text-embedding-3-small"
 )
@@ -272,13 +272,13 @@ List available models and their properties.
 
 ```python
 # Async: List all models
-models = await client.models.alist_models()
+models = await client.models.list_models()
 
 # Sync: List models by category
 ai_models = client.models.list_models(category=["programming", "technology"])
 
 # Async: Count models
-count = await client.models.acount()
+count = await client.models.count()
 
 # Sync: Count models
 count = client.models.count()
@@ -290,7 +290,7 @@ Check your remaining credits and usage.
 
 ```python
 # Async
-credits_data = await client.credits.asummary()
+credits_data = await client.credits.summary()
 print(f"Credits remaining: {credits_data.get('credits', 'N/A')}")
 
 # Sync
@@ -304,7 +304,7 @@ Retrieve metadata for a specific generation.
 
 ```python
 # Async
-metadata = await client.generations.aretrieve(id="gen-1234567890")
+metadata = await client.generations.retrieve(id="gen-1234567890")
 
 # Sync
 metadata = client.generations.retrieve(id="gen-1234567890")
@@ -316,7 +316,7 @@ List all available providers.
 
 ```python
 # Async
-providers = await client.providers.alist_providers()
+providers = await client.providers.list_providers()
 
 # Sync
 providers = client.providers.list_providers()
@@ -328,7 +328,7 @@ Get the supported parameters for a specific model.
 
 ```python
 # Async
-params = await client.parameters.alist_supported(author="openai", slug="gpt-4")
+params = await client.parameters.list_supported(author="openai", slug="gpt-4")
 
 # Sync
 params = client.parameters.list_supported(author="openai", slug="gpt-4")
@@ -358,7 +358,7 @@ from src.utilities.openrouter.exceptions import AuthenticationError, RateLimitEr
 async def error_handling_example():
     client = AsyncOpenRouterClient(api_key="invalid-key")
     try:
-        await client.chat.acompletions.create(messages=[{"role": "user", "content": "Hello!"}])
+        await client.chat.completions.create(messages=[{"role": "user", "content": "Hello!"}])
     except AuthenticationError:
         print("Authentication failed: Please check your API key.")
     except RateLimitError:

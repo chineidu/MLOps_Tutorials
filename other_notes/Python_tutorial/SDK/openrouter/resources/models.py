@@ -94,7 +94,7 @@ class ModelsAsyncResource:
     def __init__(self, client: ChatResourceClient) -> None:
         self.client: ChatResourceClient = _validate_client(client)
 
-    async def acount(self) -> dict[str, Any]:
+    async def count(self) -> dict[str, Any]:
         """Asynchronously count available models from OpenRouter API."""
         base_url: str = _validate_base_url_attribute(self.client)
         path: str = f"{base_url}/{OpenRouterClientPaths.MODEL_COUNT.value}"
@@ -104,7 +104,7 @@ class ModelsAsyncResource:
 
         return await async_client._arequest(RequestMethods.GET, path)
 
-    async def alist_models(
+    async def list_models(
         self,
         category: list[CategoryTypes] | None = None,
         supported_parameters: list[SupportedParameters] | None = None,
