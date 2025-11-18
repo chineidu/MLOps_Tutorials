@@ -142,7 +142,5 @@ class AsyncOpenRouterClient:
 
     async def _arequest(self, method: RequestMethods, path: str, **kwargs: Any) -> Any:
         """Internal method to make asynchronous HTTP requests."""
-        async with self._client as client:
-            response = await client.request(method, path, **kwargs)
-
+        response = await self._client.request(method, path, **kwargs)
         return _validate_response(self, response)
