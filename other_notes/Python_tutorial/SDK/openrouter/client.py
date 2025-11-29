@@ -1,7 +1,6 @@
 from typing import Any
 
 import httpx
-
 from src.utilities.model_config import RemoteModel
 from src.utilities.openrouter.types import OpenRouterClientPaths, RequestMethods
 from src.utilities.openrouter.utils import _validate_response, get_openrouter_api_keys
