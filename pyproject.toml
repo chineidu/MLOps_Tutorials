@@ -27,6 +27,8 @@ dependencies = [
 [dependency-groups]
 dev = [
     "jupyter>=1.1.1",
+    "jupyterlab>=4.4.5",
     "nb-black-formatter>=1.0.1",
     "pandas>=2.3.1",
+    "pyrefly>=0.46.0",
 ]

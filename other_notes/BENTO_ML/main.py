@@ -4,12 +4,12 @@ from typing import Literal
 import polars as pl
 from omegaconf import DictConfig, OmegaConf
 from pydantic import BaseModel, Field
+from sklearn.pipeline import Pipeline
+from utils import load_model
 
 pl.Config.set_fmt_str_lengths(1_000)
 pl.Config.set_tbl_cols(n=1_000)
 
-from sklearn.pipeline import Pipeline
-from utils import load_model
 
 root: Path = Path(__file__).absolute().parent
 config: DictConfig = OmegaConf.load(f"{root}/params.yaml")
