@@ -17,6 +17,7 @@ with proper handling of function signatures, docstrings, and various use cases.
     - [TEMPLATE 2B: Async Decorator with Arguments handles sync/async functions](#template-2b-async-decorator-with-arguments-handles-syncasync-functions)
     - [TEMPLATE 3: Flexible Decorator with or without arguments](#template-3-flexible-decorator-with-or-without-arguments)
     - [TEMPLATE 4: Class-based Decorator](#template-4-class-based-decorator)
+  - [EXAMPLE](#example)
   - [PRACTICAL EXAMPLES](#practical-examples)
 
 <!-- /TOC -->
@@ -195,6 +196,138 @@ class ClassDecorator:
             return result
 
         return wrapper
+
+```
+
+## EXAMPLE
+
+```py
+import asyncio
+import logging
+import time
+from functools import wraps
+from typing import Any, Awaitable, Callable, ParamSpec, TypeVar, overload
+
+logger = logging.getLogger("utilities.timeit")
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+# Separate type vars for sync and async functions
+SyncFunc = TypeVar("SyncFunc", bound=Callable[..., Any])
+AsyncFunc = TypeVar("AsyncFunc", bound=Callable[..., Awaitable[Any]])
+
+
+
+@overload
+def timeit(
+    func: SyncFunc,
+    *,
+    name: str | None = None,
+) -> SyncFunc: ...
+
+
+@overload
+def timeit(
+    func: AsyncFunc,
+    *,
+    name: str | None = None,
+) -> AsyncFunc: ...
+
+
+@overload
+def timeit(
+    func: None = None,
+    *,
+    name: str | None = None,
+) -> Callable[[SyncFunc], SyncFunc]: ...
+
+
+def timeit(
+    func: Callable[..., Any] | None = None,
+    *,
+    name: str | None = None,
+) -> Any:
+    """Decorator to measure and log the execution time of asynchronous functions.
+
+    Parameters
+    ----------
+    name : str | None, optional
+        The name to use in the log message. If not provided, defaults to the function's __name__.
+
+    Returns
+    -------
+    Callable
+        The decorated function with execution time logging.
+    """
+
+    def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
+        if asyncio.iscoroutinefunction(f):
+
+            @wraps(f)
+            async def awrapper(*args: Any, **kwargs: Any) -> Any:
+                start_time = time.perf_counter()
+                # Execute the original asynchronous function
+                result = await f(*args, **kwargs)
+                end_time = time.perf_counter()
+                elapsed_time = end_time - start_time
+                func_name = name or f.__name__
+                logger.info(f"Function '{func_name}' executed in {elapsed_time:.4f} seconds.")
+                return result
+
+            return awrapper
+
+        @wraps(f)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            start_time = time.perf_counter()
+            # Execute the original synchronous function
+            result = f(*args, **kwargs)
+            end_time = time.perf_counter()
+            elapsed_time = end_time - start_time
+            func_name = name or f.__name__
+            logger.info(f"Function '{func_name}' executed in {elapsed_time:.4f} seconds.")
+            return result
+
+        return wrapper
+
+    # Called with parameters
+    if not func:
+        return decorator
+
+    # Called without parameters
+    return decorator(func)
+
+
+# ---- Example usage ----
+
+@timeit(name="custom_async_function")
+async def example_async_function(delay: float) -> str:
+    """Example asynchronous function that simulates a delay."""
+    await asyncio.sleep(delay)
+    return "Completed"
+
+
+@timeit(name="custom_sync_function")
+def example_sync_function(delay: float) -> str:
+    """Example synchronous function that simulates a delay."""
+    time.sleep(delay)
+    return "Completed"
+
+
+# To test the decorators, you can run the following code:
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
+    async def test_async():
+        result = await example_async_function(1.5)
+        print(result)
+
+    def test_sync():
+        result = example_sync_function(2.0)
+        print(result)
+
+    asyncio.run(test_async())
+    test_sync()
 
 ```
 
