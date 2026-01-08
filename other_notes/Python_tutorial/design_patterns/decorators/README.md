@@ -14,6 +14,7 @@ with proper handling of function signatures, docstrings, and various use cases.
   - [Templates](#templates)
     - [TEMPLATE 1: Basic Decorator no arguments](#template-1-basic-decorator-no-arguments)
     - [TEMPLATE 2: Decorator with Arguments](#template-2-decorator-with-arguments)
+    - [TEMPLATE 2B: Async Decorator with Arguments handles sync/async functions](#template-2b-async-decorator-with-arguments-handles-syncasync-functions)
     - [TEMPLATE 3: Flexible Decorator with or without arguments](#template-3-flexible-decorator-with-or-without-arguments)
     - [TEMPLATE 4: Class-based Decorator](#template-4-class-based-decorator)
   - [PRACTICAL EXAMPLES](#practical-examples)
@@ -95,6 +96,45 @@ def decorator_with_args(arg1: str, arg2: int = 10) -> Callable[[Callable[P, R]],
 
     return decorator
 
+```
+
+### TEMPLATE 2B: Async Decorator with Arguments (handles sync/async functions)
+
+```py
+def async_decorator_with_args(arg1: str, arg2: int = 10) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    """
+    Decorator template for async functions that accepts arguments.
+    Can handle both sync and async functions automatically.
+    
+    Usage:
+        @async_decorator_with_args("test", arg2=5)
+        async def my_async_function():
+            pass
+        
+        @async_decorator_with_args("test")
+        def my_sync_function():
+            pass
+    """
+    import asyncio
+    from inspect import iscoroutinefunction
+    
+    def decorator(func: Callable[P, R]) -> Callable[P, R]:
+        if iscoroutinefunction(func):
+            @wraps(func)
+            async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+                print(f"Async decorator args: {arg1}, {arg2}")
+                result = await func(*args, **kwargs)
+                return result
+            return async_wrapper  # type: ignore
+        else:
+            @wraps(func)
+            def sync_wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+                print(f"Sync decorator args: {arg1}, {arg2}")
+                result = func(*args, **kwargs)
+                return result
+            return sync_wrapper  # type: ignore
+    
+    return decorator
 ```
 
 ### TEMPLATE 3: Flexible Decorator (with or without arguments)
