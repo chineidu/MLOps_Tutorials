@@ -99,6 +99,7 @@ class AioHTTPClient:
         if not self.session:
             return {"success": False, "error": "Session not initialized", "data": None}
         try:
+            url = self._get_url(url)
             async with self.session.get(url, params=params, headers=headers) as response:
                 # Try to parse JSON response
                 try:
@@ -170,6 +171,7 @@ class AioHTTPClient:
         if not self.session:
             return {"success": False, "error": "Session not initialized", "data": None}
         try:
+            url = self._get_url(url)
             async with self.session.post(url, data=data, json=json_data, headers=headers) as response:
                 try:
                     response_data = await response.json()
@@ -190,6 +192,12 @@ class AioHTTPClient:
             return {"success": False, "error": "Request timeout", "data": None}
         except Exception as e:
             return {"success": False, "error": f"Unexpected error: {e}", "data": None}
+
+    def _get_url(self, url: str) -> str:
+        """Get the full URL of the client."""
+        if self.base_url and not url.startswith(("http://", "https://")):
+            return self.base_url + url
+        return url
 
 
 # ============================================================================
@@ -292,6 +300,7 @@ class HTTPXClient:
             return {"success": False, "error": "Client not initialized", "data": None}
 
         try:
+            url = self._get_url(url)
             response = await self.client.get(url, params=params, headers=headers)
 
             # Try to parse JSON response
@@ -366,6 +375,7 @@ class HTTPXClient:
         if not self.client:
             return {"success": False, "error": "Client not initialized", "data": None}
         try:
+            url = self._get_url(url)
             response = await self.client.post(url, data=data, json=json_data, headers=headers)
 
             try:
@@ -390,7 +400,11 @@ class HTTPXClient:
         except Exception as e:
             return {"success": False, "error": f"Unexpected error: {e}", "data": None}
 
-
+    def _get_url(self, url: str) -> str:
+        """Get the full URL of the client."""
+        if self.base_url and not url.startswith(("http://", "https://")):
+            return self.base_url + url
+        return url
 # ============================================================================
 # USAGE EXAMPLES
 # ============================================================================
