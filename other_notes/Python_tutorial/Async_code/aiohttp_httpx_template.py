@@ -63,16 +63,38 @@ class AioHTTPClient:
     async def get(
         self, url: str, params: dict[str, Any] | None = None, headers: dict[str, str] | None = None
     ) -> dict[str, Any]:
-        """
-        Make GET request with error handling
+        """Make an asynchronous GET request with consistent error handling and response formatting.
 
-        Args:
-            url: Endpoint URL
-            params: Query parameters
-            headers: Request headers
+        This method performs an HTTP GET request using the internal httpx client and returns
+        a standardized dictionary containing success status, HTTP status code, parsed response
+        data (JSON if possible, otherwise raw text), response headers, and any error message.
 
-        Returns:
-            Dictionary with 'success', 'data', 'status', 'error' keys
+        Parameters
+        ----------
+        url : str
+            The target URL for the GET request.
+        params : dict[str, Any] or None, optional
+            Query parameters to include in the URL (default: None).
+        headers : dict[str, str] or None, optional
+            Custom HTTP headers to send with the request (default: None).
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with the following keys:
+
+            - success : bool
+                True if the request completed with status code < 400, False otherwise.
+            - status : int
+                The HTTP status code returned by the server.
+            - data : dict or str or None
+                Parsed JSON response if content-type is JSON and parsing succeeded,
+                otherwise the raw response text, or None in case of connection-level errors.
+            - headers : dict[str, str]
+                The response headers as a dictionary.
+            - error : str or None
+                Error message if the request failed (connection error, timeout, HTTP error, etc.),
+                or None if the request was successful.
         """
         if not self.session:
             return {"success": False, "error": "Session not initialized", "data": None}
@@ -106,17 +128,44 @@ class AioHTTPClient:
         json_data: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
     ) -> dict[str, Any]:
-        """
-        Make POST request with error handling
+        """Make an asynchronous POST request with consistent error handling and response formatting.
 
-        Args:
-            url: Endpoint URL
-            data: Form data
-            json_data: JSON payload
-            headers: Request headers
+        This method performs an HTTP POST request using the internal httpx client. It supports
+        sending either form-encoded data (`data`) or JSON payload (`json_data`), and returns
+        a standardized dictionary with success status, HTTP status code, parsed response data,
+        response headers, and any error message.
 
-        Returns:
-            Dictionary with 'success', 'data', 'status', 'error' keys
+        Parameters
+        ----------
+        url : str
+            The target URL/endpoint for the POST request.
+        data : dict[str, Any] or None, optional
+            Form-encoded data to send in the request body (e.g., for multipart/form-data or
+            application/x-www-form-urlencoded). Mutually exclusive with `json_data` in most
+            use cases (default: None).
+        json_data : dict[str, Any] or None, optional
+            JSON-serializable data to send as the request body (sets Content-Type: application/json
+            automatically). Mutually exclusive with `data` in most use cases (default: None).
+        headers : dict[str, str] or None, optional
+            Custom HTTP headers to include in the request (default: None).
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with the following keys:
+
+            - success : bool
+                True if the request completed with status code < 400, False otherwise.
+            - status : int
+                The HTTP status code returned by the server.
+            - data : dict or str or None
+                Parsed JSON response if the content-type is JSON and parsing succeeded,
+                otherwise the raw response text, or None in case of connection-level errors.
+            - headers : dict[str, str]
+                The response headers as a dictionary.
+            - error : str or None
+                Error message if the request failed (connection error, timeout, HTTP error, etc.),
+                or None if the request was successful.
         """
         if not self.session:
             return {"success": False, "error": "Session not initialized", "data": None}
@@ -206,16 +255,38 @@ class HTTPXClient:
     async def get(
         self, url: str, params: dict[str, Any] | None = None, headers: dict[str, str] | None = None
     ) -> dict[str, Any]:
-        """
-        Make GET request with error handling
+        """Make an asynchronous GET request with consistent error handling and response formatting.
 
-        Args:
-            url: Endpoint URL
-            params: Query parameters
-            headers: Request headers
+        This method performs an HTTP GET request using the internal httpx client and returns
+        a standardized dictionary containing success status, HTTP status code, parsed response
+        data (JSON if possible, otherwise raw text), response headers, and any error message.
 
-        Returns:
-            Dictionary with 'success', 'data', 'status', 'error' keys
+        Parameters
+        ----------
+        url : str
+            The target URL for the GET request.
+        params : dict[str, Any] or None, optional
+            Query parameters to include in the URL (default: None).
+        headers : dict[str, str] or None, optional
+            Custom HTTP headers to send with the request (default: None).
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with the following keys:
+
+            - success : bool
+                True if the request completed with status code < 400, False otherwise.
+            - status : int
+                The HTTP status code returned by the server.
+            - data : dict or str or None
+                Parsed JSON response if content-type is JSON and parsing succeeded,
+                otherwise the raw response text, or None in case of connection-level errors.
+            - headers : dict[str, str]
+                The response headers as a dictionary.
+            - error : str or None
+                Error message if the request failed (connection error, timeout, HTTP error, etc.),
+                or None if the request was successful.
         """
         if not self.client:
             return {"success": False, "error": "Client not initialized", "data": None}
@@ -253,17 +324,44 @@ class HTTPXClient:
         json_data: dict[str, Any] | None = None,
         headers: dict[str, str] | None = None,
     ) -> dict[str, Any]:
-        """
-        Make POST request with error handling
+        """Make an asynchronous POST request with consistent error handling and response formatting.
 
-        Args:
-            url: Endpoint URL
-            data: Form data
-            json_data: JSON payload
-            headers: Request headers
+        This method performs an HTTP POST request using the internal httpx client. It supports
+        sending either form-encoded data (`data`) or JSON payload (`json_data`), and returns
+        a standardized dictionary with success status, HTTP status code, parsed response data,
+        response headers, and any error message.
 
-        Returns:
-            Dictionary with 'success', 'data', 'status', 'error' keys
+        Parameters
+        ----------
+        url : str
+            The target URL/endpoint for the POST request.
+        data : dict[str, Any] or None, optional
+            Form-encoded data to send in the request body (e.g., for multipart/form-data or
+            application/x-www-form-urlencoded). Mutually exclusive with `json_data` in most
+            use cases (default: None).
+        json_data : dict[str, Any] or None, optional
+            JSON-serializable data to send as the request body (sets Content-Type: application/json
+            automatically). Mutually exclusive with `data` in most use cases (default: None).
+        headers : dict[str, str] or None, optional
+            Custom HTTP headers to include in the request (default: None).
+
+        Returns
+        -------
+        dict[str, Any]
+            A dictionary with the following keys:
+
+            - success : bool
+                True if the request completed with status code < 400, False otherwise.
+            - status : int
+                The HTTP status code returned by the server.
+            - data : dict or str or None
+                Parsed JSON response if the content-type is JSON and parsing succeeded,
+                otherwise the raw response text, or None in case of connection-level errors.
+            - headers : dict[str, str]
+                The response headers as a dictionary.
+            - error : str or None
+                Error message if the request failed (connection error, timeout, HTTP error, etc.),
+                or None if the request was successful.
         """
         if not self.client:
             return {"success": False, "error": "Client not initialized", "data": None}
