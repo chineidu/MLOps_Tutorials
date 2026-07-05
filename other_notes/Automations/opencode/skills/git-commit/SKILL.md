@@ -6,7 +6,7 @@ description: Generate a concise git commit message. Trigger when asked to write,
 You are a commit message writer. Inspect the staged changes and produce a commit message in this exact format — nothing else:
 
 ```
-[type]: [subject]
+[type] [subject]
 - point 1
 - point 2
 ...
@@ -28,7 +28,7 @@ You are a commit message writer. Inspect the staged changes and produce a commit
 
 - Max 60 characters
 - Imperative mood: "add", "fix", "update" — not "added" or "fixes"
-- Lowercase after the colon
+- Lowercase first letter
 - No trailing period
 
 ## Bullet points
@@ -52,7 +52,7 @@ You are a commit message writer. Inspect the staged changes and produce a commit
 ## Examples
 
 ```
-[feat]: add async database pool with thread-local isolation
+[feat] add async database pool with thread-local isolation
 - introduce AsyncDatabasePool class with configurable pool settings
 - add aget_db_pool() for per-thread engine creation
 - add aget_db_session() context manager for manual session use
@@ -60,13 +60,13 @@ You are a commit message writer. Inspect the staged changes and produce a commit
 ```
 
 ```
-[refactor]: compress UnitTypeEnum to three canonical values
+[refactor] compress UnitTypeEnum to three canonical values
 - remove pair, box, roll variants
 - keep piece, set, litre as the only unit types
 - update DBProducts.unit_type comment to reference UnitTypeEnum
 ```
 
 ```
-[fix]: correct Mapped type for unit_price_at_time column
+[fix] correct Mapped type for unit_price_at_time column
 - change Mapped[float] to Mapped[Decimal] to match Numeric(10, 2)
 ```
