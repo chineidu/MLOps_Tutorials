@@ -16,7 +16,8 @@ opencode/
 │   ├── opencode.jsonc           # Project-level config (from ~/.config/opencode/)
 │   └── config.json              # User-level config (from ~/.config/opencode/)
 ├── agents/
-│   └── (empty - no global agents configured)
+│   ├── ask-only.md               # Read-only codebase Q&A agent
+│   └── research.md               # External docs & dependency research agent
 └── skills/
     ├── git-commit/
     │   └── SKILL.md             # Git commit message skill
@@ -51,6 +52,113 @@ tools: [read, write, edit, bash, ...]  # optional, defaults to all
 ---
 # Agent instructions/prompt
 ```
+
+---
+
+## Using Subagents
+
+Subagents are specialized agents that handle focused tasks autonomously. They run in the background and return results when complete.
+
+### Built-in Subagents
+
+| Agent | Description | Permissions |
+|-------|-------------|-------------|
+| `@ask-only` | Read-only codebase Q&A | No edit, bash, or file writes |
+| `@research` | External docs & dependency research | Read-only + can access external dirs |
+
+### How to Invoke
+
+**Automatic dispatch** — the main agent decides which subagent to use based on your request:
+
+```
+You: "How does the auth module work?"
+→ opencode auto-selects @ask-only
+```
+
+**Explicit dispatch** — reference the agent directly:
+
+```
+You: "Use @ask-only to explain the database schema"
+```
+
+**Via the task tool** — the main agent spawns a subagent programmatically:
+
+```
+You: "Research how FastAPI handles dependency injection"
+→ main agent dispatches @research with a detailed prompt
+```
+
+### Concrete Examples
+
+#### Codebase Q&A with `@ask-only`
+
+```
+You: "What does the calculate_metrics function do?"
+
+@ask-only: [reads src/metrics.py, searches for usages]
+→ "calculate_metrics takes a DataFrame and returns precision, recall, and
+   F1 score. It filters out NaN values before computing. Used in
+   src/training/evaluate.py:42 and src/api/routes.py:18."
+```
+
+#### Dependency Research with `@research`
+
+```
+You: "How does SQLAlchemy 2.0 handle async sessions differently from 1.4?"
+
+@research: [clones sqlalchemy repo, inspects source, reads docs]
+→ "In 2.4, AsyncSession uses a separate connection pool...
+   [returns with file paths to source evidence]"
+```
+
+#### Parallel Research
+
+The main agent can dispatch multiple subagents simultaneously:
+
+```
+You: "Compare uv vs poetry for this project"
+
+Main agent dispatches:
+  ├─ @research: "Research uv's dependency resolution algorithm"
+  └─ @research: "Research poetry's lock file format and resolution"
+→ Results merged into a comparison table
+```
+
+### Creating Custom Subagents
+
+See [creating-agents.md](docs/creating-agents.md) for a full walkthrough.
+
+Minimal template:
+
+```markdown
+---
+description: One-line trigger for when to use this agent
+mode: subagent
+permission:
+  edit: deny
+  bash: deny
+  task: deny
+  todowrite: deny
+  external_directory: deny
+---
+
+You are a [role]. Your purpose is to [goal].
+
+Use this agent when asked to:
+- [trigger 1]
+- [trigger 2]
+```
+
+### Permission Reference
+
+| Permission | `allow` | `deny` |
+|------------|---------|--------|
+| `edit` | Can write/modify files | Read-only |
+| `bash` | Can run shell commands | No command execution |
+| `task` | Can spawn its own subagents | Cannot delegate further |
+| `todowrite` | Can manage task lists | No task tracking |
+| `external_directory` | Can access dirs outside workspace | Restricted to workspace |
+| `doom_loop` | Can retry failing operations | Stops on failure |
 
 ---
 
