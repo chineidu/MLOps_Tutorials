@@ -148,6 +148,31 @@ Examples:
 
 ---
 
+## Workflow Modes
+
+### Responses
+- Keep responses concise unless the user asks for more detail
+
+### Planning Mode
+- Always ask clarifying questions before proposing a plan
+- Never assume design choices, libraries, or approach — confirm with the user
+- Use sub-agents for research/deep-dives on unfamiliar parts of the codebase before presenting a plan
+- Use sub-agents to review different aspects of the plan (e.g. test coverage, type safety, architecture fit) before presenting it to the user
+
+### Edit Mode
+- Prefer sub-agents for implementation; act as coordinator rather than implementing directly, except for trivial single-file changes
+- Identify independent parts of the plan and dispatch them to sub-agents in parallel where safe to do so
+- Flag any sub-agent work that touches files outside the plan's stated scope
+- After each sub-agent completes, run the relevant checks from Common Commands (`uv run ruff check .`, `uv run ty check`, `uv run pytest`) before considering the task done
+- If checks fail, attempt one fix pass; if still failing, stop and report to the user rather than looping
+- Never commit or push without explicit user confirmation, even after all checks pass
+
+### Model Selection
+- For complex implementation tasks, use a stronger model available in this environment (e.g. GLM-5.2, Qwen3.7 Max, DeepSeek V4 Pro)
+- For simple tasks (docs, formatting, boilerplate), use a cheaper/faster model (e.g. DeepSeek V4 Flash, MiniMax M3) to conserve usage limits
+
+---
+
 ## Important Constraints
 
 - **No `print()` in library code** — use `logging` with the module-level logger (`logger = create_logger(name=__name__)`)
