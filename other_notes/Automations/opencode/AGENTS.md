@@ -62,6 +62,7 @@ Run these before committing. All checks must pass.
 - **Type checker:** ty (`uv run ty check`) — fix all errors before committing; do not use `# type: ignore` without a comment explaining why
 - **Docstrings:** NumPy style for public APIs; omit for private helpers unless complex
 - **Line length:** 100 characters
+- **String formatting:** Always use f-strings (`f"..."`). Never use `%`-formatting, `.format()`, or string concatenation with `+` for log messages or any other strings, unless the user explicitly specifies otherwise or there is a genuine technical need (e.g., lazy evaluation in `logging.debug()` with `%s`, or deferred-interpolation template strings where the template is defined in one place and interpolated later with `.format()`).
 
 ### Naming Conventions
 
@@ -69,6 +70,12 @@ Run these before committing. All checks must pass.
 - Classes: `PascalCase`
 - Constants: `UPPER_SNAKE_CASE`
 - Private members: `_single_leading_underscore`
+
+### String Formatting
+
+- **Always use f-strings** (`f"..."`). Never use `%`-formatting, `.format()`, or string concatenation with `+` for log messages or any other strings.
+- **Exception:** Lazy evaluation in `logging.debug()`/`logger.debug()` calls — use `%s` placeholders so the string is only formatted when the log level is enabled (e.g., `logger.debug("Processing %s items", count)`).
+- **Exception:** Deferred-interpolation template strings where the template is defined in one place and interpolated later with `.format()`.
 
 ---
 
