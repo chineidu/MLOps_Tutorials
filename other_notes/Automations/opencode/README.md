@@ -15,6 +15,8 @@ opencode/
 ├── configs/
 │   ├── opencode.jsonc           # Project-level config (from ~/.config/opencode/)
 │   └── config.json              # User-level config (from ~/.config/opencode/)
+├── command/
+│   └── commit.md               # `/commit` slash command: stage all + commit with generated message
 ├── agents/
 │   ├── ask-only.md               # Read-only codebase Q&A agent
 │   └── research.md               # External docs & dependency research agent
@@ -194,12 +196,46 @@ description: When to use this skill
 
 ---
 
+## What is a Command?
+
+A **command** (or slash command) in opencode is a custom shortcut triggered via `/commandname` in the chat. Commands allow you to:
+
+- Execute multi-step workflows with a single short invocation
+- Combine skills, agents, and shell commands into repeatable routines
+- Define them globally (`~/.config/opencode/command/`) or per-project (`.opencode/command/`)
+
+### Available Commands
+
+| Command | File | Description |
+|---------|------|-------------|
+| `/commit` | `command/commit.md` | Stage all changes (`git add -A`), load the `git-commit` skill to generate a message, show the proposed message, then commit. Optional arguments are treated as extra context for the message. |
+
+### `/commit` Usage
+
+```
+/commit                                   # Stage all + generate message from diff
+/commit fix the login redirect bug        # Same, but with extra context for the message
+```
+
+The command:
+1. Runs `git status` to inspect the working tree
+2. Stages everything with `git add -A`
+3. Inspects the staged diff
+4. Loads the `git-commit` skill to produce a conventional commit message
+5. Shows the message to the user, then commits
+6. Prints the commit hash and summary
+
+**Constraint:** Does not push, amend, or force-push. If a pre-commit hook fails, it reports and stops.
+
+---
+
 ## Quick Reference
 
 | Concept | Purpose | Scope |
 |---------|---------|-------|
 | **Agent** | Specialized AI persona for tasks | Global or Project |
 | **Skill** | Reusable knowledge/capability | Global, Project, or Built-in |
+| **Command** | Custom slash command for multi-step workflows | Global (`~/.config/opencode/command/`) or Project (`.opencode/command/`) |
 | **Config** | Tool permissions, LSP settings | Global (`config.json`) or Project (`opencode.jsonc`) |
 
 ---
