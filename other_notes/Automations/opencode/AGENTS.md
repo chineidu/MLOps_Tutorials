@@ -59,8 +59,9 @@ Run these before committing. All checks must pass.
 
 - **Formatter:** Ruff (`ruff format`) — do not manually adjust whitespace or imports
 - **Linter:** Ruff (`ruff check`) — fix all warnings before committing
-- **Type checker:** ty (`uv run ty check`) — fix all errors before committing; do not use `# type: ignore` without a comment explaining why
+- **Type checker:** ty (`uv run ty check`) — fix all errors before committing; do not use `# type: ignore` without a comment explaining why. Applies to `src/`, `tests/`, and `scripts/` — no directory is excluded from type checking.
 - **Docstrings:** NumPy style for public APIs; omit for private helpers unless complex
+- **Docstrings in tests:** Not required — test method names are descriptive enough. Docstring linting rules (D100–D104) are ignored for `tests/`.
 - **Line length:** 100 characters
 - **String formatting:** Always use f-strings (`f"..."`). Never use `%`-formatting, `.format()`, or string concatenation with `+` for log messages or any other strings, unless the user explicitly specifies otherwise or there is a genuine technical need (e.g., lazy evaluation in `logging.debug()` with `%s`, or deferred-interpolation template strings where the template is defined in one place and interpolated later with `.format()`).
 
