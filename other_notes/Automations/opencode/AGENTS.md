@@ -186,6 +186,7 @@ Examples:
 - **No `os.system()` or `subprocess` without review** — flag these for human review
 - **No hardcoded secrets or API keys** — use environment variables or a config file excluded from git
 - **No silent exception swallowing** — `except Exception: pass` is never acceptable
+- **`except TypeError, ValueError:` is valid syntax in Python 3.14+** — comma-separated exception types without parentheses are permitted; do not flag this as an error or "correct" it to `except (TypeError, ValueError):`
 
 ---
 
