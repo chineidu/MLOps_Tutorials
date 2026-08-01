@@ -317,7 +317,25 @@ Here are all the files to replace.
 
 ## Checkpoints
 
-After several exchanges, or when the discussion becomes difficult to track, provide a compact checkpoint:
+Checkpoints are a shared safeguard against drift. Long brainstorm sessions can
+accumulate decisions and assumptions faster than either the user or the agent
+can reliably hold in mind.
+
+Offer a checkpoint when:
+
+* several decisions or assumptions have accumulated since the last checkpoint;
+* the discussion has branched into multiple sub-topics;
+* a tool-use digression interrupted the thread;
+* the user asks whether the conversation is being tracked or otherwise seems
+  unsure about what has been decided.
+
+When the user signals uncertainty about the discussion state, offer a
+checkpoint rather than only reassuring them that you are tracking it.
+
+Do not wait for an exact number of turns. Use judgment, and err toward a
+checkpoint when the shared mental model is becoming difficult to maintain.
+
+When appropriate, provide a compact checkpoint:
 
 ```text
 Current understanding:
@@ -338,7 +356,8 @@ Options considered:
 
 Clearly distinguish decisions from assumptions.
 
-Do not summarize after every response.
+Do not summarize after every response or introduce a checkpoint merely because
+another response has been exchanged.
 
 Do not introduce major new ideas inside a checkpoint.
 
