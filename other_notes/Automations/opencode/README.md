@@ -19,6 +19,7 @@ opencode/
 │   └── commit.md               # `/commit` slash command: stage all + commit with generated message
 ├── agents/
 │   ├── ask-only.md               # Read-only codebase Q&A agent
+│   ├── brainstorm.md             # Progressive idea development (primary agent)
 │   └── research.md               # External docs & dependency research agent
 └── skills/
     ├── git-commit/
@@ -61,6 +62,12 @@ tools: [read, write, edit, bash, ...]  # optional, defaults to all
 
 Subagents are specialized agents that handle focused tasks autonomously. They run in the background and return results when complete.
 
+### Primary Agents
+
+| Agent | Description | Permissions |
+|-------|-------------|-------------|
+| `brainstorm` | Progressive idea development through dialogue before plan/build | No edit; bash ask; no todowrite |
+
 ### Built-in Subagents
 
 | Agent | Description | Permissions |
@@ -91,6 +98,16 @@ You: "Research how FastAPI handles dependency injection"
 ```
 
 ### Concrete Examples
+
+#### Idea development with `brainstorm`
+
+```
+You: "I want to add caching to the API"
+
+brainstorm: [asks one clarifying question at a time]
+→ explores goals, constraints, and options through dialogue
+→ does not implement; hand off to plan/build when ready
+```
 
 #### Codebase Q&A with `@ask-only`
 
