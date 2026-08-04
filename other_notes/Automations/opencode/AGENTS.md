@@ -59,9 +59,8 @@ Run these before committing. All checks must pass.
 
 - **Formatter:** Ruff (`ruff format`) — do not manually adjust whitespace or imports
 - **Linter:** Ruff (`ruff check`) — fix all warnings before committing
-- **Type checker:** ty (`uv run ty check`) — fix all errors before committing; do not use `# type: ignore` without a comment explaining why. Applies to `src/`, `tests/`, and `scripts/` — no directory is excluded from type checking.
+- **Type checker:** ty (`uv run ty check`) — fix all errors before committing; do not use `# type: ignore` without a comment explaining why
 - **Docstrings:** NumPy style for public APIs; omit for private helpers unless complex
-- **Docstrings in tests:** Not required — test method names are descriptive enough. Docstring linting rules (D100–D104) are ignored for `tests/`.
 - **Line length:** 100 characters
 - **String formatting:** Always use f-strings (`f"..."`). Never use `%`-formatting, `.format()`, or string concatenation with `+` for log messages or any other strings, unless the user explicitly specifies otherwise or there is a genuine technical need (e.g., lazy evaluation in `logging.debug()` with `%s`, or deferred-interpolation template strings where the template is defined in one place and interpolated later with `.format()`).
 
@@ -71,6 +70,12 @@ Run these before committing. All checks must pass.
 - Classes: `PascalCase`
 - Constants: `UPPER_SNAKE_CASE`
 - Private members: `_single_leading_underscore`
+
+### Enums over raw strings
+
+- **Favour `StrEnum` over raw string literals** for any fixed set of string values (statuses, metric names, window types, model names, etc.). Enforce validation at the code layer (e.g. via Pydantic schema fields or enum types); do not rely on DB-level constraints.
+- Define enums in `src/schemas/types.py` (or the closest shared types module) and reference `.value` when persisting to DB columns or emitting metric labels.
+- Use `StrEnum` (not plain `Enum` or `IntEnum`) so values serialize naturally as strings.
 
 ### String Formatting
 
@@ -127,6 +132,7 @@ The title line is a short summary (max 60 characters, imperative mood, lowercase
 Rules:
 - Do **not** add a colon after the type — use `[feat] add ...`, never `[feat]: add ...`
 - Do **not** collapse bullets into the title line with ` - detail` segments — use a real bulleted list
+- When executing `git commit -m`, paste the subject verbatim from your proposal — do not translate `[feat]` into `feat:`
 
 Examples:
 
@@ -187,7 +193,6 @@ Examples:
 - **No `os.system()` or `subprocess` without review** — flag these for human review
 - **No hardcoded secrets or API keys** — use environment variables or a config file excluded from git
 - **No silent exception swallowing** — `except Exception: pass` is never acceptable
-- **`except TypeError, ValueError:` is valid syntax in Python 3.14+** — comma-separated exception types without parentheses are permitted; do not flag this as an error or "correct" it to `except (TypeError, ValueError):`
 
 ---
 
