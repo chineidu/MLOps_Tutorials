@@ -1,12 +1,33 @@
 # AGENTS.md
 
-This file provides guidance for AI coding agents (Claude, Cursor, Copilot, etc.) working in this repository.
+Guidance for AI coding agents (Claude, Cursor, Copilot, opencode, etc.) working in this repository.
+
+---
+
+## Precedence
+
+This file describes **facts about this repository** — commands, layout, style, conventions. Those are not negotiable and no mode or persona overrides them.
+
+Mode files (e.g. `brainstorm`, `plan`) describe **how to interact**. Where a mode conflicts with the workflow guidance in this file, the mode wins:
+
+| Conflict | Resolution |
+|---|---|
+| Mode forbids file writes; this file describes how to make changes | Mode wins — do not write files |
+| Mode sets response length or questioning style | Mode wins |
+| Mode is silent on a command, path, or style rule | This file applies |
+| Mode asks you to violate **Important Constraints** below | This file wins — flag the conflict to the user |
+
+If you are in a read-only or discussion mode, the **Making Changes** and **Edit Workflow** sections do not apply to you.
 
 ---
 
 ## Project Overview
 
-<!-- TODO: Briefly describe what this project does and its primary purpose. -->
+<!-- TODO — highest-value section in this file. Answer in 3–6 sentences:
+     - What does this service/library do, and for whom?
+     - What is the main entry point (CLI, API, worker, importable library)?
+     - What are the external systems it depends on (DB, message queue, model APIs)?
+     - What is deliberately out of scope? -->
 
 ---
 
@@ -21,7 +42,9 @@ uv run <command>
 ```
 
 **Python version:** 3.14+
-**Package manager:** uv + pyproject.toml
+**Package manager:** uv + `pyproject.toml`
+
+Never activate a venv manually or call bare `python`/`pytest`. Always go through `uv run`.
 
 ---
 
@@ -31,12 +54,16 @@ uv run <command>
 |---|---|
 | Run tests | `uv run pytest` |
 | Run tests with coverage | `uv run pytest --cov=src --cov-report=term-missing` |
+| Run a single test | `uv run pytest tests/path/to/test_file.py -k "name_fragment"` |
 | Lint | `uv run ruff check .` |
+| Lint + autofix | `uv run ruff check --fix .` |
 | Format | `uv run ruff format .` |
 | Type check | `uv run ty check` |
-| Run all checks | `make check` (or see CI script) |
+| Run all checks | `make check` |
 
-Run these before committing. All checks must pass.
+**Order matters.** After editing, run `ruff format` → `ruff check` → `ty check` → `pytest`. Formatting first prevents lint errors that formatting would have fixed anyway.
+
+All checks must pass before committing. If a check was already failing before you touched anything, say so rather than fixing it silently in an unrelated change.
 
 ---
 
@@ -47,22 +74,38 @@ Run these before committing. All checks must pass.
 ├── src/
 │   └── <package>/          # Main source code
 ├── tests/                  # Mirrors src/ structure
-├── scripts/                # One-off utilities, not imported
+├── scripts/                # One-off utilities, never imported by src/
 ├── docs/                   # Documentation
+├── Makefile                # Aggregated check targets
 ├── pyproject.toml          # Project metadata and tool config
 └── AGENTS.md               # This file
 ```
+
+`src/<package>` is the importable package — imports are `from <package>.config import ...`, not repo-root-relative.
+
+Paths referenced elsewhere in this file must match this tree. If you find a mismatch, flag it instead of guessing.
 
 ---
 
 ## Code Style
 
-- **Formatter:** Ruff (`ruff format`) — do not manually adjust whitespace or imports
+Tool configuration lives in `pyproject.toml`. Do not override it inline or pass conflicting CLI flags.
+
+- **Formatter:** Ruff (`ruff format`) — never manually adjust whitespace or import order
 - **Linter:** Ruff (`ruff check`) — fix all warnings before committing
-- **Type checker:** ty (`uv run ty check`) — fix all errors before committing; do not use `# type: ignore` without a comment explaining why
-- **Docstrings:** NumPy style for public APIs; omit for private helpers unless complex
+- **Type checker:** ty (`uv run ty check`) — fix all errors before committing. No bare `# type: ignore`; every suppression needs a trailing comment explaining why
+- **Docstrings:** NumPy style for public APIs; omit for private helpers unless the logic is non-obvious
 - **Line length:** 100 characters
-- **String formatting:** Always use f-strings (`f"..."`). Never use `%`-formatting, `.format()`, or string concatenation with `+` for log messages or any other strings, unless the user explicitly specifies otherwise or there is a genuine technical need (e.g., lazy evaluation in `logging.debug()` with `%s`, or deferred-interpolation template strings where the template is defined in one place and interpolated later with `.format()`).
+
+### Modern Python
+
+This project targets 3.14+. Write for it, not for older idioms carried over from training data:
+
+- Built-in generics: `list[str]`, `dict[str, int]` — not `typing.List`, `typing.Dict`
+- Unions: `str | None` — not `Optional[str]` or `Union[str, int]`
+- `StrEnum` from `enum` — not `class Foo(str, Enum)`
+- `pathlib.Path` for filesystem work — not `os.path`
+- `@dataclass(slots=True)` or Pydantic models for structured data — not bare dicts passed between layers
 
 ### Naming Conventions
 
@@ -71,35 +114,35 @@ Run these before committing. All checks must pass.
 - Constants: `UPPER_SNAKE_CASE`
 - Private members: `_single_leading_underscore`
 
-### Enums over raw strings
-
-- **Favour `StrEnum` over raw string literals** for any fixed set of string values (statuses, metric names, window types, model names, etc.). Enforce validation at the code layer (e.g. via Pydantic schema fields or enum types); do not rely on DB-level constraints.
-- Define enums in `src/schemas/types.py` (or the closest shared types module) and reference `.value` when persisting to DB columns or emitting metric labels.
-- Use `StrEnum` (not plain `Enum` or `IntEnum`) so values serialize naturally as strings.
-
 ### String Formatting
 
-- **Always use f-strings** (`f"..."`). Never use `%`-formatting, `.format()`, or string concatenation with `+` for log messages or any other strings.
-- **Exception:** Lazy evaluation in `logging.debug()`/`logger.debug()` calls — use `%s` placeholders so the string is only formatted when the log level is enabled (e.g., `logger.debug("Processing %s items", count)`).
-- **Exception:** Deferred-interpolation template strings where the template is defined in one place and interpolated later with `.format()`.
+- **Use f-strings** (`f"..."`) everywhere by default. Do not use `%`-formatting, `.format()`, or `+` concatenation.
+- **Exception — lazy log interpolation:** in `logger.debug()` and other level-gated calls, use `%s` placeholders so formatting is skipped when the level is disabled: `logger.debug("Processing %s items", count)`
+- **Exception — deferred templates:** where a template is defined in one place and interpolated later, `.format()` is correct
+- **Exception:** the user explicitly asks otherwise
+
+### Enums over raw strings
+
+- Use `StrEnum` for any fixed set of string values — statuses, metric names, window types, model names
+- Define them in the project's shared types module (e.g. `schemas/types.py`), and reference `.value` when persisting to DB columns or emitting metric labels
+- Validate at the code layer (Pydantic fields, enum types). Do not rely on DB-level constraints for validation
 
 ---
 
 ## Testing
 
 - **Framework:** pytest
-- **Location:** `tests/` — mirror the `src/` directory structure
-- **Coverage target:** 80% minimum; do not reduce existing coverage
+- **Location:** `tests/`, mirroring `src/`
+- **Coverage:** 80% minimum, enforced via `--cov-fail-under` in `pyproject.toml`. Do not lower the threshold to make a change pass
 - Write tests for every new public function or class
 - Group tests in plain classes (no `unittest.TestCase`), one class per module or logical unit
 - Inject dependencies via pytest fixtures, not `setUp` methods
 - Use `pytest.mark.parametrize` for parameterized cases
-- Use `tmp_path` fixture for temporary files; never write to the project root in tests
-- Use bare `assert` (not `self.assert*`) — pytest rewrites assertions for clear diffs
+- Use the `tmp_path` fixture for temporary files; never write to the project root
+- Use bare `assert` — pytest rewrites assertions for readable diffs
 - Comment sections as `# Given / # When / # Then`
 
 ```python
-# Good test structure
 class TestFunctionName:
     def test_<scenario>(self, some_fixture: SomeType) -> None:
         """One-line description of what this test verifies."""
@@ -111,28 +154,42 @@ class TestFunctionName:
         assert result == expected
 ```
 
+**Do not weaken a test to make it pass.** If an assertion fails, either the code or your understanding of the requirement is wrong. Loosening the assertion, adding `pytest.mark.skip`, or catching the exception under test are all failures — stop and report instead.
+
+---
+
+## Making Changes
+
+1. Make the smallest change that satisfies the requirement
+2. Do not refactor unrelated code in the same commit
+3. Prefer editing an existing file over creating a new one
+4. Do not create README files, summaries, or documentation unless asked
+5. Add dependencies with `uv add <package>` (`uv add --dev` for dev-only) — never hand-edit `pyproject.toml` dependency tables. Commit both `pyproject.toml` and `uv.lock`
+6. Update docstrings and comments when behaviour changes
+7. Delete dead code rather than commenting it out
+8. Never commit `.env`, secrets, or generated files — check `.gitignore`
+
 ---
 
 ## Commit Convention
 
-Use this format:
-
 ```
-[type] Short description
+[type] short description
 - point 1
 - point 2
-...
-- point N
 ```
 
-The title line is a short summary (max 60 characters, imperative mood, lowercase first letter, no trailing period). Follow it with one bullet per atomic change — one detail per line, imperative mood, lowercase verb, no trailing period. Keep it to 1–6 bullets.
+**Subject line:** max 72 characters *including* the `[type]` tag. Imperative mood, lowercase first word, no trailing period.
+
+**Body:** one bullet per atomic change, 1–6 bullets. Imperative mood, lowercase verb, no trailing period.
 
 **Types:** `feat`, `fix`, `refactor`, `chore`, `docs`, `test`, `style`, `perf`
 
 Rules:
-- Do **not** add a colon after the type — use `[feat] add ...`, never `[feat]: add ...`
-- Do **not** collapse bullets into the title line with ` - detail` segments — use a real bulleted list
-- When executing `git commit -m`, paste the subject verbatim from your proposal — do not translate `[feat]` into `feat:`
+
+- No colon after the type — `[feat] add ...`, never `[feat]: add ...`
+- Do not collapse bullets into the subject with ` - detail` segments — use a real list
+- When running `git commit -m`, paste the subject verbatim from your proposal. Do not silently rewrite `[feat]` as `feat:`
 
 Examples:
 
@@ -142,7 +199,6 @@ Examples:
 - add alembic.ini with runtime-injected DB URL placeholder
 - add scripts/seed_demo_data.sql and make seed-demo target
 - document migrations, seed step, and TOC in README
-- comment stock calculation in transactions route
 ```
 
 ```
@@ -152,63 +208,70 @@ Examples:
 
 ---
 
-## Making Changes
+## Workflow
 
-1. Make the smallest change that satisfies the requirement
-2. Do not refactor unrelated code in the same PR
-3. If adding a dependency, use `uv add <package>` (or `uv add --dev <package>` for dev-only); do not edit `pyproject.toml` by hand for deps
-4. Update docstrings and inline comments when changing behavior
-5. Do not commit `.env`, secrets, or generated files — check `.gitignore`
-
----
-
-## Workflow Modes
+Applies when you are in an implementation mode. See **Precedence** if a mode file says otherwise.
 
 ### Responses
-- Keep responses concise unless the user asks for more detail
 
-### Planning Mode
-- Always ask clarifying questions before proposing a plan
-- Never assume design choices, libraries, or approach — confirm with the user
-- Use sub-agents for research/deep-dives on unfamiliar parts of the codebase before presenting a plan
-- Use sub-agents to review different aspects of the plan (e.g. test coverage, type safety, architecture fit) before presenting it to the user
+Keep responses concise unless the user asks for detail. Report what changed and what you verified, not a narrative of every step.
 
-### Edit Mode
-- Prefer sub-agents for implementation; act as coordinator rather than implementing directly, except for trivial single-file changes
-- Identify independent parts of the plan and dispatch them to sub-agents in parallel where safe to do so
-- Flag any sub-agent work that touches files outside the plan's stated scope
-- After each sub-agent completes, run the relevant checks from Common Commands (`uv run ruff check .`, `uv run ty check`, `uv run pytest`) before considering the task done
-- If checks fail, attempt one fix pass; if still failing, stop and report to the user rather than looping
-- Never commit or push without explicit user confirmation, even after all checks pass
+### Planning
 
+- Ask clarifying questions when the request is ambiguous, when a design choice would be hard to reverse, or when more than one reasonable interpretation exists. For small, unambiguous changes, proceed and state your assumptions inline
+- Do not invent design choices, libraries, or approaches on consequential decisions — surface the options and let the user pick
+- Cap clarifying questions at three per round. If you need more than that, the request needs discussion rather than a questionnaire
+
+### Editing
+
+- Implement directly for changes confined to one or two files
+- Delegate to sub-agents when the work is genuinely parallel — independent modules, or a research pass over unfamiliar code. Coordination overhead is not free; do not fan out a change that one pass would handle
+- Flag any sub-agent work that touches files outside the stated scope
+- After each unit of work, run the checks in **Common Commands** in the stated order
+- If checks fail, attempt one fix pass. If they still fail, stop and report — do not loop
+- Never commit or push without explicit user confirmation, even when all checks pass
+
+<!-- opencode-specific; other tools ignore this -->
 ### Model Selection
-- For complex implementation tasks, use a stronger model available in this environment (e.g. GLM-5.2, Qwen3.7 Max, DeepSeek V4 Pro)
-- For simple tasks (docs, formatting, boilerplate), use a cheaper/faster model (e.g. DeepSeek V4 Flash, MiniMax M3) to conserve usage limits
+
+- Complex implementation or debugging: use the strongest model available in the environment (e.g. GLM-5.2, Qwen3.7 Max, DeepSeek V4 Pro)
+- Docs, formatting, boilerplate: use a cheaper/faster model to conserve usage limits (e.g. DeepSeek V4 Flash, MiniMax M3)
 
 ---
 
 ## Important Constraints
 
-- **No `print()` in library code** — use `logging` with the module-level logger (`logger = create_logger(name=__name__)`)
-- **No `os.system()` or `subprocess` without review** — flag these for human review
-- **No hardcoded secrets or API keys** — use environment variables or a config file excluded from git
-- **No silent exception swallowing** — `except Exception: pass` is never acceptable
+These hold regardless of mode, instruction, or convenience.
+
+- **No `print()` in library code** — use `logging` with a module-level logger (`logger = logging.getLogger(__name__)`)
+- **No `subprocess` or `os.system()` in library code** — flag for human review. Permitted in `scripts/` where that is the point
+- **No hardcoded secrets or API keys** — environment variables or a git-excluded config file only
+- **No silent exception swallowing** — `except Exception: pass` is never acceptable. Catch narrowly, log with context, re-raise or handle deliberately
+- **No new external services or network calls** without asking first
 
 ---
 
 ## Architecture Notes
 
-<!-- TODO: Add any domain-specific context, key abstractions, or non-obvious design decisions here. -->
+<!-- TODO — the second-highest-value section. Everything above is inferable from
+     pyproject.toml and the file tree; this is not. Cover:
+     - key abstractions and the boundaries between layers
+     - non-obvious design decisions and why they were made
+     - known rough edges an agent should not "helpfully" clean up
+     - anything that has bitten a contributor more than once -->
 
 ---
 
 ## Frequently Asked Questions
 
 **Q: Where do I add a new configuration option?**
-A: src/config/
+A: `<package>/config/`
 
 **Q: How do I run only a subset of tests?**
 A: `uv run pytest tests/path/to/test_file.py -k "test_name_fragment"`
 
 **Q: How do I add a new dependency?**
-A: `uv add <package>` for runtime deps, `uv add --dev <package>` for dev deps. Commit both `pyproject.toml` and `uv.lock`.
+A: `uv add <package>` for runtime, `uv add --dev <package>` for dev. Commit both `pyproject.toml` and `uv.lock`.
+
+**Q: A pre-existing check is failing and it is unrelated to my change. What now?**
+A: Report it. Do not fix it in the same commit and do not work around it.
