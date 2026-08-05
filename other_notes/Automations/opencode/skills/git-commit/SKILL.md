@@ -69,4 +69,10 @@ You are a commit message writer. Inspect the staged changes and produce a commit
 ```
 [fix] correct Mapped type for unit_price_at_time column
 - change Mapped[float] to Mapped[Decimal] to match Numeric(10, 2)
+
+## Mechanics
+
+- The `-m` argument must use `[type]` with square brackets and no colon: `git commit -m "[feat] add ..."`
+- Copy the subject line verbatim from the proposed message — never reformat `[type]` to `type:`
+- If the subject contains a single quote, escape it or use double quotes for the entire message
 ```

@@ -1,19 +1,37 @@
 ---
-description: Add or update a changelog entry following Keep a Changelog conventions.
+description: Gather commits/diff since the last release and draft the next CHANGELOG.md entry (uses the changelog skill for format/style)
 agent: build
 ---
 
-Load the `changelog` skill and follow its workflow to produce or update `CHANGELOG.md`.
+Use the `changelog` skill's rules for format, section order, bullet style, version-bump
+logic, and cold-start behavior. Everything below is just the raw material — don't restate
+or override the skill's conventions here.
 
-If the user passed arguments after `/changelog` (e.g. `/changelog added dark mode toggle`), treat them as the scope of changes for the entry.
+Optional hint from the caller (version, range, or scope — may be empty): $ARGUMENTS
 
-Process:
+## Context
 
-1. Check whether `CHANGELOG.md` exists. If not, follow the skill's **Cold start** section to scaffold it before continuing.
-2. Read the full `CHANGELOG.md` to confirm the current top version and absorb the existing tone/format.
-3. Gather the actual set of changes — run `git log` / `git diff` against the last tagged release (or ask the user) rather than guessing. Never invent or embellish.
-4. Agree on the version bump (MAJOR / MINOR / PATCH) if it isn't obvious from the change alone. Ask the user when ambiguous.
-5. Draft entries using the skill's format: bold short title, file list in backticks, em dash, plain-English explanation of *why*. Group under `### Added`, `### Fixed`, `### Changed` as appropriate.
-6. Insert the new version block at the top of `CHANGELOG.md`, separated from the previous entry by `---`.
-7. Bump version file(s) if applicable, and record it under `### Changed`.
-8. Show the user the diff/new entries. Do not treat the task as done until the user confirms — changelog tone and technical accuracy matter.
+Today: !`date +%F`
+
+Last tag: !`git describe --tags --abbrev=0 2>/dev/null || echo "(no tags)"`
+
+Declared version: !`grep -m1 -E '^\s*version\s*[:=]' pyproject.toml Cargo.toml config.yaml 2>/dev/null; grep -m1 '"version"' package.json 2>/dev/null; true`
+
+Commits since last release:
+!`git log --no-merges --pretty=format:'--- %h %s%n%b' $(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD`
+
+Files touched since last release:
+!`git diff --stat $(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD`
+
+Existing changelog:
+@CHANGELOG.md
+
+## What to do
+
+1. If the hint above names a different range, tag, or version, re-derive the context
+   yourself for that range instead of trusting what's injected above.
+2. Read the diff for the areas you plan to describe — not just commit subjects — before
+   writing any bullet: `git diff <base>..HEAD -- <path>`.
+3. Apply the `changelog` skill for everything else: version bump, section order, bullet
+   format, cold-start handling, version-file sync.
+4. Show the drafted entry for review before treating this as done.

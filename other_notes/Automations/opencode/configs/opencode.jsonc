@@ -1,3 +1,61 @@
 {
-  "$schema": "https://opencode.ai/config.json"
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md"],
+  "lsp": {
+    "ty": {
+      "command": ["uvx", "ty", "server"],
+      "extensions": [".py", ".pyi"]
+    }
+  },
+  "permission": {
+    "edit": "ask",
+    "bash": {
+      "*": "ask",
+      "uv run *": "allow",
+      "ls *": "allow",
+      "grep *": "allow",
+      "sort *": "allow",
+      "find *": "allow",
+      "cat *": "allow",
+      "echo *": "allow",
+      "wc *": "allow",
+      "head *": "allow",
+      "tail *": "allow",
+      "du *": "allow",
+      "df *": "allow",
+      "file *": "allow",
+      "stat *": "allow",
+      "pwd": "allow",
+      "date": "allow",
+      "which *": "allow",
+      "whereis *": "allow",
+      "locate *": "allow",
+      "type *": "allow",
+      "command -v *": "allow",
+      "man *": "allow",
+      "whatis *": "allow",
+      "apropos *": "allow",
+      "rg *": "allow",
+      "fd *": "allow",
+      "strings *": "allow",
+      "env": "allow",
+      "diff *": "allow",
+      "git status": "allow",
+      "git log *": "allow",
+      "git diff *": "allow",
+      "git show *": "allow",
+      "git branch": "allow",
+      "git branch *": "allow",
+      "git stash list": "allow",
+      "git remote *": "allow",
+      "git --version": "allow"
+    }
+  },
+  "mcp": {
+    "polars-mcp": {
+      "type": "local",
+      "command": ["/Users/neidu/.local/bin/polars-mcp"],
+      "enabled": true
+    }
+  }
 }

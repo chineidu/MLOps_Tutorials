@@ -233,7 +233,6 @@ Topic
 → Trade-offs
 → Decisions
 → plan.md
-→ Execution
 ```
 
 Do not run through it like a checklist.

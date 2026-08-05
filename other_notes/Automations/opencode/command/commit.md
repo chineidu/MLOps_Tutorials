@@ -3,7 +3,7 @@ description: Review changes, then stage and commit with a generated message.
 agent: build
 ---
 
-Stage all changes and run a code review before committing.
+Stage all changes and run a code review before committing. Pass `--quick` or `-Q` to skip the review step.
 
 ## Step 1 — Stage everything
 

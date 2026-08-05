@@ -13,17 +13,23 @@ opencode/
 │   ├── creating-agents.md       # Step-by-step guide to create agents
 │   └── creating-skills.md       # Step-by-step guide to create skills
 ├── configs/
-│   ├── opencode.jsonc           # Project-level config (from ~/.config/opencode/)
-│   └── config.json              # User-level config (from ~/.config/opencode/)
+│   └── opencode.jsonc           # Global config (from ~/.config/opencode/)
 ├── command/
-│   └── commit.md               # `/commit` slash command: stage all + commit with generated message
+│   ├── changelog.md             # `/changelog` slash command: draft next CHANGELOG.md entry
+│   ├── commit.md                # `/commit` slash command: stage all + commit with generated message
+│   └── validate.md              # `/validate` slash command: review uncommitted changes (read-only)
 ├── agents/
 │   ├── ask-only.md               # Read-only codebase Q&A agent
 │   ├── brainstorm.md             # Progressive idea development (primary agent)
-│   └── research.md               # External docs & dependency research agent
+│   ├── research.md               # External docs & dependency research agent
+│   └── review.md                 # Diff review agent (used by /validate)
 └── skills/
+    ├── changelog/
+    │   └── SKILL.md             # Keep a Changelog conventions skill
     ├── git-commit/
     │   └── SKILL.md             # Git commit message skill
+    ├── polars/
+    │   └── SKILL.md             # Polars lazy-API data work skill
     ├── python-skills/
     │   └── SKILL.md             # Python project conventions skill
     └── customize-opencode/
@@ -225,22 +231,26 @@ A **command** (or slash command) in opencode is a custom shortcut triggered via 
 
 | Command | File | Description |
 |---------|------|-------------|
-| `/commit` | `command/commit.md` | Stage all changes (`git add -A`), load the `git-commit` skill to generate a message, show the proposed message, then commit. Optional arguments are treated as extra context for the message. |
+| `/commit` | `command/commit.md` | Stage all changes (`git add -A`), load the `git-commit` skill to generate a message, show the proposed message, then commit. Pass `--quick`/`-Q` to skip the review step. Optional arguments are treated as extra context for the message. |
+| `/changelog` | `command/changelog.md` | Gather commits/diff since the last release and draft the next `CHANGELOG.md` entry using the `changelog` skill. |
+| `/validate` | `command/validate.md` | Dispatch the `review` subagent to review uncommitted changes. Validate-only — never builds, edits, fixes, or commits. |
 
 ### `/commit` Usage
 
 ```
 /commit                                   # Stage all + generate message from diff
+/commit --quick                           # Skip the review step
 /commit fix the login redirect bug        # Same, but with extra context for the message
 ```
 
 The command:
 1. Runs `git status` to inspect the working tree
 2. Stages everything with `git add -A`
-3. Inspects the staged diff
-4. Loads the `git-commit` skill to produce a conventional commit message
-5. Shows the message to the user, then commits
-6. Prints the commit hash and summary
+3. Runs a code review on the staged changes
+4. Inspects the staged diff
+5. Loads the `git-commit` skill to produce a conventional commit message
+6. Shows the message to the user, then commits
+7. Prints the commit hash and summary
 
 **Constraint:** Does not push, amend, or force-push. If a pre-commit hook fails, it reports and stops.
 
@@ -253,7 +263,7 @@ The command:
 | **Agent** | Specialized AI persona for tasks | Global or Project |
 | **Skill** | Reusable knowledge/capability | Global, Project, or Built-in |
 | **Command** | Custom slash command for multi-step workflows | Global (`~/.config/opencode/command/`) or Project (`.opencode/command/`) |
-| **Config** | Tool permissions, LSP settings | Global (`config.json`) or Project (`opencode.jsonc`) |
+| **Config** | Tool permissions, LSP settings | Global (`opencode.jsonc`) or Project (`opencode.jsonc`) |
 
 ---
 
@@ -263,4 +273,4 @@ All configs in this directory are **exact copies** from:
 - **Global user config**: `~/.config/opencode/`
 - **Built-in skills**: opencode's internal skills
 
-Last synced: July 5, 2026
+Last synced: August 5, 2026
