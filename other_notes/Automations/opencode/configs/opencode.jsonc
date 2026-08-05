@@ -124,7 +124,7 @@
   "mcp": {
     "polars-mcp": {
       "type": "local",
-      "command": ["/Users/neidu/.local/bin/polars-mcp"],
+      "command": ["uvx", "--with", "polars", "--with", "mcp<1.30", "polars-mcp"],
       "enabled": true
     }
   }
