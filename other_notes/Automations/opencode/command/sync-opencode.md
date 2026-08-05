@@ -1,60 +1,234 @@
 ---
-description: Sync the global opencode config from the repo mirror. One-way, adds missing/updated files, skips docs/python-skills/customize-opencode, merges opencode.jsonc mcp.
+description: Sync the global opencode configuration from the repository mirror.
 agent: build
 ---
 
-Sync the global opencode configuration from the documentation repo mirror. The repo is the SOURCE OF TRUTH (it mirrors the intended setup for reuse across machines); the global config is the DESTINATION.
+Synchronize the global opencode configuration from the local repository mirror.
 
-## Paths
+The repository mirror is a Git-tracked copy of my reusable opencode configuration.
+It is the **canonical source of truth** that I maintain and version control.
 
-```
-SOURCE: /Users/mac/Desktop/Projects/MLOps_Tutorials/other_notes/Automations/opencode
-DEST:   ~/.config/opencode
-```
+The global configuration (`~/.config/opencode`) is the machine-specific installation.
 
-## Directory mapping (mirror subdir -> global subdir)
-
-- `SOURCE/agents/*.md`            -> `DEST/agents/`
-- `SOURCE/command/*.md`           -> `DEST/command/`
-- `SOURCE/skills/<name>/SKILL.md` -> `DEST/skills/<name>/SKILL.md`
-- `SOURCE/configs/config.json`    -> `DEST/config.json`
-- `SOURCE/configs/opencode.jsonc` -> `DEST/opencode.jsonc`
-- `SOURCE/AGENTS.md`              -> `DEST/AGENTS.md`
-
-## Exclusions — never copy these
-
-1. `SOURCE/docs/` (reference docs, not configs)
-2. `SOURCE/README.md` (documentation)
-3. `SOURCE/shift-enter-newline.md` (documentation)
-4. `SOURCE/skills/python-skills/` (redundant with AGENTS.md)
-5. `SOURCE/skills/customize-opencode/` (native/built-in opencode skill)
-6. Any `node_modules`, `package.json`, `package-lock.json`, `tui.json`, or `.git` files
-
-## Rules
-
-1. DIRECTION IS ONE-WAY (SOURCE -> DEST). Do not modify the repo. Do not delete or rename anything already in DEST that is not in SOURCE (DEST may have extra files; leave them alone).
-2. For plain markdown configs (`agents/`, `command/`, `skills/`, `AGENTS.md`, `config.json`): if SOURCE and DEST differ, overwrite DEST with SOURCE (SOURCE is newer/canonical). Report each overwrite.
-3. For `opencode.jsonc`, MERGE — do not blindly overwrite:
-   a. Add any top-level keys present in SOURCE but missing in DEST (e.g. `instructions`, `lsp`, `permission`).
-   b. For the `mcp` block: preserve DEST's existing entries verbatim. DEST's `polars` uses the portable `uvx` invocation — keep it. Do NOT copy SOURCE's hardcoded machine-specific path (`/Users/neidu/.local/bin/polars-mcp`) or any other absolute path that does not exist on this machine.
-   c. Do not remove any key that only exists in DEST.
-4. Do not invent content. Copy bytes exactly. Use `cp`, not re-typing.
-5. Never modify SOURCE. Never touch `DEST/tui.json` or any non-listed file.
-
-## Steps
-
-1. `find` SOURCE and DEST to enumerate files; skip the exclusions.
-2. For each mapped file, compare with `diff -q` and classify: MISSING (in DEST only), DIFFERS, or same.
-3. Copy MISSING and DIFFERS files (per Rules 2–3). Use exact byte copies.
-4. After copying, re-run `diff -q` for every mapped file and confirm MISSING=0 and DIFFERS=0 (except `opencode.jsonc` mcp, which may legitimately differ in the preserved mcp block).
-5. Validate `opencode.jsonc` parses (jsonc allows comments; use a tolerant parser or strip comments) and that no copied file references paths that do not exist on this machine (e.g. check `/Users/neidu/...` is absent from the final DEST configs).
-6. Report a table: file | status (added/updated/skipped) | reason.
-
-## Report format
+This command performs a **one-way synchronization**:
 
 ```
-Added: <list>
-Updated: <list>
-Skipped: <list with reasons>
-Verified: <diff results + json validity>
+REPO_MIRROR → GLOBAL_CONFIG
+```
+
+Never modify the repository mirror.
+Never synchronize in the opposite direction.
+
+The command must be **idempotent**. Running it multiple times without repository changes should produce no modifications.
+
+---
+
+# Paths
+
+```text
+REPO_MIRROR: /Users/mac/Desktop/Projects/MLOps_Tutorials/other_notes/Automations/opencode
+GLOBAL_CONFIG: ~/.config/opencode
+```
+
+---
+
+# Directory mapping
+
+| Repository | Global |
+|------------|--------|
+| `REPO_MIRROR/agents/*.md` | `GLOBAL_CONFIG/agents/` |
+| `REPO_MIRROR/command/*.md` | `GLOBAL_CONFIG/command/` |
+| `REPO_MIRROR/skills/<name>/SKILL.md` | `GLOBAL_CONFIG/skills/<name>/SKILL.md` |
+| `REPO_MIRROR/configs/config.json` | `GLOBAL_CONFIG/config.json` |
+| `REPO_MIRROR/configs/opencode.jsonc` | `GLOBAL_CONFIG/opencode.jsonc` |
+| `REPO_MIRROR/AGENTS.md` | `GLOBAL_CONFIG/AGENTS.md` |
+
+Create parent directories if they do not already exist.
+
+---
+
+# Exclusions
+
+Never copy:
+
+- `REPO_MIRROR/docs/`
+- `REPO_MIRROR/README.md`
+- `REPO_MIRROR/shift-enter-newline.md`
+- `REPO_MIRROR/skills/python-skills/`
+- `REPO_MIRROR/skills/customize-opencode/`
+- `.git`
+- `node_modules`
+- `package.json`
+- `package-lock.json`
+- `tui.json`
+
+---
+
+# Rules
+
+## 1. Direction
+
+Synchronization is strictly:
+
+```
+REPO_MIRROR → GLOBAL_CONFIG
+```
+
+Never:
+
+- modify the repository
+- delete files from `GLOBAL_CONFIG`
+- rename files in `GLOBAL_CONFIG`
+
+`GLOBAL_CONFIG` may contain additional files not present in the repository.
+
+Leave them untouched.
+
+---
+
+## 2. Standard files
+
+Applies to:
+
+- `agents/`
+- `command/`
+- `skills/`
+- `AGENTS.md`
+- `config.json`
+
+For every mapped file:
+
+- If missing in `GLOBAL_CONFIG`, copy it.
+- If contents differ, overwrite `GLOBAL_CONFIG` with an exact byte-for-byte copy.
+- If identical, do nothing.
+
+Do not recreate or rewrite file contents manually.
+
+Use filesystem copy operations (`cp`) rather than retyping or regenerating files.
+
+---
+
+## 3. opencode.jsonc
+
+Do **not** overwrite.
+
+Merge instead.
+
+`opencode.jsonc` contains machine-specific configuration (for example local MCP servers, portable executable paths, providers, and OS-dependent settings). Preserve those while importing reusable defaults.
+
+### Top-level keys
+
+For every top-level key:
+
+- if it exists in the repository but not globally, add it
+- if it already exists globally, preserve the global value
+- never remove keys that exist only globally
+
+Examples include:
+
+- `instructions`
+- `permission`
+- `lsp`
+
+### MCP
+
+For each MCP server:
+
+- preserve every existing server in `GLOBAL_CONFIG` unchanged
+- add servers that exist only in the repository
+- never replace an existing global server definition
+- never remove existing global servers
+
+Specifically:
+
+- preserve the portable `uvx`-based `polars` configuration already in `GLOBAL_CONFIG`
+- never copy machine-specific absolute paths from the repository (for example `/Users/neidu/...`)
+- reject any copied configuration containing absolute paths that do not exist on this machine
+
+---
+
+## 4. Copy policy
+
+Copy bytes exactly.
+
+Do not:
+
+- normalize formatting
+- regenerate files
+- reorder content
+- "improve" configuration
+
+The repository contents are authoritative.
+
+---
+
+## 5. Never touch
+
+Do not modify:
+
+- the repository mirror
+- `GLOBAL_CONFIG/tui.json`
+- any file outside the mappings above
+
+---
+
+# Procedure
+
+1. Enumerate every mapped file while honoring the exclusions.
+
+2. Classify each mapped file as one of:
+
+- Missing in `GLOBAL_CONFIG`
+- Different
+- Identical
+
+3. Synchronize according to the rules above.
+
+4. Verify synchronization.
+
+Re-check every mapped file.
+
+Expected result:
+
+- Missing = 0
+- Different = 0
+
+`opencode.jsonc` may legitimately differ where global machine-specific values are intentionally preserved.
+
+5. Validate:
+
+- `opencode.jsonc` parses successfully as JSONC.
+- No copied configuration references nonexistent machine-specific paths (for example `/Users/neidu/...`).
+
+Abort and report any validation failure.
+
+---
+
+# Report
+
+Produce a summary table.
+
+| File | Action | Reason |
+|------|--------|--------|
+| ... | Added / Updated / Skipped | ... |
+
+Then report:
+
+```text
+Added:
+...
+
+Updated:
+...
+
+Skipped:
+...
+
+Verification
+
+✓ Repository unchanged
+✓ All mapped files synchronized
+✓ JSONC valid
+✓ No foreign machine-specific paths detected
+✓ Synchronization complete
 ```
