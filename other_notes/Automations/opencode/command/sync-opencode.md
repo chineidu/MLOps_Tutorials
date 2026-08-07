@@ -42,6 +42,7 @@ GLOBAL_CONFIG: ~/.config/opencode
 | `REPO_MIRROR/configs/config.json` | `GLOBAL_CONFIG/config.json` |
 | `REPO_MIRROR/configs/opencode.jsonc` | `GLOBAL_CONFIG/opencode.jsonc` |
 | `REPO_MIRROR/AGENTS.md` | `GLOBAL_CONFIG/AGENTS.md` |
+| `REPO_MIRROR/plugins/*.ts` | `GLOBAL_CONFIG/plugins/` |
 
 Create parent directories if they do not already exist.
 
@@ -93,6 +94,7 @@ Applies to:
 - `agents/`
 - `command/`
 - `skills/`
+- `plugins/`
 - `AGENTS.md`
 - `config.json`
 
