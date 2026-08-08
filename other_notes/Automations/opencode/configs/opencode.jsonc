@@ -12,6 +12,7 @@
     "bash": {
       "*": "ask",
       "uv run *": "allow",
+      "echo *": "allow",
 
       // file listing / inspection
       "ls *": "allow",
