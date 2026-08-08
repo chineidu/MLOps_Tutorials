@@ -95,7 +95,7 @@ Tool configuration lives in `pyproject.toml`. Do not override it inline or pass 
 - **Linter:** Ruff (`ruff check`) — fix all warnings before committing
 - **Type checker:** ty (`uv run ty check`) — fix all errors before committing. No bare `# type: ignore`; every suppression needs a trailing comment explaining why
 - **Docstrings:** NumPy style for public APIs; omit for private helpers unless the logic is non-obvious
-- **Line length:** 100 characters
+- **Line length:** 110 characters
 
 ### Modern Python
 

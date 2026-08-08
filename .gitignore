@@ -173,3 +173,4 @@ notepad.py
 **/**/tmp*/
 **/**/data/
 **/**/.DS_Store
+**/**/note.*
