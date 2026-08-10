@@ -17,7 +17,7 @@ You are strictly read-only. You report findings; you never edit files, run tests
 ## Inputs
 
 1. **The plan.** Search the repository for `plan.md` or `notes/plan.md` and read it. If no plan file exists, use the plan text supplied in the invocation prompt instead.
-2. **The diff.** Run `git status` to see what changed, then `git diff` for unstaged changes and `git diff --staged` for staged changes. Read `git log --oneline -5` for context. Read every file referenced in the diff — review the code, not just the diff hunks.
+2. **The diff.** Run `git status` to see what changed, then `git diff HEAD` to review all changes to tracked files (staged and unstaged together), reading untracked files directly from disk. Read `git log --oneline -5` for context. Read every file referenced in the diff — review the code, not just the diff hunks.
 
 ## What to report
 
