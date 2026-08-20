@@ -11,7 +11,8 @@ opencode/
 │   ├── what-are-agents.md       # Definition and explanation of agents
 │   ├── what-are-skills.md       # Definition and explanation of skills
 │   ├── creating-agents.md       # Step-by-step guide to create agents
-│   └── creating-skills.md       # Step-by-step guide to create skills
+│   ├── creating-skills.md       # Step-by-step guide to create skills
+│   └── permission-system.md     # How opencode's permission system works (investigation notes)
 ├── configs/
 │   └── opencode.jsonc           # Global config (from ~/.config/opencode/)
 ├── command/
@@ -23,6 +24,10 @@ opencode/
 │   ├── brainstorm.md             # Progressive idea development (primary agent)
 │   ├── research.md               # External docs & dependency research agent
 │   └── review.md                 # Diff review agent (used by /validate)
+├── plugins/
+│   └── venv-activate.ts          # Auto-activate Python venv in shell tool
+├── archives/
+│   └── auto-approve-pipes.ts     # DEAD plugin (permission.ask hook never fires in 1.18.x)
 └── skills/
     ├── changelog/
     │   └── SKILL.md             # Keep a Changelog conventions skill
@@ -273,4 +278,16 @@ All configs in this directory are **exact copies** from:
 - **Global user config**: `~/.config/opencode/`
 - **Built-in skills**: opencode's internal skills
 
-Last synced: August 5, 2026
+Last synced: August 20, 2026
+
+---
+
+## Archived Plugins
+
+The `archives/` directory contains plugins that are no longer active but kept
+for reference. Each archived plugin includes a header explaining why it was
+retired.
+
+| Plugin | Reason |
+|--------|--------|
+| `auto-approve-pipes.ts` | Relied on the `permission.ask` plugin hook, which is declared in the type definition but never invoked at runtime in opencode 1.18.x. opencode's native bash permission rules are believed to already split chained commands and evaluate each segment independently, though this isn't fully proven. See [docs/permission-system.md](docs/permission-system.md). |

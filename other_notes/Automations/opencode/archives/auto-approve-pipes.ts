@@ -1,3 +1,36 @@
+// =============================================================================
+// ARCHIVED — DO NOT USE
+//
+// This plugin relied on the `permission.ask` hook, which is DEAD in opencode
+// 1.18.x.  The hook is declared in the plugin type definition
+// (packages/plugin/src/index.ts:261) but is never invoked at runtime.  It was
+// already dead in v1.18.5 and remains dead in v1.18.18 — the upgrade did not
+// break it.
+//
+// Investigation findings (Aug 2026):
+//   - opencode natively splits chained commands on `&&` into per-segment
+//     patterns before evaluating permission rules.  A probe confirmed that
+//     `ls && rm --version` produces `patterns: ["ls", "rm --version"]`.
+//   - The built-in `evaluate()` function (permission/index.ts:28) uses
+//     `findLast` on the flattened merged ruleset, so config allow rules
+//     inserted after the `"*": "ask"` catch-all DO win for matching patterns.
+//   - The `event` hook fires and `permission.asked` events ARE delivered to
+//     plugins, but they are observational only — setting `output.status` has
+//     no effect because the hook is never called in the permission flow.
+//   - The shell tool (tool/shell.ts:282) skips the bash permission ask
+//     entirely when `scan.patterns.size === 0`.
+//
+// Conclusion: opencode's native permission rules already handle chained
+// commands.  This plugin is unnecessary AND non-functional.  The config in
+// configs/opencode.jsonc (bash allow-list) is the correct mechanism for
+// rule-based auto-approval.
+//
+// See docs/permission-system.md for the full investigation.
+// =============================================================================
+//
+// Original header preserved below:
+//
+
 import type { Plugin } from "@opencode-ai/plugin";
 
 // ---------------------------------------------------------------------------

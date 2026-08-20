@@ -1,7 +1,12 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "instructions": ["AGENTS.md"],
-  "plugin": ["./plugins/auto-approve-pipes.ts"],
+  // Removed the auto-approve-pipes plugin: the `permission.ask` hook is dead
+  // in opencode 1.18.x — it never fires. opencode's native bash permission
+  // rules are believed to already split chained commands on `&&` into
+  // per-segment patterns and evaluate each against the allow-list below, but
+  // this isn't fully proven — see the "Unsolved Mystery" in
+  // docs/permission-system.md.
   "lsp": {
     "ty": {
       "command": ["uvx", "ty", "server"],
