@@ -88,7 +88,7 @@ Subagents are specialized agents that handle focused tasks autonomously. They ru
 
 | Agent | Description | Model | Permissions |
 |-------|-------------|-------|-------------|
-| `brainstorm` | Progressive idea development through dialogue before plan/build | `opencode-go/minimax-m3` | No edit; bash ask; no todowrite |
+| `brainstorm` | Progressive idea development through dialogue before plan/build | `opencode-go/minimax-m3` | edit ask; bash read-only allow (`ls`/`cat`/`grep`/`git status`/`log` etc.), else ask; todowrite deny |
 
 ### Built-in Subagents
 

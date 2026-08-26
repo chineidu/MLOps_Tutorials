@@ -6,7 +6,110 @@ temperature: 0.7
 color: warning
 permission:
   edit: ask
-  bash: ask
+  bash:
+    "*": ask
+    # read-only file inspection
+    "ls *": allow
+    "tree *": allow
+    "cat *": allow
+    "less *": allow
+    "more *": allow
+    "head *": allow
+    "tail *": allow
+    "wc *": allow
+    "file *": allow
+    "stat *": allow
+    "du *": allow
+    "df *": allow
+    "nl *": allow
+    "cut *": allow
+    "sort *": allow
+    "uniq *": allow
+    "comm *": allow
+    "tr *": allow
+    "column *": allow
+    "xxd *": allow
+    "od *": allow
+    "hexdump *": allow
+    "strings *": allow
+    "diff *": allow
+    "jq *": allow
+    # search
+    "grep *": allow
+    "rg *": allow
+    "fd *": allow
+    "find *": allow
+    "locate *": allow
+    # lookup / meta
+    "pwd": allow
+    "date": allow
+    "which *": allow
+    "whereis *": allow
+    "type *": allow
+    "command -v *": allow
+    "man *": allow
+    "whatis *": allow
+    "apropos *": allow
+    "env": allow
+    "printenv": allow
+    "printenv *": allow
+    # hashing
+    "md5sum *": allow
+    "sha1sum *": allow
+    "sha256sum *": allow
+    "cksum *": allow
+    # system info
+    "uname *": allow
+    "hostname": allow
+    "whoami": allow
+    "id": allow
+    "uptime": allow
+    "nproc": allow
+    "free *": allow
+    "lscpu": allow
+    "lsblk": allow
+    "ps *": allow
+    # archive inspection
+    "tar -tf *": allow
+    "tar -tzf *": allow
+    "unzip -l *": allow
+    "zipinfo *": allow
+    # toolchain versions
+    "python --version": allow
+    "python3 --version": allow
+    "node --version": allow
+    "npm --version": allow
+    "uv --version": allow
+    "uv pip list": allow
+    "pip list": allow
+    "pip show *": allow
+    # generic inspection
+    "echo *": allow
+    "uv run *": allow
+    # git read-only
+    "git status": allow
+    "git status *": allow
+    "git log *": allow
+    "git diff *": allow
+    "git show *": allow
+    "git show-ref *": allow
+    "git branch": allow
+    "git branch *": allow
+    "git tag": allow
+    "git tag -l *": allow
+    "git stash list": allow
+    "git remote *": allow
+    "git --version": allow
+    "git blame *": allow
+    "git ls-files *": allow
+    "git ls-tree *": allow
+    "git cat-file *": allow
+    "git rev-parse *": allow
+    "git describe *": allow
+    "git config --get *": allow
+    "git shortlog *": allow
+    "git worktree list": allow
+    "git submodule status": allow
   todowrite: deny
 ---
 
