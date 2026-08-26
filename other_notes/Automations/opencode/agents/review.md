@@ -1,7 +1,7 @@
 ---
 description: Reads the diff from the build step, cross-references it against the plan, and reports gaps, scope creep, untested paths, convention violations linters miss, and edge cases. Read-only review; run after build and before commit.
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: opencode-go/longcat-2.0
 permission:
   edit: deny
   bash: { "*": "deny", "git diff*": "allow", "git status*": "allow", "git log*": "allow", "git show*": "allow" }

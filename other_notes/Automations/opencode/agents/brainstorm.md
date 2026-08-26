@@ -1,7 +1,7 @@
 ---
 description: Progressive idea development through dialogue. Use before plan/build when exploring problems, options, and decisions. Does not implement.
 mode: primary
-model: opencode-go/deepseek-v4-pro
+model: opencode-go/minimax-m3
 temperature: 0.7
 color: warning
 permission:

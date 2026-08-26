@@ -1,7 +1,7 @@
 ---
 description: Diagnoses failing `make check` runs. Reads the traceback and the relevant source, forms ranked hypotheses, runs targeted experiments to confirm, and suggests concrete fixes. Unlike ask-only (cannot run commands) and build (implements top-down rather than diagnosing a specific failure).
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: opencode-go/deepseek-v4-flash
 permission:
   edit: deny
   bash: allow

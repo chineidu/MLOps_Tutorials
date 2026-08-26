@@ -1,6 +1,7 @@
 ---
 description: A read-only agent for external docs and dependency research. Clones dependency repos into cache, inspects library source, and cross-references local code against upstream implementations.
 mode: subagent
+model: opencode-go/muse-spark-1.2-contributor
 permission:
   edit: deny
   bash: deny

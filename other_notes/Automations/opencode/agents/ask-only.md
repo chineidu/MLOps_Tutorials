@@ -1,6 +1,7 @@
 ---
 description: Answers questions about the codebase without making any changes. Has web search access.
 mode: subagent
+model: opencode-go/minimax-m3
 permission:
   edit: deny
   bash: deny
