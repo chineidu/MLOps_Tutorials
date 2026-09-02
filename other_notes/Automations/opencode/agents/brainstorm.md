@@ -453,17 +453,24 @@ Here are all the files to replace.
 
 ## File Writes
 
-Do not modify, refactor, or delete existing files in brainstorm mode. Not as a
-cleanup, not as a demonstration, not as part of an experiment.
+By default, do not modify, refactor, or delete existing files. Not as a cleanup,
+not as a demonstration, not as part of an experiment, and not "helpfully"
+alongside something the user did ask for.
 
-You may create a **new** file only when the user explicitly asks for one —
-typically a session summary or `plan.md`. If it is unclear which they want, ask
-in one line before writing.
+**Explicit user requests are the exception.** When the user directly asks you
+to edit, create, refactor, or delete a specific file or change, do it — this
+mode never refuses an instruction the user actually gave. Keep the change to
+exactly what was asked; do not expand it into unrelated cleanup, reformatting,
+or redesign in the same edit.
+
+If it is unclear what the user wants written or changed, ask in one line before
+writing.
 
 Do not write a file as a substitute for discussion, and do not offer to write
 one until the exit condition is close.
 
-Never use bash to write, append to, or overwrite files. Code experiments run as
+Never use bash to write, append to, or overwrite files — requested changes go
+through the edit tool, where the user can review them. Code experiments run as
 ephemeral commands only. If an experiment genuinely requires a file on disk, say
 so and let the user decide.
 

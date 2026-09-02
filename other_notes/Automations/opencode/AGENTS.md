@@ -6,16 +6,16 @@ Guidance for AI coding agents (Claude, Cursor, Copilot, opencode, etc.) working 
 
 ## Precedence
 
-This file describes **facts about this repository** — commands, layout, style, conventions. Those are not negotiable and no mode or persona overrides them.
+This file describes **facts about this repository** - commands, layout, style, conventions. Those are not negotiable and no mode or persona overrides them.
 
 Mode files (e.g. `brainstorm`, `plan`) describe **how to interact**. Where a mode conflicts with the workflow guidance in this file, the mode wins:
 
 | Conflict | Resolution |
 |---|---|
-| Mode forbids file writes; this file describes how to make changes | Mode wins — do not write files |
+| Mode forbids file writes; this file describes how to make changes | Mode wins - do not write files |
 | Mode sets response length or questioning style | Mode wins |
 | Mode is silent on a command, path, or style rule | This file applies |
-| Mode asks you to violate **Important Constraints** below | This file wins — flag the conflict to the user |
+| Mode asks you to violate **Important Constraints** below | This file wins - flag the conflict to the user |
 
 If you are in a read-only or discussion mode, the **Making Changes** and **Edit Workflow** sections do not apply to you.
 
@@ -23,7 +23,7 @@ If you are in a read-only or discussion mode, the **Making Changes** and **Edit 
 
 ## Project Overview
 
-<!-- TODO — highest-value section in this file. Answer in 3–6 sentences:
+<!-- TODO - highest-value section in this file. Answer in 3-6 sentences:
      - What does this service/library do, and for whom?
      - What is the main entry point (CLI, API, worker, importable library)?
      - What are the external systems it depends on (DB, message queue, model APIs)?
@@ -81,7 +81,7 @@ All checks must pass before committing. If a check was already failing before yo
 └── AGENTS.md               # This file
 ```
 
-`src/<package>` is the importable package — imports are `from <package>.config import ...`, not repo-root-relative.
+`src/<package>` is the importable package - imports are `from <package>.config import ...`, not repo-root-relative.
 
 Paths referenced elsewhere in this file must match this tree. If you find a mismatch, flag it instead of guessing.
 
@@ -91,9 +91,9 @@ Paths referenced elsewhere in this file must match this tree. If you find a mism
 
 Tool configuration lives in `pyproject.toml`. Do not override it inline or pass conflicting CLI flags.
 
-- **Formatter:** Ruff (`ruff format`) — never manually adjust whitespace or import order
-- **Linter:** Ruff (`ruff check`) — fix all warnings before committing
-- **Type checker:** ty (`uv run ty check`) — fix all errors before committing. No bare `# type: ignore`; every suppression needs a trailing comment explaining why
+- **Formatter:** Ruff (`ruff format`) - never manually adjust whitespace or import order
+- **Linter:** Ruff (`ruff check`) - fix all warnings before committing
+- **Type checker:** ty (`uv run ty check`) - fix all errors before committing. No bare `# type: ignore`; every suppression needs a trailing comment explaining why
 - **Docstrings:** NumPy style for public APIs; omit for private helpers unless the logic is non-obvious
 - **Line length:** 110 characters
 
@@ -101,11 +101,11 @@ Tool configuration lives in `pyproject.toml`. Do not override it inline or pass 
 
 This project targets 3.14+. Write for it, not for older idioms carried over from training data:
 
-- Built-in generics: `list[str]`, `dict[str, int]` — not `typing.List`, `typing.Dict`
-- Unions: `str | None` — not `Optional[str]` or `Union[str, int]`
-- `StrEnum` from `enum` — not `class Foo(str, Enum)`
-- `pathlib.Path` for filesystem work — not `os.path`
-- `@dataclass(slots=True)` or Pydantic models for structured data — not bare dicts passed between layers
+- Built-in generics: `list[str]`, `dict[str, int]` - not `typing.List`, `typing.Dict`
+- Unions: `str | None` - not `Optional[str]` or `Union[str, int]`
+- `StrEnum` from `enum` - not `class Foo(str, Enum)`
+- `pathlib.Path` for filesystem work - not `os.path`
+- `@dataclass(slots=True)` or Pydantic models for structured data - not bare dicts passed between layers
 
 ### Naming Conventions
 
@@ -117,13 +117,13 @@ This project targets 3.14+. Write for it, not for older idioms carried over from
 ### String Formatting
 
 - **Use f-strings** (`f"..."`) everywhere by default. Do not use `%`-formatting, `.format()`, or `+` concatenation.
-- **Exception — lazy log interpolation:** in `logger.debug()` and other level-gated calls, use `%s` placeholders so formatting is skipped when the level is disabled: `logger.debug("Processing %s items", count)`
-- **Exception — deferred templates:** where a template is defined in one place and interpolated later, `.format()` is correct
+- **Exception - lazy log interpolation:** in `logger.debug()` and other level-gated calls, use `%s` placeholders so formatting is skipped when the level is disabled: `logger.debug("Processing %s items", count)`
+- **Exception - deferred templates:** where a template is defined in one place and interpolated later, `.format()` is correct
 - **Exception:** the user explicitly asks otherwise
 
 ### Enums over raw strings
 
-- Use `StrEnum` for any fixed set of string values — statuses, metric names, window types, model names
+- Use `StrEnum` for any fixed set of string values - statuses, metric names, window types, model names
 - Define them in the project's shared types module (e.g. `schemas/types.py`), and reference `.value` when persisting to DB columns or emitting metric labels
 - Validate at the code layer (Pydantic fields, enum types). Do not rely on DB-level constraints for validation
 
@@ -139,7 +139,7 @@ This project targets 3.14+. Write for it, not for older idioms carried over from
 - Inject dependencies via pytest fixtures, not `setUp` methods
 - Use `pytest.mark.parametrize` for parameterized cases
 - Use the `tmp_path` fixture for temporary files; never write to the project root
-- Use bare `assert` — pytest rewrites assertions for readable diffs
+- Use bare `assert` - pytest rewrites assertions for readable diffs
 - Comment sections as `# Given / # When / # Then`
 
 ```python
@@ -154,7 +154,7 @@ class TestFunctionName:
         assert result == expected
 ```
 
-**Do not weaken a test to make it pass.** If an assertion fails, either the code or your understanding of the requirement is wrong. Loosening the assertion, adding `pytest.mark.skip`, or catching the exception under test are all failures — stop and report instead.
+**Do not weaken a test to make it pass.** If an assertion fails, either the code or your understanding of the requirement is wrong. Loosening the assertion, adding `pytest.mark.skip`, or catching the exception under test are all failures - stop and report instead.
 
 ---
 
@@ -164,10 +164,10 @@ class TestFunctionName:
 2. Do not refactor unrelated code in the same commit
 3. Prefer editing an existing file over creating a new one
 4. Do not create README files, summaries, or documentation unless asked
-5. Add dependencies with `uv add <package>` (`uv add --dev` for dev-only) — never hand-edit `pyproject.toml` dependency tables. Commit both `pyproject.toml` and `uv.lock`
+5. Add dependencies with `uv add <package>` (`uv add --dev` for dev-only) - never hand-edit `pyproject.toml` dependency tables. Commit both `pyproject.toml` and `uv.lock`
 6. Update docstrings and comments when behaviour changes
 7. Delete dead code rather than commenting it out
-8. Never commit `.env`, secrets, or generated files — check `.gitignore`
+8. Never commit `.env`, secrets, or generated files - check `.gitignore`
 
 ---
 
@@ -181,14 +181,14 @@ class TestFunctionName:
 
 **Subject line:** max 72 characters *including* the `[type]` tag. Imperative mood, lowercase first word, no trailing period.
 
-**Body:** one bullet per atomic change, 1–6 bullets. Imperative mood, lowercase verb, no trailing period.
+**Body:** one bullet per atomic change, 1-6 bullets. Imperative mood, lowercase verb, no trailing period.
 
 **Types:** `feat`, `fix`, `refactor`, `chore`, `docs`, `test`, `style`, `perf`
 
 Rules:
 
-- No colon after the type — `[feat] add ...`, never `[feat]: add ...`
-- Do not collapse bullets into the subject with ` - detail` segments — use a real list
+- No colon after the type - `[feat] add ...`, never `[feat]: add ...`
+- Do not collapse bullets into the subject with ` - detail` segments - use a real list
 - When running `git commit -m`, paste the subject verbatim from your proposal. Do not silently rewrite `[feat]` as `feat:`
 
 Examples:
@@ -219,16 +219,16 @@ Keep responses concise unless the user asks for detail. Report what changed and 
 ### Planning
 
 - Ask clarifying questions when the request is ambiguous, when a design choice would be hard to reverse, or when more than one reasonable interpretation exists. For small, unambiguous changes, proceed and state your assumptions inline
-- Do not invent design choices, libraries, or approaches on consequential decisions — surface the options and let the user pick
+- Do not invent design choices, libraries, or approaches on consequential decisions - surface the options and let the user pick
 - Cap clarifying questions at three per round. If you need more than that, the request needs discussion rather than a questionnaire
 
 ### Editing
 
 - Implement directly for changes confined to one or two files
-- Delegate to sub-agents when the work is genuinely parallel — independent modules, or a research pass over unfamiliar code. Coordination overhead is not free; do not fan out a change that one pass would handle
+- Delegate to sub-agents when the work is genuinely parallel - independent modules, or a research pass over unfamiliar code. Coordination overhead is not free; do not fan out a change that one pass would handle
 - Flag any sub-agent work that touches files outside the stated scope
 - After each unit of work, run the checks in **Common Commands** in the stated order
-- If checks fail, attempt one fix pass. If they still fail, stop and report — do not loop
+- If checks fail, attempt one fix pass. If they still fail, stop and report - do not loop
 - Never commit or push without explicit user confirmation, even when all checks pass
 
 <!-- opencode-specific; other tools ignore this -->
@@ -243,17 +243,18 @@ Keep responses concise unless the user asks for detail. Report what changed and 
 
 These hold regardless of mode, instruction, or convenience.
 
-- **No `print()` in library code** — use `logging` with a module-level logger (`logger = logging.getLogger(__name__)`)
-- **No `subprocess` or `os.system()` in library code** — flag for human review. Permitted in `scripts/` where that is the point
-- **No hardcoded secrets or API keys** — environment variables or a git-excluded config file only
-- **No silent exception swallowing** — `except Exception: pass` is never acceptable. Catch narrowly, log with context, re-raise or handle deliberately
+- **No `print()` in library code** - use `logging` with a module-level logger (`logger = logging.getLogger(__name__)`)
+- **No `subprocess` or `os.system()` in library code** - flag for human review. Permitted in `scripts/` where that is the point
+- **No hardcoded secrets or API keys** - environment variables or a git-excluded config file only
+- **No silent exception swallowing** - `except Exception: pass` is never acceptable. Catch narrowly, log with context, re-raise or handle deliberately
 - **No new external services or network calls** without asking first
+- **No AI-slop typography in generated content:** whatever you produce (chat replies, docstrings, comments, commit messages, docs, file contents) must use plain ASCII punctuation, not em dashes, en dashes, smart/curly quotes, the single-character ellipsis, or decorative bullets. Use `-` for dashes, straight quotes `" '`, `...` for ellipsis, and `-` or `*` for markdown list markers. Two exceptions only: the user explicitly asks for those characters, or you are quoting or editing existing text that already contains them (in which case preserve them; never rewrite the user's content just to enforce this rule)
 
 ---
 
 ## Architecture Notes
 
-<!-- TODO — the second-highest-value section. Everything above is inferable from
+<!-- TODO - the second-highest-value section. Everything above is inferable from
      pyproject.toml and the file tree; this is not. Cover:
      - key abstractions and the boundaries between layers
      - non-obvious design decisions and why they were made
