@@ -73,6 +73,11 @@ All checks must pass before committing. If a check was already failing before yo
 .
 ├── src/
 │   └── <package>/          # Main source code
+│       ├── schemas/        # Pydantic models, dataclasses, and schemas
+│       ├── config/         # Configuration dataclasses and schemas
+│       ├── api/            # FastAPI app (if any)
+│       ├── db/             # SQLAlchemy models (if any)
+│       └── services/       # Modular services (if any)
 ├── tests/                  # Mirrors src/ structure
 ├── scripts/                # One-off utilities, never imported by src/
 ├── docs/                   # Documentation
@@ -113,6 +118,9 @@ This project targets 3.14+. Write for it, not for older idioms carried over from
 - Classes: `PascalCase`
 - Constants: `UPPER_SNAKE_CASE`
 - Private members: `_single_leading_underscore`
+- Sync functions: `snake_case` - e.g. `def foo() -> str`
+- Async functions: `a` prefix + `snake_case` - e.g. `async def afoo() -> str`
+- Private async functions: `_a` prefix + `snake_case` - e.g. `async def _afoo() -> str`
 
 ### String Formatting
 
