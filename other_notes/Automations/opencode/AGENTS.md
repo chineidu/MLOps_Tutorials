@@ -102,6 +102,13 @@ Tool configuration lives in `pyproject.toml`. Do not override it inline or pass 
 - **Docstrings:** NumPy style for public APIs; omit for private helpers unless the logic is non-obvious
 - **Line length:** 110 characters
 
+### Comments
+
+- Use one short block comment per logical step in non-trivial functions to show flow
+- Style: single line, imperative mood, ends with a period (e.g. `# Validate the input.`, `# Fetch the rows.`, `# Render the output.`)
+- Apply when a function has three or more distinct phases, branching, or error mapping. Skip for trivial getters, single-call wrappers, and anything the docstring already covers
+- State the intent of the block, not a restatement of the code. Never use block comments as a substitute for docstrings and never leave commented-out dead code
+
 ### Modern Python
 
 This project targets 3.14+. Write for it, not for older idioms carried over from training data:
