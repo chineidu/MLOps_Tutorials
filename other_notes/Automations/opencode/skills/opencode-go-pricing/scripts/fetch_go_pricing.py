@@ -8,8 +8,8 @@
 Reads https://opencode.ai/docs/go/, extracts three tables (Pricing,
 Requests per period, Privacy), normalizes model names, joins them on the
 model column with a left join from pricing (so models with no request
-counts such as MiniMax M2.5 are kept), sorts by Usage (USD) descending,
-and prints a markdown table.
+counts such as MiniMax M2.5 are kept), sorts by Usage (USD) descending
+then requests per 5 hour descending, and prints a markdown table.
 
 Null request counts and null data-retention values render as `N/A`.
 """
@@ -45,13 +45,16 @@ class TableExtractor(HTMLParser):
     """Collect every `<table>` in the document as rows of cell strings."""
 
     def __init__(self) -> None:
+        """Initialize the extractor with empty state."""
         super().__init__()
         self.tables: list[list[list[str]]] = []
         self._current_table: list[list[str]] | None = None
         self._current_row: list[str] | None = None
         self._current_cell: list[str] | None = None
 
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+    def handle_starttag(self, tag: str, _attrs: list[tuple[str, str | None]]) -> None:
+        """Record an opening table, row, or cell tag."""
+        # _attrs unused - required by HTMLParser override.
         if tag == "table":
             self._current_table = []
         elif tag == "tr" and self._current_table is not None:
@@ -60,10 +63,15 @@ class TableExtractor(HTMLParser):
             self._current_cell = []
 
     def handle_endtag(self, tag: str) -> None:
+        """Close the current cell, row, or table and store completed rows."""
         if tag == "table" and self._current_table is not None:
             self.tables.append(self._current_table)
             self._current_table = None
-        elif tag == "tr" and self._current_row is not None and self._current_table is not None:
+        elif (
+            tag == "tr"
+            and self._current_row is not None
+            and self._current_table is not None
+        ):
             self._current_table.append(self._current_row)
             self._current_row = None
         elif tag in ("td", "th") and self._current_cell is not None:
@@ -72,14 +80,17 @@ class TableExtractor(HTMLParser):
             self._current_cell = None
 
     def handle_data(self, data: str) -> None:
+        """Append character data to the current cell."""
         if self._current_cell is not None:
             self._current_cell.append(data)
 
 
 def fetch_html(url: str) -> str:
     """Fetch the page and return its body as text."""
-    request = urllib.request.Request(url, headers={"User-Agent": "opencode-go-pricing-skill"})
-    with urllib.request.urlopen(request, timeout=30) as response:
+    request = urllib.request.Request(  # noqa: S310 - URL is the hardcoded Go docs page
+        url, headers={"User-Agent": "opencode-go-pricing-skill"}
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:  # noqa: S310 - URL is the hardcoded Go docs page
         return response.read().decode("utf-8")
 
 
@@ -90,9 +101,13 @@ def extract_tables(html: str) -> list[list[list[str]]]:
     return extractor.tables
 
 
-def find_table(tables: list[list[list[str]]], required_cols: set[str]) -> list[list[str]] | None:
-    """Return the first table whose header row contains every required
-    column (case-insensitive comparison)."""
+def find_table(
+    tables: list[list[list[str]]], required_cols: set[str]
+) -> list[list[str]] | None:
+    """Return the first matching table.
+
+    The header row must contain every required column (case-insensitive comparison).
+    """
     required = {c.lower() for c in required_cols}
     for table in tables:
         if len(table) < 2:
@@ -104,9 +119,10 @@ def find_table(tables: list[list[list[str]]], required_cols: set[str]) -> list[l
 
 
 def rows_to_dataframe(rows: list[list[str]]) -> pl.DataFrame:
-    """Build a Polars DataFrame from a parsed HTML table. rows[0] is the
-    header; every row after it is data (HTML tables have no separator
-    row, unlike markdown pipe tables)."""
+    """Build a Polars DataFrame from a parsed HTML table.
+
+    rows[0] is the header; every row after it is data (HTML tables have no separator row).
+    """
     if len(rows) < 2:
         return pl.DataFrame()
     header = rows[0]
@@ -132,7 +148,11 @@ def normalize_name(name: str | None) -> str | None:
 
 def normalize_model_column() -> pl.Expr:
     """Expression that adds a normalized `model` column from `Model`."""
-    return pl.col("Model").map_elements(normalize_name, return_dtype=pl.Utf8, skip_nulls=True).alias("model")
+    return (
+        pl.col("Model")
+        .map_elements(normalize_name, return_dtype=pl.Utf8, skip_nulls=True)
+        .alias("model")
+    )
 
 
 def parse_usage(value: str | None) -> int | None:
@@ -192,8 +212,12 @@ def build_table() -> pl.DataFrame:
     pricing = pricing.unique(subset=["model"], keep="first")
 
     # Sort key: parsed Usage integer. None sorts last when descending.
+    # Secondary key: requests per 5 hour, so models sharing a Usage tier
+    # order by highest throughput first.
     pricing = pricing.with_columns(
-        pl.col("Usage").map_elements(parse_usage, return_dtype=pl.Int64, skip_nulls=False).alias("_usage_int")
+        pl.col("Usage")
+        .map_elements(parse_usage, return_dtype=pl.Int64, skip_nulls=False)
+        .alias("_usage_int")
     )
 
     pricing_cols = pricing.select(["model", "Usage", "_usage_int"])
@@ -203,30 +227,41 @@ def build_table() -> pl.DataFrame:
     requests_cols = requests.select(
         [
             "model",
-            pl.col("requests per 5 hour").str.replace(",", "").cast(pl.Int64, strict=False).alias("req_5h"),
-            pl.col("requests per week").str.replace(",", "").cast(pl.Int64, strict=False).alias("req_week"),
-            pl.col("requests per month").str.replace(",", "").cast(pl.Int64, strict=False).alias("req_month"),
+            pl.col("requests per 5 hour")
+            .str.replace(",", "")
+            .cast(pl.Int64, strict=False)
+            .alias("req_5h"),
+            pl.col("requests per week")
+            .str.replace(",", "")
+            .cast(pl.Int64, strict=False)
+            .alias("req_week"),
+            pl.col("requests per month")
+            .str.replace(",", "")
+            .cast(pl.Int64, strict=False)
+            .alias("req_month"),
         ]
     )
-    privacy_cols = privacy.select(["model", pl.col("Data retention").alias("data_retention")])
+    privacy_cols = privacy.select(
+        ["model", pl.col("Data retention").alias("data_retention")]
+    )
 
-    joined = (
+    return (
         pricing_cols.join(requests_cols, on="model", how="left")
         .join(privacy_cols, on="model", how="left")
-        .sort("_usage_int", descending=True, nulls_last=True)
+        .sort(["_usage_int", "req_5h"], descending=[True, True], nulls_last=True)
         .rename({"Usage": "usage"})
         .select(["model", "usage", "req_5h", "req_week", "req_month", "data_retention"])
     )
-    return joined
 
 
 def main() -> int:
+    """Fetch, join, and print the Go model table."""
     try:
         df = build_table()
-    except Exception as exc:
-        print(f"error: {exc}", file=sys.stderr)
+    except Exception as exc:  # noqa: BLE001 - top-level CLI error boundary
+        print(f"error: {exc}", file=sys.stderr)  # noqa: T201 - CLI error output
         return 1
-    print(render_markdown(df))
+    print(render_markdown(df))  # noqa: T201 - script output is the markdown table
     return 0
 
 
