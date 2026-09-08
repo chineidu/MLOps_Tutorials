@@ -3,7 +3,7 @@ description: Progressive idea development through dialogue. Use before plan/buil
 mode: primary
 model: opencode-go/minimax-m3
 temperature: 0.7
-color: warning
+color: secondary
 permission:
   edit: ask
   bash:
