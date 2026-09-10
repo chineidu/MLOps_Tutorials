@@ -344,10 +344,21 @@ materialising as `notes/ADR/NNNN-slug.md`:
   extraction, naming within a contract, error message wording):
   batched at session end as `status: proposed` MADR files. The
   user ratifies the batch in one pass.
-- **Superseding decisions**: when a new ADR replaces an older one,
-  the older file's frontmatter moves to `status: superseded` and
-  gains a `superseded_by: NNNN-slug` line. Never delete a
-  superseded ADR.
+- **Superseding decisions**: when a new ADR replaces an older,
+  already ratified or committed one, the older file's frontmatter
+  moves to `status: superseded` and gains a `superseded_by:
+  NNNN-slug` line. Never delete a superseded ADR.
+
+**Draft mutability.** A `draft` or `proposed` ADR that is not yet
+committed is a working document, not a record. Revise it in place
+when the decision changes, grows, or picks up a related design:
+fold the update into Context, Decision, and Alternatives rather
+than allocating a new number or superseding it. Allocate a new
+`NNNN-slug.md` only when the decision is genuinely new (no
+existing draft covers it) or when replacing a ratified or
+committed ADR. Establish commit state with git (`git status
+--porcelain notes/ADR/`; untracked or modified entries are
+uncommitted) rather than assuming a file on disk is committed.
 
 Status transitions: `draft → proposed → ratified`. `draft` is for
 in-progress ADRs the agent is still working out (not yet shown to
@@ -367,8 +378,10 @@ session ends:
   hierarchy. This is the durable breadcrumb; the chat transcript is
   not.
 - Promote each batched tactical decision into its own
-  `NNNN-slug.md` with `status: proposed`. The user ratifies the
-  batch in one pass.
+  `NNNN-slug.md` with `status: proposed`, or fold it into an
+  existing uncommitted draft that already covers the same ground
+  (per §4.7 draft mutability). The user ratifies the batch in one
+  pass.
 - Note any open gaps as entries in
   `notes/ADR/sessions/open-questions.md` (create or append).
   Items here become MADR files when decided.
@@ -428,8 +441,10 @@ notes/ADR/
 ### 8.2 File naming
 
 `NNNN-kebab-case-slug.md`. `NNNN` is a zero-padded 4-digit sequence
-number (`0001`, `0002`, ...). Allocate sequentially; never reuse a
-number, even for a superseded ADR. The slug describes the decision
+number (`0001`, `0002`, ...). Allocate sequentially, and only when
+warranted per §4.7 (a genuinely new decision, or replacement of a
+ratified or committed ADR); never reuse a number, even for a
+superseded ADR. The slug describes the decision
 ("omega-conf-config", "adapter-pattern", not "decision-3").
 
 ### 8.3 Template
@@ -504,5 +519,7 @@ When context is large or compressed, the mode still requires:
 - Scope-creep fixes are flagged, never inlined.
 - Architectural ADR drafts land immediately with `status:
   proposed`; tactical decisions batch at session end, also as
-  `status: proposed` MADR files.
+  `status: proposed` MADR files. Uncommitted drafts are revised
+  in place; a new number is allocated only for a genuinely new
+  decision or when superseding a ratified or committed ADR.
 - `architecture_legacy.md` is read-only. Do not edit or append.
