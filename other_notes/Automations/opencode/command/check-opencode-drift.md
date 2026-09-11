@@ -54,16 +54,17 @@ GLOBAL_CONFIG: ~/.config/opencode
 | `GLOBAL_CONFIG/skills/<name>/` (all contents) | `REPO_MIRROR/skills/<name>/` (all contents) |
 | `GLOBAL_CONFIG/config.json` | `REPO_MIRROR/configs/config.json` |
 | `GLOBAL_CONFIG/opencode.jsonc` | `REPO_MIRROR/configs/opencode.jsonc` |
+| `GLOBAL_CONFIG/tui.json` | `REPO_MIRROR/configs/tui.json` |
 | `GLOBAL_CONFIG/AGENTS.md` | `REPO_MIRROR/AGENTS.md` |
 | `GLOBAL_CONFIG/plugins/*.ts` | `REPO_MIRROR/plugins/*.ts` |
 
-`opencode.jsonc` lives in `REPO_MIRROR/configs/` (not repo root) because the repo root holds the mirror itself.
+The config files (`config.json`, `opencode.jsonc`, `tui.json`) live in `REPO_MIRROR/configs/` (not repo root) because the repo root holds the mirror itself.
 
 ---
 
 # Exclusions (skip these entirely)
 
-- `GLOBAL_CONFIG/.gitignore`, `GLOBAL_CONFIG/node_modules/`, `GLOBAL_CONFIG/package.json`, `GLOBAL_CONFIG/package-lock.json`, `GLOBAL_CONFIG/tui.json`
+- `GLOBAL_CONFIG/.gitignore`, `GLOBAL_CONFIG/node_modules/`, `GLOBAL_CONFIG/package.json`, `GLOBAL_CONFIG/package-lock.json`
 - `REPO_MIRROR/docs/`, `REPO_MIRROR/README.md`, `REPO_MIRROR/shift-enter-newline.md`
 - `REPO_MIRROR/skills/python-skills/`, `REPO_MIRROR/skills/customize-opencode/`
 - `.git`
@@ -208,7 +209,7 @@ After the report, check:
 
 - No mapped file was excluded from the scan
 - File counts match actual filesystem contents in both locations
-- `REPO_MIRROR/configs/opencode.jsonc` parses successfully as JSONC (report if not; this is a repo-side problem)
+- `REPO_MIRROR/configs/opencode.jsonc` parses successfully as JSONC and `REPO_MIRROR/configs/tui.json` parses successfully as JSON (report if not; this is a repo-side problem)
 - In push mode: every pushed path re-classifies as `IDENTICAL`, no `REPO_ONLY` item was deleted, and the only modifications were to mapped paths in `REPO_MIRROR`
 
 Report any validation failures at the bottom.

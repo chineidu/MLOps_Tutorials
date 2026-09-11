@@ -41,6 +41,7 @@ GLOBAL_CONFIG: ~/.config/opencode
 | `REPO_MIRROR/skills/<name>/SKILL.md` | `GLOBAL_CONFIG/skills/<name>/SKILL.md` |
 | `REPO_MIRROR/configs/config.json` | `GLOBAL_CONFIG/config.json` |
 | `REPO_MIRROR/configs/opencode.jsonc` | `GLOBAL_CONFIG/opencode.jsonc` |
+| `REPO_MIRROR/configs/tui.json` | `GLOBAL_CONFIG/tui.json` |
 | `REPO_MIRROR/AGENTS.md` | `GLOBAL_CONFIG/AGENTS.md` |
 | `REPO_MIRROR/plugins/*.ts` | `GLOBAL_CONFIG/plugins/` |
 
@@ -61,7 +62,6 @@ Never copy:
 - `node_modules`
 - `package.json`
 - `package-lock.json`
-- `tui.json`
 
 ---
 
@@ -97,6 +97,7 @@ Applies to:
 - `plugins/`
 - `AGENTS.md`
 - `config.json`
+- `tui.json`
 
 For every mapped file:
 
@@ -169,7 +170,6 @@ The repository contents are authoritative.
 Do not modify:
 
 - the repository mirror
-- `GLOBAL_CONFIG/tui.json`
 - any file outside the mappings above
 
 ---
