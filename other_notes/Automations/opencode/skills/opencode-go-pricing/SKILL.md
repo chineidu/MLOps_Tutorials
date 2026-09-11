@@ -8,7 +8,11 @@ description: Fetch the live opencode Go docs page (https://opencode.ai/docs/go/)
 The user wants a live, joined view of three tables on the
 [opencode Go docs page](https://opencode.ai/docs/go/):
 
-- **Pricing** — carries the per-model `Usage` allowance in USD.
+- **Pricing** — carries the per-model USD allowance per $10/month
+  subscription. Current column name is `Monthly limit` (renamed from
+  `Usage`). A higher number means more usage per dollar — the $15 tier
+  (Grok 4.6, Kimi K3, GLM-5.3, Qwen3.8 Max, DeepSeek V4 Pro) is the
+  expensive tier; the $60 tier is roughly 4x more generous.
 - **Requests per period** — carries `requests per 5 hour / week / month`.
 - **Privacy** — carries `Data retention`.
 
@@ -19,13 +23,24 @@ to be handled every fetch:
    the pricing table: `Grok 4.6 (≤ 200K tokens)` and `Grok 4.6 (> 200K
    tokens)`, `GPT 5.6 Luna` (≤/>272K), `Qwen3.7 Plus` and `Qwen3.6 Plus`
    (≤/>256K), and `DeepSeek V4 Pro / V4 Flash / V4 Flash Vision Exp`
-   (Off-Peak / Peak). Their `Usage` column is identical across both tiers,
+   (Off-Peak / Peak). Their value column is identical across both tiers,
    so collapsing to one row per model is safe.
 2. **MiMo name spacing differs across tables.** Pricing writes `MiMo V2.5`
    and `MiMo V2.5 Pro`; the other two tables write `MiMo-V2.5` and
    `MiMo-V2.5-Pro`. Naive joins will silently drop MiMo on both sides —
    and MiMo has the highest request counts on the page, so this is not a
    corner case.
+
+**Column-rename resilience.** Each target column is resolved in two
+passes: a header alias match against a list of known names (so past
+renames like `Usage` → `Monthly limit` keep working), then a
+value-pattern signature match against every non-empty cell in the
+column (so future renames are caught without a code change). The
+pricing monthly-limit column carries the pattern `^\$\d+$` — whole
+dollar amounts only — which excludes the per-token rate columns
+(`$0.15`, `$1.40`) so the heuristic cannot misfire on a sibling. When
+the fallback fires, the script prints a stderr warning naming the
+discovered column so it can be promoted into the alias list.
 
 The helper script owns both pieces deterministically:
 
