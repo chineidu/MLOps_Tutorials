@@ -209,10 +209,18 @@ Do not wrap table rows to satisfy line length. That breaks the table.
 
 ## Line length (MD013)
 
-- pymarkdown default is 80. Ruff in many Python repos is 110. Check
-  `pyproject.toml`, `.pymarkdown.json`, `.markdownlint.json`, or
-  `.markdownlint.yaml` before wrapping.
-- Wrap prose and list items at the configured limit (or 80-110 if none).
+- Effective limit discovery order (first hit wins):
+  1. A reported `MD013` diagnostic (`Expected: N`) - authoritative.
+  2. Project markdownlint config: `.markdownlint.json`,
+     `.markdownlint.yaml`, `.markdownlint.yml`.
+  3. VS Code settings, under `markdownlint.config` -> `MD013` ->
+     `line_length`: `<project>/.vscode/settings.json`, then the user
+     `settings.json`.
+  4. `[tool.pymarkdown.plugins.md013]` in `pyproject.toml`,
+     `.pymarkdown.json`.
+- Ruff `max-line-length` in `pyproject.toml` is Python-only. Never use
+  it as the markdown limit.
+- Wrap prose and list items at the effective limit (80 if none found).
   Break on spaces, not in the middle of `code` spans.
 - Do not wrap tables or fenced code.
 - If tables or code still trip MD013, prefer project config:
