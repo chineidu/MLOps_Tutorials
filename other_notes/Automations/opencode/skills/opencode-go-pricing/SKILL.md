@@ -16,7 +16,7 @@ The user wants a live, joined view of three tables on the
 - **Requests per period** — carries `requests per 5 hour / week / month`.
 - **Privacy** — carries `Data retention`.
 
-All three join on the model column, but the page has two gotchas that have
+All three join on the model column, but the page has three gotchas that have
 to be handled every fetch:
 
 1. **Tiered pricing rows are duplicated.** Several models appear twice in
@@ -30,17 +30,32 @@ to be handled every fetch:
    `MiMo-V2.5-Pro`. Naive joins will silently drop MiMo on both sides —
    and MiMo has the highest request counts on the page, so this is not a
    corner case.
+3. **Promo markup carries struck-through old values.** A promoted model
+   renders `<del>$15</del> <strong>$60</strong>` plus a `4x · Ends Sep 20`
+   note (and `<del>6,500</del><br><strong>26,000</strong>` in the requests
+   table). All digit parsing is regex-driven and takes the last (bold,
+   current) value: usage extracts every `$` amount (commas and decimals
+   included), counts extract every number (commas and k/M/B suffixes
+   included), and model names have any promo suffix stripped before
+   joining. Cells with no parseable digits yield `N/A`, never a crash.
 
-**Column-rename resilience.** Each target column is resolved in two
-passes: a header alias match against a list of known names (so past
-renames like `Usage` → `Monthly limit` keep working), then a
-value-pattern signature match against every non-empty cell in the
-column (so future renames are caught without a code change). The
-pricing monthly-limit column carries the pattern `^\$\d+$` — whole
-dollar amounts only — which excludes the per-token rate columns
-(`$0.15`, `$1.40`) so the heuristic cannot misfire on a sibling. When
-the fallback fires, the script prints a stderr warning naming the
-discovered column so it can be promoted into the alias list.
+**Column-rename resilience.** Each target column is resolved in passes,
+first success wins: a header alias match against a list of known names
+(so past renames like `Usage` → `Monthly limit` keep working), then a
+value-pattern signature match over data cells (`-`/`N/A` placeholders
+ignored). The pricing monthly-limit pattern `\$\d+(?![\d.])` matches a
+whole-dollar amount anywhere in the cell while excluding per-token rates
+(`$0.15`); known price columns (`Input`, `Output`, ...) are excluded
+outright, and any remaining tie breaks by lowest cardinality (tiered
+limits repeat; prices vary). The request windows are indistinguishable
+by pattern, so their fallback is structural: the unique column
+assignment satisfying 5h <= week <= month on every complete row (the
+20%/50%/100% sizing relationship). Retention falls back to a
+days-or-ZDR pattern. Tables are located by header hints first, then by
+column signature. Integral floats render without decimals. Every
+fallback prints a stderr warning naming what it found so it can be
+promoted into the alias or hint lists; total failure still raises
+instead of guessing.
 
 The helper script owns both pieces deterministically:
 
