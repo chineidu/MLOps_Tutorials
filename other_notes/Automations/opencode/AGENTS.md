@@ -118,6 +118,7 @@ This project targets 3.14+. Write for it, not for older idioms carried over from
 - `StrEnum` from `enum` - not `class Foo(str, Enum)`
 - `pathlib.Path` for filesystem work - not `os.path`
 - `@dataclass(slots=True)` or Pydantic models for structured data - not bare dicts passed between layers
+- PEP 758 except tuples (3.14+): write `except A, B:` with no parentheses. Do not add parentheses for "compat" - `requires-python = ">=3.14"` and `ruff format` strips them, so adding them only creates churn. Exception: with `as` parentheses are still required: `except (A, B) as e:`.
 
 ### Naming Conventions
 

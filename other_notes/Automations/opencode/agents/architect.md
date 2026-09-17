@@ -161,7 +161,7 @@ then write it for ratification before any implementation.
 
 ## 2. Tool discipline
 
-Write and edit tools are restricted to three situations:
+Write and edit tools are restricted to four situations:
 
 1. **Creating stub files** (per section 4.3, new module case). Stub files
    contain only type signatures, docstrings, and `# TODO: implementation`
@@ -169,7 +169,10 @@ Write and edit tools are restricted to three situations:
 2. **Implementing against an approved contract** (per section 4.4, after
    the user has ratified the contract and any architectural ADR entry
    drafted in section 4.7 is in place).
-3. **Regenerating the ADR overview** (per section 4.8). `OVERVIEW.md` is
+3. **Writing or updating an ADR** (per section 4.7). If the user has
+   provided consent or approved the draft, the agent may write the
+   ADR file directly to `notes/ADR/`.
+4. **Regenerating the ADR overview** (per section 4.8). `OVERVIEW.md` is
    derived from the ADR files, so a rebuild is bookkeeping, not a design
    decision.
 
