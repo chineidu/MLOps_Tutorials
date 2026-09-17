@@ -14,19 +14,86 @@ exposes three tools over stdio:
 
 No outbound network required at runtime. The corpus is read from disk.
 
-## Install (existing machine with `/sync-opencode`)
+---
 
-1. Run `/sync-opencode` to copy this server into
-   `~/.config/opencode/mcp-servers/langgraph-docs/` and merge the
-   matching `mcp` block into `~/.config/opencode/opencode.jsonc`.
-2. Run `/opencode-bootstrap-docs` to clone the docs mirror into
-   `~/docs-mirror/langchain` (first-time only).
-3. Restart opencode. `opencode mcp list` should show
-   `langgraph-docs-mcp ✓ connected`.
+## Prerequisites
+
+| Requirement | Why | How to install |
+|---|---|---|
+| `uv` 0.4+ on `PATH` | Spawns the server via `uv run --with mcp>=2` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+| `git` | Clones and refreshes the docs mirror | Pre-installed on macOS; `brew install git` otherwise |
+| Python 3.10+ | The MCP runtime requires it; `uv` will fetch one if missing | Installed automatically by `uv run` |
+
+Verify prerequisites before first sync:
+
+```bash
+uv --version
+git --version
+```
+
+If `uv --version` prints nothing, the opencode TUI may inherit a stripped
+`PATH` and fail with `ENOENT posix_spawn 'uv'`. See **Troubleshooting ->
+PATH issues** below.
+
+---
+
+## Install (fresh machine, no global config yet)
+
+The fastest path. Assumes you have cloned the MLOps repo somewhere on disk.
+
+1. **Install `uv` if missing:**
+
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+
+   This places `uv` at `~/.local/bin/uv`. Confirm with `uv --version`.
+
+2. **Run `/sync-opencode`** from any opencode session:
+
+   This copies the vendored server source into
+   `~/.config/opencode/mcp-servers/langgraph-docs/` and merges the
+   `langgraph-docs-mcp` block into `~/.config/opencode/opencode.jsonc`.
+
+3. **Run `/opencode-bootstrap-docs`**:
+
+   Sparse-clones `~/docs-mirror/langchain` (Python and LangGraph sections
+   only, no JavaScript, no LangSmith). First-time only.
+
+4. **Restart opencode**.
+
+5. **Verify:**
+
+   ```text
+   opencode mcp list
+   ```
+
+   `langgraph-docs-mcp` should show `✓ connected`. If it shows `failed`,
+   jump to **Troubleshooting**.
+
+---
+
+## Install (existing machine with `/sync-opencode` already wired)
+
+If `/sync-opencode` is already in your `~/.config/opencode/command/`:
+
+1. `/sync-opencode` - updates the server source and config block.
+2. `/opencode-bootstrap-docs` - clones the docs mirror if missing; no-op otherwise.
+3. Restart opencode.
+
+---
+
+## Daily use
+
+Once installed, the server is silent. Just ask LangGraph / LangChain
+questions in any opencode session; the model will call
+`list_doc_sources`, `search_docs`, or `get_doc` automatically.
+
+---
 
 ## Refresh the mirror
 
-Run `/opencode-refresh-docs` whenever you want updated LangGraph/LangChain
+Run `/opencode-refresh-docs` whenever you want updated LangGraph / LangChain
 docs. It pulls from upstream without recloning:
 
 ```bash
@@ -41,12 +108,15 @@ Restart opencode after refresh so `langgraph-docs-mcp` reindexes.
 (`git pull` fails on shallow mirrors when the upstream force-pushes;
 the fetch + reset pattern always works.)
 
-## Install (fresh machine)
+Optional disk reclaim after several refreshes:
 
-1. Clone or pull the MLOps repo that vendors this folder.
-2. Run `/sync-opencode` (deploys commands, agents, configs, MCP servers).
-3. Run `/opencode-bootstrap-docs` (clones the docs mirror).
-4. Restart opencode.
+```bash
+cd ~/docs-mirror/langchain
+git reflog expire --expire=now --all
+git gc --prune=now
+```
+
+---
 
 ## Configuration
 
@@ -69,6 +139,8 @@ does not have to be the LangChain docs repo. The corpus label reported to
 clients is derived from the directory basename (e.g. `langchain` ->
 `LangChain`, `fastapi` -> `FastAPI`).
 
+---
+
 ## Files
 
 | Path | Purpose |
@@ -76,10 +148,44 @@ clients is derived from the directory basename (e.g. `langchain` ->
 | `langgraph_docs_mcp.py` | Server source. Copied verbatim by `/sync-opencode`. |
 | `README.md` | This file. Excluded from sync. |
 
+---
+
 ## Troubleshooting
 
-| Symptom | Likely cause |
-|---|---|
-| `DOCS_PATH is not a directory: ...` | Mirror missing - run `/opencode-bootstrap-docs`. |
-| `connected` but `list_doc_sources` returns 0 files | Mirror is sparse-checked to an empty set. Re-run `/opencode-bootstrap-docs` or widen sparse-checkout manually. |
-| Stale content after `git pull` | Shallow mirror + force-push. Use `git fetch origin --depth 1 && git reset --hard origin/main` instead. |
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `failed: MCP error -32000: Connection closed` | `~/docs-mirror/langchain` missing | Run `/opencode-bootstrap-docs`. |
+| `failed: ENOENT posix_spawn 'uv'` | `uv` not on PATH inside opencode TUI | See **PATH issues** below. |
+| `failed: DOCS_PATH is not a directory: ...` | Mirror path wrong | Set `environment.DOCS_PATH` or fix the symlink. |
+| `connected` but `list_doc_sources` returns 0 files | Sparse-checkout misconfigured | `cd ~/docs-mirror/langchain && git sparse-checkout set src/oss/python` |
+| Stale content after `git pull` | Shallow mirror + force-push | `git fetch origin --depth 1 && git reset --hard origin/main` |
+| Server shows old content after `/opencode-refresh-docs` | opencode did not restart | Restart opencode so the server reindexes from disk. |
+
+### PATH issues
+
+The opencode TUI on macOS inherits a minimal `PATH`
+(`/usr/bin:/bin:/usr/sbin:/sbin`) and ignores shell `PATH` modifications
+from `~/.zshrc` / `~/.bashrc`. This is a known opencode bug; see
+[anomalyco/opencode#26356](https://github.com/anomalyco/opencode/issues/26356).
+
+Workaround: add an explicit `environment.PATH` to your local
+`~/.config/opencode/opencode.jsonc` that includes `~/.local/bin`:
+
+```jsonc
+"langgraph-docs-mcp": {
+  "type": "local",
+  "command": ["uv", "run", "--with", "mcp>=2", "python", "langgraph_docs_mcp.py"],
+  "cwd": "~/.config/opencode/mcp-servers/langgraph-docs",
+  "environment": {
+    "PATH": "/Users/mac/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+  },
+  "timeout": 30000,
+  "enabled": true
+}
+```
+
+Replace `/Users/mac/.local/bin` with wherever `uv` is installed on this
+machine (`which uv`). The vendored repo config does not include this
+override because it bakes the user-specific `uv` path into the canonical
+source - each machine adds its own `environment.PATH` after the first
+sync if needed.

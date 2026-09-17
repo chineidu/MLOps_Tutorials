@@ -28,6 +28,36 @@ without per-machine configuration.
 
 ---
 
+# Preconditions
+
+Before doing anything, verify the prerequisites are present:
+
+| Tool | How to check | Required because |
+|---|---|---|
+| `git` | `git --version` | Clones and refreshes the docs mirror |
+| `uv` | `uv --version` | Spawned by opencode to run the MCP server (`uv run --with mcp>=2`) |
+
+If `git` is missing: install it (`brew install git` or `xcode-select --install`).
+Do not proceed; abort with a clear error.
+
+If `uv` is missing: stop with this exact message:
+
+```text
+uv is required but not on PATH.
+
+Install with:
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+
+This places uv at ~/.local/bin/uv. After installation, restart opencode
+so the TUI inherits the updated PATH, then re-run this command.
+```
+
+Do not auto-install. Do not proceed.
+
+If both are present, continue.
+
+---
+
 # What it does
 
 1. Resolve `~/docs-mirror/langchain` to an absolute path.
@@ -112,12 +142,16 @@ After the command completes:
 # Report
 
 ```text
+Preconditions:  git <version>, uv <version> OK | uv missing
 Mirror path:    ~/docs-mirror/langchain
-Action:         cloned | already-present
+Action:         cloned | already-present | prerequisites-failed
 HEAD:           <short SHA on first clone only>
 Files indexed:  <count on first clone only>
 Size on disk:   <du output on first clone only>
 ```
+
+If the prerequisites failed (e.g. `uv` missing), end with the install
+instructions from the **Preconditions** section. Do not proceed.
 
 If the mirror already existed, end with:
 
