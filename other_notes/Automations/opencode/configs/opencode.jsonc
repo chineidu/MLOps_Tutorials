@@ -133,6 +133,13 @@
       "type": "local",
       "command": ["uvx", "--with", "polars", "--with", "mcp<1.30", "polars-mcp"],
       "enabled": true
+    },
+    "langgraph-docs-mcp": {
+      "type": "local",
+      "command": ["uv", "run", "--with", "mcp>=2", "python", "langgraph_docs_mcp.py"],
+      "cwd": "~/.config/opencode/mcp-servers/langgraph-docs",
+      "timeout": 30000,
+      "enabled": true
     }
   }
 }

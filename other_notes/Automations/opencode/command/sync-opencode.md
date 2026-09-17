@@ -44,6 +44,7 @@ GLOBAL_CONFIG: ~/.config/opencode
 | `REPO_MIRROR/configs/tui.json` | `GLOBAL_CONFIG/tui.json` |
 | `REPO_MIRROR/AGENTS.md` | `GLOBAL_CONFIG/AGENTS.md` |
 | `REPO_MIRROR/plugins/*.ts` | `GLOBAL_CONFIG/plugins/` |
+| `REPO_MIRROR/mcp-servers/<name>/*` | `GLOBAL_CONFIG/mcp-servers/<name>/` |
 
 Create parent directories if they do not already exist.
 
@@ -58,6 +59,7 @@ Never copy:
 - `REPO_MIRROR/shift-enter-newline.md`
 - `REPO_MIRROR/skills/python-skills/`
 - `REPO_MIRROR/skills/customize-opencode/`
+- `REPO_MIRROR/mcp-servers/<name>/README.md` (per-server docs stay in the repo)
 - `.git`
 - `node_modules`
 - `package.json`
@@ -95,6 +97,7 @@ Applies to:
 - `command/`
 - `skills/`
 - `plugins/`
+- `mcp-servers/`
 - `AGENTS.md`
 - `config.json`
 - `tui.json`
@@ -178,15 +181,55 @@ Do not modify:
 
 1. Enumerate every mapped file while honoring the exclusions.
 
-2. Classify each mapped file as one of:
+2. Detect unexpected files in mapped directories.
+
+For each mapped directory in the table, find files that exist in
+`REPO_MIRROR` but are not covered by the mapping pattern:
+
+| Mapped pattern | Expected extension(s) | Anything else is unexpected |
+|----------------|----------------------|------------------------------|
+| `command/*.md` | `.md` only | `command/foo.py`, `command/subdir/` |
+| `skills/<name>/SKILL.md` | `SKILL.md` only | `skills/<name>/scripts/`, `skills/<name>/references.md` |
+| `agents/*.md` | `.md` only | `agents/brainstorm.py`, `agents/subdir/` |
+| `plugins/*.ts` | `.ts` only | `plugins/foo.js`, `plugins/foo.tsx` |
+| `mcp-servers/<name>/*` | any | (no constraint - vendored as-is) |
+
+Honour the existing Exclusions list when scanning: a `.md` inside
+`docs/` or a `SKILL.md` inside `skills/python-skills/` is excluded,
+not unexpected.
+
+If any unexpected files are found, present them to the user and ask
+which to include in this run:
+
+```text
+Unexpected files in mapped directories:
+
+  command/foo.py              Python-backed command, not in the mapping table
+  skills/polars/scripts/      Helper scripts under a skill, not covered by SKILL.md
+
+Include any of these in this sync? [y/N per file, or 'all' / 'none']
+```
+
+Per-file decision:
+
+- **Include** - extend the in-memory mapping for this run only. Add to
+  the report as "Added (ad-hoc)".
+- **Skip** - leave the file in the repo, do not copy. Add to the report
+  as "Skipped (unexpected)".
+
+The mapping table in this file is the durable source of truth. The
+ad-hoc decisions do not modify it; remind the user to update the table
+if the choice is meant to persist.
+
+3. Classify each mapped file (table + ad-hoc) as one of:
 
 - Missing in `GLOBAL_CONFIG`
 - Different
 - Identical
 
-3. Synchronize according to the rules above.
+4. Synchronize according to the rules above.
 
-4. Verify synchronization.
+5. Verify synchronization.
 
 Re-check every mapped file.
 
@@ -197,7 +240,7 @@ Expected result:
 
 `opencode.jsonc` may legitimately differ where global machine-specific values are intentionally preserved.
 
-5. Validate:
+6. Validate:
 
 - `opencode.jsonc` parses successfully as JSONC.
 - No copied configuration references nonexistent machine-specific paths (for example `/Users/neidu/...`).
@@ -213,6 +256,8 @@ Produce a summary table.
 | File | Action | Reason |
 |------|--------|--------|
 | ... | Added / Updated / Skipped | ... |
+| command/foo.py | Added (ad-hoc) | User included at runtime - not in mapping table |
+| skills/polars/scripts/build.sh | Skipped (unexpected) | User opted out at runtime |
 
 Then report:
 
@@ -226,6 +271,9 @@ Updated:
 Skipped:
 ...
 
+Ad-hoc (runtime decision - consider updating the mapping table):
+...
+
 Verification
 
 ✓ Repository unchanged
@@ -233,4 +281,11 @@ Verification
 ✓ JSONC valid
 ✓ No foreign machine-specific paths detected
 ✓ Synchronization complete
+```
+
+If any ad-hoc additions were made, end with:
+
+```text
+N file(s) were copied via ad-hoc decision. Update the mapping table in
+sync-opencode.md if these should persist across runs.
 ```

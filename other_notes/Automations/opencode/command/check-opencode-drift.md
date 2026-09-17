@@ -57,6 +57,7 @@ GLOBAL_CONFIG: ~/.config/opencode
 | `GLOBAL_CONFIG/tui.json` | `REPO_MIRROR/configs/tui.json` |
 | `GLOBAL_CONFIG/AGENTS.md` | `REPO_MIRROR/AGENTS.md` |
 | `GLOBAL_CONFIG/plugins/*.ts` | `REPO_MIRROR/plugins/*.ts` |
+| `GLOBAL_CONFIG/mcp-servers/<name>/*` (excluding `README.md`) | `REPO_MIRROR/mcp-servers/<name>/*` (excluding `README.md`) |
 
 The config files (`config.json`, `opencode.jsonc`, `tui.json`) live in `REPO_MIRROR/configs/` (not repo root) because the repo root holds the mirror itself.
 
@@ -67,6 +68,7 @@ The config files (`config.json`, `opencode.jsonc`, `tui.json`) live in `REPO_MIR
 - `GLOBAL_CONFIG/.gitignore`, `GLOBAL_CONFIG/node_modules/`, `GLOBAL_CONFIG/package.json`, `GLOBAL_CONFIG/package-lock.json`
 - `REPO_MIRROR/docs/`, `REPO_MIRROR/README.md`, `REPO_MIRROR/shift-enter-newline.md`
 - `REPO_MIRROR/skills/python-skills/`, `REPO_MIRROR/skills/customize-opencode/`
+- `REPO_MIRROR/mcp-servers/<name>/README.md` and any global `GLOBAL_CONFIG/mcp-servers/<name>/README.md` (per-server docs)
 - `.git`
 
 These are machine-specific, generated, documentation, or repo-only by design.
@@ -81,6 +83,27 @@ Build the list of mapped files from both sides, honoring exclusions.
 
 For skills, include every file under `<name>/`, not just `SKILL.md` (the polars skill includes references and a `.claude-plugin/` directory).
 
+Also scan mapped directories for files outside the mapping pattern.
+These are "unexpected" files - present on one side but invisible to the
+mapping table:
+
+| Mapped pattern | Expected | Anything else is unexpected |
+|----------------|----------|------------------------------|
+| `command/*.md` | `.md` only | `command/foo.py`, `command/subdir/` |
+| `skills/<name>/SKILL.md` | `SKILL.md` only | `skills/<name>/scripts/`, `skills/<name>/references.md` |
+| `agents/*.md` | `.md` only | `agents/brainstorm.py`, `agents/subdir/` |
+| `plugins/*.ts` | `.ts` only | `plugins/foo.js`, `plugins/foo.tsx` |
+| `mcp-servers/<name>/*` | any | (no constraint - vendored as-is) |
+
+Honour the existing Exclusions list when scanning: a `.md` inside
+`docs/` or a `SKILL.md` inside `skills/python-skills/` is excluded,
+not unexpected.
+
+Unexpected files are reported but never classified as
+`GLOBAL_ONLY` / `REPO_ONLY` / `DIFFER` / `IDENTICAL`. They are a
+separate category so the existing classification logic does not double-
+count them.
+
 ## 2. Classify
 
 For each mapped path, determine which side it exists on:
@@ -91,6 +114,14 @@ For each mapped path, determine which side it exists on:
 | `REPO_ONLY` | Exists in `REPO_MIRROR`, not in `GLOBAL_CONFIG` |
 | `DIFFER` | Exists on both sides, contents differ |
 | `IDENTICAL` | Exists on both sides, byte-for-byte identical |
+
+For each unexpected file, classify as:
+
+| Classification | Meaning |
+|----------------|---------|
+| `UNEXPECTED_GLOBAL` | In `GLOBAL_CONFIG` under a mapped dir, doesn't match pattern |
+| `UNEXPECTED_REPO` | In `REPO_MIRROR` under a mapped dir, doesn't match pattern |
+| `UNEXPECTED_BOTH` | Unexpected on both sides at the same relative path |
 
 ## 3. Report
 
@@ -105,6 +136,7 @@ Rules for the Detail column:
 - `REPO_ONLY`: file count
 - `DIFFER`: first meaningful difference (truncated). For JSONC, note specific top-level keys or MCP servers that differ, not raw diff.
 - `IDENTICAL`: leave **Detail** blank
+- `UNEXPECTED_GLOBAL` / `UNEXPECTED_REPO` / `UNEXPECTED_BOTH`: the relative path under the mapped directory, plus a one-line hint (e.g. `command/foo.py - not covered by *.md pattern`). If many unexpected files share a directory, collapse to one row per directory with a count.
 
 After the table, produce a summary section.
 
@@ -115,10 +147,13 @@ After the table, produce a summary section.
 ```text
 Drift detected:
 
-GLOBAL_ONLY     N    Items in global but missing from repo
-REPO_ONLY       N    Items in repo but missing from global
-DIFFER          N    Items on both sides with different content
-IDENTICAL       N    Items in sync
+GLOBAL_ONLY         N    Items in global but missing from repo
+REPO_ONLY           N    Items in repo but missing from global
+DIFFER              N    Items on both sides with different content
+IDENTICAL           N    Items in sync
+UNEXPECTED_GLOBAL   N    Items in global under mapped dirs, off-pattern
+UNEXPECTED_REPO     N    Items in repo under mapped dirs, off-pattern
+UNEXPECTED_BOTH     N    Items on both sides at the same off-pattern path
 
 All other files excluded per mapping.
 ```
@@ -128,6 +163,9 @@ Interpretation guidance (report mode):
 - `GLOBAL_ONLY` items were likely added directly to global. To adopt them into the repo, run `/check-opencode-drift push`, then commit in the repo. After that, the repo is canonical again.
 - `REPO_ONLY` items exist in the repo but not globally. If they should be deployed, run `/sync-opencode`. If they are stale, remove them from the repo. Push mode never touches them.
 - `DIFFER` items mean both sides were edited independently. Treat this as a conflict: examine both versions before acting. `/check-opencode-drift push` resolves it by overwriting the repo copy with the global one, so push only after confirming the global version is the one to keep.
+- `UNEXPECTED_GLOBAL` items exist in global under a mapped directory but the mapping table does not cover them. They were likely added by hand or by an older sync. Adopt into the repo with `/check-opencode-drift push` only if the mapping table is widened to cover them - otherwise the next sync will silently drop them from global.
+- `UNEXPECTED_REPO` items exist in the repo under a mapped directory but the mapping table does not cover them. They will be silently ignored by `/sync-opencode`. Either update the mapping table in `sync-opencode.md` so they ship, or remove them from the repo if they are stale.
+- `UNEXPECTED_BOTH` items exist on both sides at the same unexpected path. Same resolution as `UNEXPECTED_REPO`: widen the mapping table, or remove from both sides.
 
 In report mode, never suggest resolving conflicts automatically. Push mode is not automatic resolution: it runs only on explicit user request, behind a confirmation step.
 
@@ -142,6 +180,7 @@ In report mode, never suggest resolving conflicts automatically. Push mode is no
 | REPO_ONLY | skills/python-skills/SKILL.md | 1 file under skills/python-skills/`
 | DIFFER | AGENTS.md | line 98: "- **Line length:** 110 characters" vs "100 characters"
 | IDENTICAL | agents/brainstorm.md | |
+| UNEXPECTED_REPO | command/foo.py | Python-backed command, not in *.md pattern |
 
 ... (remaining identical files grouped as "[N] files")
 
@@ -153,11 +192,16 @@ Drift detected:
 - REPO_ONLY:   [N]
 - DIFFER:      [N]
 - IDENTICAL:   [N]
+- UNEXPECTED_GLOBAL: [N]
+- UNEXPECTED_REPO:   [N]
+- UNEXPECTED_BOTH:   [N]
 ```
 
 Collapse long lists of identical files: show the first 3 as individual rows, then `[N more] files` on a single `IDENTICAL` row.
 
 For directories with multiple drifted files, show one row per directory with the count in Detail, not one row per file.
+
+For unexpected files, collapse to one row per directory with a count (same as drifted files).
 
 In report mode, when the report contains `GLOBAL_ONLY` or `DIFFER` items, end with exactly this line:
 
@@ -166,6 +210,15 @@ To adopt these into the repo: /check-opencode-drift push  (optionally add paths 
 ```
 
 Skip this line in push mode (the report there is a preview) and when there is nothing to push.
+
+When the report contains any `UNEXPECTED_*` items, end with:
+
+```text
+N unexpected file(s) are not covered by the mapping table.
+Update the table in sync-opencode.md to ship them, or remove from the repo.
+```
+
+Skip this line when there are no unexpected files.
 
 ---
 
