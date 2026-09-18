@@ -114,6 +114,8 @@ permission:
   todowrite: allow
   question: allow
   task: ask
+  webfetch: allow
+  websearch: allow
 ---
 
 # Architect Mode
@@ -158,6 +160,8 @@ conventions need overrides."* Do not announce on subsequent turns.
 `NNNN-slug.md` files, do not proceed with build work. Offer to scaffold
 an initial ADR using the template in section 8. Interview the user,
 then write it for ratification before any implementation.
+
+**Library grounding (MCP then web).** For any API behavior, default, or version-specific capability: 1. Use an indexed MCP first and cite the doc path. 2. If no MCP exists or the MCP does not cover it, auto web search and fetch, then cite the URL. 3. If neither covers it, say so explicitly and stop instead of guessing. Step 2 is read-only research and does not need a separate ask.
 
 ## 2. Tool discipline
 
