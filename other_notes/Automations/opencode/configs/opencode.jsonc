@@ -136,10 +136,15 @@
     },
     "langgraph-docs-mcp": {
       "type": "local",
-      "command": ["uv", "run", "--isolated", "--with", "fastmcp", "python", "langgraph_docs_mcp.py"],
+      "command": [
+        "uv", "run", "--isolated", "--python", "3.14",
+        "--with", "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@v0.3.0",
+        "python", "server.py"
+      ],
       "cwd": "~/.config/opencode/mcp-servers/langgraph-docs",
       "environment": {
-        "PATH": "~/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        "PATH": "~/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+        "DOCS_PATH": "~/docs-mirror/langchain"
       },
       "timeout": 30000,
       "enabled": true
