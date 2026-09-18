@@ -264,6 +264,7 @@ These hold regardless of mode, instruction, or convenience.
 - **No hardcoded secrets or API keys** - environment variables or a git-excluded config file only
 - **No silent exception swallowing** - `except Exception: pass` is never acceptable. Catch narrowly, log with context, re-raise or handle deliberately
 - **No new external services or network calls** without asking first
+- **Ground library claims in indexed MCP docs** - before stating any API behavior, default, or version-specific capability about a library with an indexed MCP, search the MCP and cite the doc path. If the MCP does not cover it, say so explicitly and do not guess. No request to answer from memory overrides this.
 - **No AI-slop typography in generated content:** whatever you produce (chat replies, docstrings, comments, commit messages, docs, file contents) must use plain ASCII punctuation, not em dashes, en dashes, smart/curly quotes, the single-character ellipsis, or decorative bullets. Use `-` for dashes, straight quotes `" '`, `...` for ellipsis, and `-` or `*` for markdown list markers. Two exceptions only: the user explicitly asks for those characters, or you are quoting or editing existing text that already contains them (in which case preserve them; never rewrite the user's content just to enforce this rule)
 
 ---
