@@ -153,7 +153,7 @@
       "type": "local",
       "command": [
         "uv", "run", "--isolated", "--python", "3.14",
-        "--with", "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@v0.2.0",
+        "--with", "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@v0.3.0",
         "python", "server.py"
       ],
       "cwd": "~/.config/opencode/mcp-servers/sklearn-docs",
