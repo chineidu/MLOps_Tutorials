@@ -35,7 +35,7 @@ Before doing anything, verify the prerequisites are present:
 | Tool | How to check | Required because |
 |---|---|---|
 | `git` | `git --version` | Clones and refreshes the docs mirror |
-| `uv` | `uv --version` | Spawned by opencode to run the MCP server (`uv run --with mcp>=2`) |
+| `uv` | `uv --version` | Spawned by opencode to run the MCP server (`uv run --isolated --with fastmcp`) |
 
 If `git` is missing: install it (`brew install git` or `xcode-select --install`).
 Do not proceed; abort with a clear error.

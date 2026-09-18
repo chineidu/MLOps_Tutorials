@@ -136,7 +136,7 @@
     },
     "langgraph-docs-mcp": {
       "type": "local",
-      "command": ["uv", "run", "--with", "mcp>=2", "python", "langgraph_docs_mcp.py"],
+      "command": ["uv", "run", "--isolated", "--with", "fastmcp", "python", "langgraph_docs_mcp.py"],
       "cwd": "~/.config/opencode/mcp-servers/langgraph-docs",
       "timeout": 30000,
       "enabled": true

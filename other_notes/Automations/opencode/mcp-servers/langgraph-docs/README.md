@@ -20,7 +20,7 @@ No outbound network required at runtime. The corpus is read from disk.
 
 | Requirement | Why | How to install |
 |---|---|---|
-| `uv` 0.4+ on `PATH` | Spawns the server via `uv run --with mcp>=2` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+| `uv` 0.4+ on `PATH` | Spawns the server via `uv run --isolated --with fastmcp` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
 | `git` | Clones and refreshes the docs mirror | Pre-installed on macOS; `brew install git` otherwise |
 | Python 3.10+ | The MCP runtime requires it; `uv` will fetch one if missing | Installed automatically by `uv run` |
 
@@ -70,6 +70,17 @@ The fastest path. Assumes you have cloned the MLOps repo somewhere on disk.
 
    `langgraph-docs-mcp` should show `✓ connected`. If it shows `failed`,
    jump to **Troubleshooting**.
+
+6. **Smoke test from the command line (optional but recommended):**
+
+   ```bash
+   DOCS_PATH=~/docs-mirror/langchain \
+     uv run --isolated --with fastmcp python client.py list_doc_sources '{}'
+   ```
+
+   Should print `LangChain`, a `file://` URL, and the first 50 indexed
+   files. `client.py` is a vendored fastmcp client that mirrors this
+   README's opencode config.
 
 ---
 
@@ -146,6 +157,7 @@ clients is derived from the directory basename (e.g. `langchain` ->
 | Path | Purpose |
 |---|---|
 | `langgraph_docs_mcp.py` | Server source. Copied verbatim by `/sync-opencode`. |
+| `client.py` | FastMCP test client mirroring this README's opencode config. |
 | `README.md` | This file. Excluded from sync. |
 
 ---
@@ -174,7 +186,7 @@ Workaround: add an explicit `environment.PATH` to your local
 ```jsonc
 "langgraph-docs-mcp": {
   "type": "local",
-  "command": ["uv", "run", "--with", "mcp>=2", "python", "langgraph_docs_mcp.py"],
+  "command": ["uv", "run", "--isolated", "--with", "fastmcp", "python", "langgraph_docs_mcp.py"],
   "cwd": "~/.config/opencode/mcp-servers/langgraph-docs",
   "environment": {
     "PATH": "/Users/mac/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
