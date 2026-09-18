@@ -138,6 +138,24 @@
       "type": "local",
       "command": ["uv", "run", "--isolated", "--with", "fastmcp", "python", "langgraph_docs_mcp.py"],
       "cwd": "~/.config/opencode/mcp-servers/langgraph-docs",
+      "environment": {
+        "PATH": "~/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+      },
+      "timeout": 30000,
+      "enabled": true
+    },
+    "sklearn-docs-mcp": {
+      "type": "local",
+      "command": [
+        "uv", "run", "--isolated", "--python", "3.14",
+        "--with", "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@v0.2.0",
+        "python", "server.py"
+      ],
+      "cwd": "~/.config/opencode/mcp-servers/sklearn-docs",
+      "environment": {
+        "PATH": "~/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+        "DOCS_PATH": "~/docs-mirror/scikit-learn/doc"
+      },
       "timeout": 30000,
       "enabled": true
     }

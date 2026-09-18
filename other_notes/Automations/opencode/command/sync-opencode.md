@@ -145,11 +145,24 @@ For each MCP server:
 - never replace an existing global server definition
 - never remove existing global servers
 
+When adding a server that exists only in the repository, expand a
+leading `~/` to the absolute `$HOME` path for this machine before
+writing to `GLOBAL_CONFIG`. Apply to `cwd` and to every string value
+under `environment`, including each colon-separated component of
+`PATH`. Example: `~/.config/opencode/...` becomes the absolute home
+path on this machine.
+
+Rationale: opencode sets `cwd` before spawning with no shell in the
+loop, so a literal `~/...` in `cwd` fails. `~` in `PATH` may resolve
+via shell lookup, but expand it anyway so the deployed config is
+deterministic.
+
 Specifically:
 
 - preserve the portable `uvx`-based `polars` configuration already in `GLOBAL_CONFIG`
-- never copy machine-specific absolute paths from the repository (for example `/Users/neidu/...`)
-- reject any copied configuration containing absolute paths that do not exist on this machine
+- never write a literal `~/...` into `GLOBAL_CONFIG` `cwd`; always expand first
+- never copy machine-specific absolute paths from the repository (for example `/Users/neidu/...`); the repository must only contain `~/...` templates, never absolute user paths
+- after expansion, reject any copied configuration whose `cwd` does not exist on this machine
 
 ---
 
@@ -243,6 +256,7 @@ Expected result:
 6. Validate:
 
 - `opencode.jsonc` parses successfully as JSONC.
+- Every deployed MCP `cwd` is absolute (no leading `~/`) and exists on this machine.
 - No copied configuration references nonexistent machine-specific paths (for example `/Users/neidu/...`).
 
 Abort and report any validation failure.
