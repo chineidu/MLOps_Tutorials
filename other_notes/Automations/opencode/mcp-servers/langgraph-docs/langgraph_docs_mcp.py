@@ -9,8 +9,28 @@ docs-shaped Git repository and exposes three tools over stdio:
 
 No outbound network. ``DOCS_PATH`` defaults to ``~/docs-mirror/langchain``
 and can be overridden via the environment. The corpus label reported to
-clients is derived from the mirror's directory basename (e.g. ``langchain``
-becomes ``LangChain``), so the same server works for any docs mirror.
+clients is derived from the mirror's directory basename, so the same
+server works for any docs mirror.
+
+Corpus labels
+-------------
+
+The label is the basename of ``DOCS_PATH``, title-cased. A small lookup
+table fixes common acronyms whose naive title-case would be wrong:
+
+* ``langchain`` -> ``LangChain``
+* ``langgraph`` -> ``LangGraph``
+* ``langsmith`` -> ``LangSmith``
+* ``fastapi``   -> ``FastAPI``
+* ``polars``    -> ``Polars``
+* ``numpy``     -> ``NumPy``
+* ``pandas``    -> ``pandas``  (intentionally not capitalised)
+* ``pydantic``  -> ``Pydantic``
+* ``sklearn``   -> ``scikit-learn``
+
+Unknown stems fall back to ``str.title()`` over a whitespace-normalised
+form, so two-word mirrors like ``deep-learning`` render as
+``Deep Learning``.
 
 Usage
 -----
@@ -32,6 +52,17 @@ Configure in ``opencode.jsonc``::
 ``DOCS_PATH`` is read from the environment when the server starts. Set it
 to override the default ``~/docs-mirror/langchain`` location, for example
 when the mirror lives elsewhere or when pointing at a different corpus.
+
+Opencode TUI PATH workaround
+----------------------------
+
+The opencode TUI on macOS inherits a minimal ``PATH`` and ignores shell
+``PATH`` modifications from ``~/.zshrc`` / ``~/.bashrc``. ``uv`` at
+``~/.local/bin/uv`` is therefore not visible to the TUI and the server
+fails with ``ENOENT posix_spawn 'uv'``. Workaround: add an explicit
+``environment.PATH`` to your local ``opencode.jsonc`` that includes the
+directory where ``uv`` is installed. See the project README for the
+full snippet.
 
 Refresh the mirror at any time inside ``DOCS_PATH``::
 
