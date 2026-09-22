@@ -255,6 +255,12 @@ Keep responses concise unless the user asks for detail. Report what changed and 
 
 ---
 
+## Prompt Engineering
+
+Applies when writing or editing LLM prompts (system prompts, user templates, few-shot examples). Load the `prompt-engineering` skill and follow it.
+
+---
+
 ## Important Constraints
 
 These hold regardless of mode, instruction, or convenience.
