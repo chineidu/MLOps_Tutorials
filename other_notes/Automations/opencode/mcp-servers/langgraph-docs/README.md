@@ -55,10 +55,19 @@ The fastest path. Assumes you have cloned the MLOps repo somewhere on disk.
    `~/.config/opencode/mcp-servers/langgraph-docs/` and merges the
    `langgraph-docs-mcp` block into `~/.config/opencode/opencode.jsonc`.
 
-3. **Run `/opencode-bootstrap-docs`**:
+3. **Bootstrap the docs mirror (first-time only):**
 
-   Sparse-clones `~/docs-mirror/langchain` (Python and LangGraph sections
-   only, no JavaScript, no LangSmith). First-time only.
+   ```bash
+   mkdir -p ~/docs-mirror
+   git clone --depth 1 --filter=blob:none --sparse https://github.com/langchain-ai/docs.git ~/docs-mirror/langchain
+   cd ~/docs-mirror/langchain
+   git sparse-checkout set src/oss/python
+   git fetch --depth 1 origin
+   git reset --hard origin/main
+   ```
+
+   This sparse-clones `~/docs-mirror/langchain` (Python and LangGraph sections
+   only, no JavaScript, no LangSmith). Skip if the directory already exists.
 
 4. **Restart opencode**.
 
@@ -89,7 +98,7 @@ The fastest path. Assumes you have cloned the MLOps repo somewhere on disk.
 If `/sync-opencode` is already in your `~/.config/opencode/command/`:
 
 1. `/sync-opencode` - updates the server source and config block.
-2. `/opencode-bootstrap-docs` - clones the docs mirror if missing; no-op otherwise.
+2. Ensure `~/docs-mirror/langchain` exists; bootstrap it with the sparse-clone commands above if missing.
 3. Restart opencode.
 
 ---
@@ -104,11 +113,9 @@ questions in any opencode session; the model will call
 
 ## Refresh the mirror
 
-Run `/opencode-refresh-docs` whenever you want updated LangGraph / LangChain
-docs. It pulls from upstream without recloning:
+To update the LangGraph / LangChain docs without recloning, run:
 
 ```bash
-# the command does this:
 cd ~/docs-mirror/langchain
 git fetch origin --depth 1
 git reset --hard origin/main
@@ -166,12 +173,12 @@ clients is derived from the directory basename (e.g. `langchain` ->
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `failed: MCP error -32000: Connection closed` | `~/docs-mirror/langchain` missing | Run `/opencode-bootstrap-docs`. |
+| `failed: MCP error -32000: Connection closed` | `~/docs-mirror/langchain` missing | Bootstrap the mirror with the sparse-clone commands in Install step 3. |
 | `failed: ENOENT posix_spawn 'uv'` | `uv` not on PATH inside opencode TUI | See **PATH issues** below. |
 | `failed: DOCS_PATH is not a directory: ...` | Mirror path wrong | Set `environment.DOCS_PATH` or fix the symlink. |
 | `connected` but `list_doc_sources` returns 0 files | Sparse-checkout misconfigured | `cd ~/docs-mirror/langchain && git sparse-checkout set src/oss/python` |
 | Stale content after `git pull` | Shallow mirror + force-push | `git fetch origin --depth 1 && git reset --hard origin/main` |
-| Server shows old content after `/opencode-refresh-docs` | opencode did not restart | Restart opencode so the server reindexes from disk. |
+| Server shows old content after refresh | opencode did not restart | Restart opencode so the server reindexes from disk. |
 
 ### PATH issues
 
