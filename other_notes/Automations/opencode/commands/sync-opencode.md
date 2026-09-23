@@ -1,0 +1,313 @@
+---
+description: Sync the global opencode configuration from the repository mirror.
+agent: build
+---
+
+Synchronize the global opencode configuration from the local repository mirror.
+
+The repository mirror is a Git-tracked copy of my reusable opencode configuration.
+It is the **canonical source of truth** that I maintain and version control.
+
+The global configuration (`~/.config/opencode`) is the machine-specific installation.
+
+This command performs a **one-way synchronization**:
+
+```
+REPO_MIRROR → GLOBAL_CONFIG
+```
+
+Never modify the repository mirror.
+Never synchronize in the opposite direction.
+
+The command must be **idempotent**. Running it multiple times without repository changes should produce no modifications.
+
+---
+
+# Paths
+
+```text
+REPO_MIRROR: $OPENCODE_REPO_MIRROR (default: /Users/neidu/Desktop/Projects/Personal/MLOps_Tutorials/other_notes/Automations/opencode)
+GLOBAL_CONFIG: ~/.config/opencode
+```
+
+Resolve `REPO_MIRROR` in this order: (1) `$OPENCODE_REPO_MIRROR` when set and pointing at an existing directory; (2) the default below. The location differs per machine, so never hard-code a new absolute path here - update the default only when the canonical checkout moves. If neither resolves to an existing directory, ask the user to paste the path to their checkout, show it back, and get explicit confirmation before syncing anything - sync overwrites global files, so a wrong paste is destructive. Then remind them they can add `export OPENCODE_REPO_MIRROR="<pasted-path>"` to their shell profile to skip this step next time.
+
+---
+
+# Directory mapping
+
+| Repository | Global |
+|------------|--------|
+| `REPO_MIRROR/agents/*.md` | `GLOBAL_CONFIG/agents/` |
+| `REPO_MIRROR/commands/*.md` | `GLOBAL_CONFIG/commands/` |
+| `REPO_MIRROR/skills/<name>/SKILL.md` | `GLOBAL_CONFIG/skills/<name>/SKILL.md` |
+| `REPO_MIRROR/configs/config.json` | `GLOBAL_CONFIG/config.json` |
+| `REPO_MIRROR/configs/opencode.jsonc` | `GLOBAL_CONFIG/opencode.jsonc` |
+| `REPO_MIRROR/configs/cli.json` | `GLOBAL_CONFIG/cli.json` |
+| `REPO_MIRROR/configs/package.json` | `GLOBAL_CONFIG/package.json` |
+| `REPO_MIRROR/AGENTS.md` | `GLOBAL_CONFIG/AGENTS.md` |
+| `REPO_MIRROR/plugins/*.ts` | `GLOBAL_CONFIG/plugins/` |
+| `REPO_MIRROR/lib/<name>/**` (all contents) | `GLOBAL_CONFIG/lib/<name>/` (all contents) |
+| `REPO_MIRROR/mcp-servers/<name>/*` | `GLOBAL_CONFIG/mcp-servers/<name>/` |
+
+Create parent directories if they do not already exist.
+
+---
+
+# Exclusions
+
+Never copy:
+
+- `REPO_MIRROR/docs/`
+- `REPO_MIRROR/README.md`
+- `REPO_MIRROR/shift-enter-newline.md`
+- `REPO_MIRROR/skills/python-skills/`
+- `REPO_MIRROR/skills/customize-opencode/`
+- `REPO_MIRROR/mcp-servers/<name>/README.md` (per-server docs stay in the repo)
+- `REPO_MIRROR/lib/<name>/**/*.bak` (backup files inside the lib tree, if any)
+- `REPO_MIRROR/configs/cli.json` is treated as a standard file - see Rule 2.
+- `.git`
+- `node_modules`
+- `package-lock.json`
+
+---
+
+# Rules
+
+## 1. Direction
+
+Synchronization is strictly:
+
+```
+REPO_MIRROR → GLOBAL_CONFIG
+```
+
+Never:
+
+- modify the repository
+- delete files from `GLOBAL_CONFIG`
+- rename files in `GLOBAL_CONFIG`
+
+`GLOBAL_CONFIG` may contain additional files not present in the repository.
+
+Leave them untouched.
+
+---
+
+## 2. Standard files
+
+Applies to:
+
+- `agents/`
+- `commands/`
+- `skills/`
+- `plugins/`
+- `lib/`
+- `mcp-servers/`
+- `AGENTS.md`
+- `config.json`
+- `cli.json`
+- `package.json`
+
+For every mapped file:
+
+- If missing in `GLOBAL_CONFIG`, copy it.
+- If contents differ, overwrite `GLOBAL_CONFIG` with an exact byte-for-byte copy.
+- If identical, do nothing.
+
+Do not recreate or rewrite file contents manually.
+
+Use filesystem copy operations (`cp`) rather than retyping or regenerating files.
+
+---
+
+## 3. opencode.jsonc
+
+Do **not** overwrite.
+
+Merge instead.
+
+`opencode.jsonc` contains machine-specific configuration (for example local MCP servers, portable executable paths, providers, and OS-dependent settings). Preserve those while importing reusable defaults.
+
+### Top-level keys
+
+For every top-level key:
+
+- if it exists in the repository but not globally, add it
+- if it already exists globally, preserve the global value
+- never remove keys that exist only globally
+
+Examples include:
+
+- `instructions`
+- `permissions`
+
+### MCP
+
+For each MCP server:
+
+- preserve every existing server in `GLOBAL_CONFIG` unchanged
+- add servers that exist only in the repository
+- never replace an existing global server definition
+- never remove existing global servers
+
+When adding a server that exists only in the repository, expand a
+leading `~/` to the absolute `$HOME` path for this machine before
+writing to `GLOBAL_CONFIG`. Apply to `cwd` and to every string value
+under `environment`, including each colon-separated component of
+`PATH`. Example: `~/.config/opencode/...` becomes the absolute home
+path on this machine.
+
+Rationale: opencode sets `cwd` before spawning with no shell in the
+loop, so a literal `~/...` in `cwd` fails. `~` in `PATH` may resolve
+via shell lookup, but expand it anyway so the deployed config is
+deterministic.
+
+Specifically:
+
+- preserve the portable `uvx`-based `polars` configuration already in `GLOBAL_CONFIG`
+- never write a literal `~/...` into `GLOBAL_CONFIG` `cwd`; always expand first
+- never copy machine-specific absolute paths from the repository (for example `/Users/neidu/...`); the repository must only contain `~/...` templates, never absolute user paths
+- after expansion, reject any copied configuration whose `cwd` does not exist on this machine
+
+---
+
+## 4. Copy policy
+
+Copy bytes exactly.
+
+Do not:
+
+- normalize formatting
+- regenerate files
+- reorder content
+- "improve" configuration
+
+The repository contents are authoritative.
+
+---
+
+## 5. Never touch
+
+Do not modify:
+
+- the repository mirror
+- any file outside the mappings above
+
+---
+
+# Procedure
+
+1. Enumerate every mapped file while honoring the exclusions.
+
+2. Detect unexpected files in mapped directories.
+
+For each mapped directory in the table, find files that exist in
+`REPO_MIRROR` but are not covered by the mapping pattern:
+
+| Mapped pattern | Expected extension(s) | Anything else is unexpected |
+|----------------|----------------------|------------------------------|
+| `commands/*.md` | `.md` only | `commands/foo.py`, `commands/subdir/` |
+| `skills/<name>/SKILL.md` | `SKILL.md` only | `skills/<name>/scripts/`, `skills/<name>/references.md` |
+| `agents/*.md` | `.md` only | `agents/brainstorm.py`, `agents/subdir/` |
+| `plugins/*.ts` | `.ts` only | `plugins/foo.js`, `plugins/foo.tsx` |
+| `mcp-servers/<name>/*` | any | (no constraint - vendored as-is) |
+| `lib/<name>/**` | any | (no constraint - vendored as-is) |
+
+Honour the existing Exclusions list when scanning: a `.md` inside
+`docs/` or a `SKILL.md` inside `skills/python-skills/` is excluded,
+not unexpected.
+
+If any unexpected files are found, present them to the user and ask
+which to include in this run:
+
+```text
+Unexpected files in mapped directories:
+
+  commands/foo.py             Python-backed command, not in the mapping table
+  skills/polars/scripts/      Helper scripts under a skill, not covered by SKILL.md
+
+Include any of these in this sync? [y/N per file, or 'all' / 'none']
+```
+
+Per-file decision:
+
+- **Include** - extend the in-memory mapping for this run only. Add to
+  the report as "Added (ad-hoc)".
+- **Skip** - leave the file in the repo, do not copy. Add to the report
+  as "Skipped (unexpected)".
+
+The mapping table in this file is the durable source of truth. The
+ad-hoc decisions do not modify it; remind the user to update the table
+if the choice is meant to persist.
+
+3. Classify each mapped file (table + ad-hoc) as one of:
+
+- Missing in `GLOBAL_CONFIG`
+- Different
+- Identical
+
+4. Synchronize according to the rules above.
+
+5. Verify synchronization.
+
+Re-check every mapped file.
+
+Expected result:
+
+- Missing = 0
+- Different = 0
+
+`opencode.jsonc` may legitimately differ where global machine-specific values are intentionally preserved.
+
+6. Validate:
+
+- `REPO_MIRROR` resolves to an existing directory (env var, default, or user-pasted-and-confirmed path); if none exists and the user does not provide one, abort - this is a setup problem, not a sync problem
+- `opencode.jsonc` parses successfully as JSONC.
+- Every deployed MCP `cwd` is absolute (no leading `~/`) and exists on this machine.
+- No copied configuration references nonexistent machine-specific paths (for example `/Users/neidu/...`).
+
+Abort and report any validation failure.
+
+---
+
+# Report
+
+Produce a summary table.
+
+| File | Action | Reason |
+|------|--------|--------|
+| ... | Added / Updated / Skipped | ... |
+| commands/foo.py | Added (ad-hoc) | User included at runtime - not in mapping table |
+| skills/polars/scripts/build.sh | Skipped (unexpected) | User opted out at runtime |
+
+Then report:
+
+```text
+Added:
+...
+
+Updated:
+...
+
+Skipped:
+...
+
+Ad-hoc (runtime decision - consider updating the mapping table):
+...
+
+Verification
+
+✓ Repository unchanged
+✓ All mapped files synchronized
+✓ JSONC valid
+✓ No foreign machine-specific paths detected
+✓ Synchronization complete
+```
+
+If any ad-hoc additions were made, end with:
+
+```text
+N file(s) were copied via ad-hoc decision. Update the mapping table in
+sync-opencode.md if these should persist across runs.
+```
