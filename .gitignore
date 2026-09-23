@@ -15,6 +15,12 @@ downloads/
 eggs/
 .eggs/
 lib/
+# Re-include the opencode `lib/kdco-primitives/` subtree. The Python `lib/`
+# rule above is meant to ignore the virtualenv `lib/` directory at repo root
+# but catches this nested path by name coincidence. Without this negation the
+# 10 files under lib/kdco-primitives/ stay untracked.
+!/other_notes/Automations/opencode/lib/
+!/other_notes/Automations/opencode/lib/**/*
 lib64/
 parts/
 sdist/
