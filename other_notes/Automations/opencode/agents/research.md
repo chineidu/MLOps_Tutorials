@@ -2,47 +2,114 @@
 description: A read-only agent for external docs and dependency research. Clones dependency repos into a sandboxed cache, inspects library source, cross-references local code against upstream implementations, and removes every artifact it created before returning.
 mode: subagent
 model: opencode-go/muse-spark-1.2-contributor
-permission:
-  edit: deny
-  task: deny
-  todowrite: deny
-  external_directory: allow
-  bash:
-    "*": deny
-    # read-only inspection
-    "ls *": allow
-    "cat *": allow
-    "head *": allow
-    "tail *": allow
-    "wc *": allow
-    "file *": allow
-    "stat *": allow
-    "tree *": allow
-    "find *": allow
-    "grep *": allow
-    "rg *": allow
-    "fd *": allow
-    "pwd": allow
-    "echo *": allow
-    # read-only archive inspection
-    "tar -tf *": allow
-    "unzip -l *": allow
-    # git read-only
-    "git log *": allow
-    "git show *": allow
-    "git ls-tree *": allow
-    "git ls-files *": allow
-    "git ls-remote *": allow
-    "git --version": allow
-    "git rev-parse *": allow
-    # sandboxed clone: destination must be inside the cache root
-    "git clone * ~/.cache/opencode/research/*": allow
-    "git clone * $XDG_CACHE_HOME/opencode/research/*": allow
-    # cleanup: only against the cache root, recursively
-    "rm -rf ~/.cache/opencode/research/*": allow
-    "rm -rf ~/.cache/opencode/research": allow
-    "rm -rf $XDG_CACHE_HOME/opencode/research/*": allow
-    "rm -rf $XDG_CACHE_HOME/opencode/research": allow
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: todowrite
+    resource: "*"
+    effect: deny
+  - action: external_directory
+    resource: "*"
+    effect: allow
+  - action: shell
+    resource: "*"
+    effect: deny
+  # read-only inspection
+  - action: shell
+    resource: "ls *"
+    effect: allow
+  - action: shell
+    resource: "cat *"
+    effect: allow
+  - action: shell
+    resource: "head *"
+    effect: allow
+  - action: shell
+    resource: "tail *"
+    effect: allow
+  - action: shell
+    resource: "wc *"
+    effect: allow
+  - action: shell
+    resource: "file *"
+    effect: allow
+  - action: shell
+    resource: "stat *"
+    effect: allow
+  - action: shell
+    resource: "tree *"
+    effect: allow
+  - action: shell
+    resource: "find *"
+    effect: allow
+  - action: shell
+    resource: "grep *"
+    effect: allow
+  - action: shell
+    resource: "rg *"
+    effect: allow
+  - action: shell
+    resource: "fd *"
+    effect: allow
+  - action: shell
+    resource: "pwd"
+    effect: allow
+  - action: shell
+    resource: "echo *"
+    effect: allow
+  # read-only archive inspection
+  - action: shell
+    resource: "tar -tf *"
+    effect: allow
+  - action: shell
+    resource: "unzip -l *"
+    effect: allow
+  # git read-only
+  - action: shell
+    resource: "git log *"
+    effect: allow
+  - action: shell
+    resource: "git show *"
+    effect: allow
+  - action: shell
+    resource: "git ls-tree *"
+    effect: allow
+  - action: shell
+    resource: "git ls-files *"
+    effect: allow
+  - action: shell
+    resource: "git ls-remote *"
+    effect: allow
+  - action: shell
+    resource: "git --version"
+    effect: allow
+  - action: shell
+    resource: "git rev-parse *"
+    effect: allow
+  # sandboxed clone: destination must be inside the cache root
+  - action: shell
+    resource: "git clone * ~/.cache/opencode/research/*"
+    effect: allow
+  - action: shell
+    resource: "git clone * $XDG_CACHE_HOME/opencode/research/*"
+    effect: allow
+  # cleanup: only against the cache root, recursively
+  - action: shell
+    resource: "rm -rf ~/.cache/opencode/research/*"
+    effect: allow
+  - action: shell
+    resource: "rm -rf ~/.cache/opencode/research"
+    effect: allow
+  - action: shell
+    resource: "rm -rf $XDG_CACHE_HOME/opencode/research/*"
+    effect: allow
+  - action: shell
+    resource: "rm -rf $XDG_CACHE_HOME/opencode/research"
+    effect: allow
 ---
 
 You are a read-only research agent for external libraries, dependency source, and documentation.

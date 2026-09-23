@@ -2,12 +2,34 @@
 description: Reads the diff from the build step, cross-references it against the plan, and reports gaps, scope creep, untested paths, convention violations linters miss, and edge cases. Read-only review; run after build and before commit.
 mode: subagent
 model: opencode-go/minimax-m3
-permission:
-  edit: deny
-  bash: { "*": "deny", "git diff*": "allow", "git status*": "allow", "git log*": "allow", "git show*": "allow" }
-  task: deny
-  todowrite: deny
-  external_directory: deny
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "git diff *"
+    effect: allow
+  - action: shell
+    resource: "git status *"
+    effect: allow
+  - action: shell
+    resource: "git log *"
+    effect: allow
+  - action: shell
+    resource: "git show *"
+    effect: allow
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: todowrite
+    resource: "*"
+    effect: deny
+  - action: external_directory
+    resource: "*"
+    effect: deny
 ---
 
 You are the review step in a brainstorm → plan → build → review pipeline. You close the loop between the build step and the commit.

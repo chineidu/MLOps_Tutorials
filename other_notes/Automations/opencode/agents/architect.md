@@ -1,121 +1,319 @@
 ---
-name: architect
 description: Build code with full user visibility. Contracts first, decisions surfaced, no silent defaults.
 mode: primary
-temperature: 0.2
-color: accent
-permission:
-  edit: ask
-  write: ask
-  bash:
-    "*": ask
-    # read-only file inspection
-    "ls *": allow
-    "tree *": allow
-    "cat *": allow
-    "less *": allow
-    "more *": allow
-    "head *": allow
-    "tail *": allow
-    "wc *": allow
-    "file *": allow
-    "stat *": allow
-    "du *": allow
-    "df *": allow
-    "nl *": allow
-    "cut *": allow
-    "sort *": allow
-    "uniq *": allow
-    "comm *": allow
-    "tr *": allow
-    "column *": allow
-    "xxd *": allow
-    "od *": allow
-    "hexdump *": allow
-    "strings *": allow
-    "diff *": allow
-    "jq *": allow
-    # search
-    "grep *": allow
-    "rg *": allow
-    "fd *": allow
-    "find *": allow
-    "locate *": allow
-    # lookup / meta
-    "pwd": allow
-    "date": allow
-    "which *": allow
-    "whereis *": allow
-    "type *": allow
-    "command -v *": allow
-    "man *": allow
-    "whatis *": allow
-    "apropos *": allow
-    "env": allow
-    "printenv": allow
-    "printenv *": allow
-    # hashing
-    "md5sum *": allow
-    "sha1sum *": allow
-    "sha256sum *": allow
-    "cksum *": allow
-    # system info
-    "uname *": allow
-    "hostname": allow
-    "whoami": allow
-    "id": allow
-    "uptime": allow
-    "nproc": allow
-    "free *": allow
-    "lscpu": allow
-    "lsblk": allow
-    "ps *": allow
-    # archive inspection
-    "tar -tf *": allow
-    "tar -tzf *": allow
-    "unzip -l *": allow
-    "zipinfo *": allow
-    # toolchain versions
-    "python --version": allow
-    "python3 --version": allow
-    "node --version": allow
-    "npm --version": allow
-    "uv --version": allow
-    "uv pip list": allow
-    "pip list": allow
-    "pip show *": allow
-    # generic inspection
-    "echo *": allow
-    "uv run *": allow
-    # git read-only
-    "git status": allow
-    "git status *": allow
-    "git log *": allow
-    "git diff *": allow
-    "git show *": allow
-    "git show-ref *": allow
-    "git branch": allow
-    "git branch *": allow
-    "git tag": allow
-    "git tag -l *": allow
-    "git stash list": allow
-    "git remote *": allow
-    "git --version": allow
-    "git blame *": allow
-    "git ls-files *": allow
-    "git ls-tree *": allow
-    "git cat-file *": allow
-    "git rev-parse *": allow
-    "git describe *": allow
-    "git config --get *": allow
-    "git shortlog *": allow
-    "git worktree list": allow
-    "git submodule status": allow
-  todowrite: allow
-  question: allow
-  task: ask
-  webfetch: allow
-  websearch: allow
+request:
+  body:
+    temperature: 0.2
+permissions:
+  - action: edit
+    resource: "*"
+    effect: ask
+  - action: shell
+    resource: "*"
+    effect: ask
+  # read-only file inspection
+  - action: shell
+    resource: "ls *"
+    effect: allow
+  - action: shell
+    resource: "tree *"
+    effect: allow
+  - action: shell
+    resource: "cat *"
+    effect: allow
+  - action: shell
+    resource: "less *"
+    effect: allow
+  - action: shell
+    resource: "more *"
+    effect: allow
+  - action: shell
+    resource: "head *"
+    effect: allow
+  - action: shell
+    resource: "tail *"
+    effect: allow
+  - action: shell
+    resource: "wc *"
+    effect: allow
+  - action: shell
+    resource: "file *"
+    effect: allow
+  - action: shell
+    resource: "stat *"
+    effect: allow
+  - action: shell
+    resource: "du *"
+    effect: allow
+  - action: shell
+    resource: "df *"
+    effect: allow
+  - action: shell
+    resource: "nl *"
+    effect: allow
+  - action: shell
+    resource: "cut *"
+    effect: allow
+  - action: shell
+    resource: "sort *"
+    effect: allow
+  - action: shell
+    resource: "uniq *"
+    effect: allow
+  - action: shell
+    resource: "comm *"
+    effect: allow
+  - action: shell
+    resource: "tr *"
+    effect: allow
+  - action: shell
+    resource: "column *"
+    effect: allow
+  - action: shell
+    resource: "xxd *"
+    effect: allow
+  - action: shell
+    resource: "od *"
+    effect: allow
+  - action: shell
+    resource: "hexdump *"
+    effect: allow
+  - action: shell
+    resource: "strings *"
+    effect: allow
+  - action: shell
+    resource: "diff *"
+    effect: allow
+  - action: shell
+    resource: "jq *"
+    effect: allow
+  # search
+  - action: shell
+    resource: "grep *"
+    effect: allow
+  - action: shell
+    resource: "rg *"
+    effect: allow
+  - action: shell
+    resource: "fd *"
+    effect: allow
+  - action: shell
+    resource: "find *"
+    effect: allow
+  - action: shell
+    resource: "locate *"
+    effect: allow
+  # lookup / meta
+  - action: shell
+    resource: "pwd"
+    effect: allow
+  - action: shell
+    resource: "date"
+    effect: allow
+  - action: shell
+    resource: "which *"
+    effect: allow
+  - action: shell
+    resource: "whereis *"
+    effect: allow
+  - action: shell
+    resource: "type *"
+    effect: allow
+  - action: shell
+    resource: "command -v *"
+    effect: allow
+  - action: shell
+    resource: "man *"
+    effect: allow
+  - action: shell
+    resource: "whatis *"
+    effect: allow
+  - action: shell
+    resource: "apropos *"
+    effect: allow
+  - action: shell
+    resource: "env"
+    effect: allow
+  - action: shell
+    resource: "printenv"
+    effect: allow
+  - action: shell
+    resource: "printenv *"
+    effect: allow
+  # hashing
+  - action: shell
+    resource: "md5sum *"
+    effect: allow
+  - action: shell
+    resource: "sha1sum *"
+    effect: allow
+  - action: shell
+    resource: "sha256sum *"
+    effect: allow
+  - action: shell
+    resource: "cksum *"
+    effect: allow
+  # system info
+  - action: shell
+    resource: "uname *"
+    effect: allow
+  - action: shell
+    resource: "hostname"
+    effect: allow
+  - action: shell
+    resource: "whoami"
+    effect: allow
+  - action: shell
+    resource: "id"
+    effect: allow
+  - action: shell
+    resource: "uptime"
+    effect: allow
+  - action: shell
+    resource: "nproc"
+    effect: allow
+  - action: shell
+    resource: "free *"
+    effect: allow
+  - action: shell
+    resource: "lscpu"
+    effect: allow
+  - action: shell
+    resource: "lsblk"
+    effect: allow
+  - action: shell
+    resource: "ps *"
+    effect: allow
+  # archive inspection
+  - action: shell
+    resource: "tar -tf *"
+    effect: allow
+  - action: shell
+    resource: "tar -tzf *"
+    effect: allow
+  - action: shell
+    resource: "unzip -l *"
+    effect: allow
+  - action: shell
+    resource: "zipinfo *"
+    effect: allow
+  # toolchain versions
+  - action: shell
+    resource: "python --version"
+    effect: allow
+  - action: shell
+    resource: "python3 --version"
+    effect: allow
+  - action: shell
+    resource: "node --version"
+    effect: allow
+  - action: shell
+    resource: "npm --version"
+    effect: allow
+  - action: shell
+    resource: "uv --version"
+    effect: allow
+  - action: shell
+    resource: "uv pip list"
+    effect: allow
+  - action: shell
+    resource: "pip list"
+    effect: allow
+  - action: shell
+    resource: "pip show *"
+    effect: allow
+  # generic inspection
+  - action: shell
+    resource: "echo *"
+    effect: allow
+  - action: shell
+    resource: "uv run *"
+    effect: allow
+  # git read-only
+  - action: shell
+    resource: "git status"
+    effect: allow
+  - action: shell
+    resource: "git status *"
+    effect: allow
+  - action: shell
+    resource: "git log *"
+    effect: allow
+  - action: shell
+    resource: "git diff *"
+    effect: allow
+  - action: shell
+    resource: "git show *"
+    effect: allow
+  - action: shell
+    resource: "git show-ref *"
+    effect: allow
+  - action: shell
+    resource: "git branch"
+    effect: allow
+  - action: shell
+    resource: "git branch *"
+    effect: allow
+  - action: shell
+    resource: "git tag"
+    effect: allow
+  - action: shell
+    resource: "git tag -l *"
+    effect: allow
+  - action: shell
+    resource: "git stash list"
+    effect: allow
+  - action: shell
+    resource: "git remote *"
+    effect: allow
+  - action: shell
+    resource: "git --version"
+    effect: allow
+  - action: shell
+    resource: "git blame *"
+    effect: allow
+  - action: shell
+    resource: "git ls-files *"
+    effect: allow
+  - action: shell
+    resource: "git ls-tree *"
+    effect: allow
+  - action: shell
+    resource: "git cat-file *"
+    effect: allow
+  - action: shell
+    resource: "git rev-parse *"
+    effect: allow
+  - action: shell
+    resource: "git describe *"
+    effect: allow
+  - action: shell
+    resource: "git config --get *"
+    effect: allow
+  - action: shell
+    resource: "git shortlog *"
+    effect: allow
+  - action: shell
+    resource: "git worktree list"
+    effect: allow
+  - action: shell
+    resource: "git submodule status"
+    effect: allow
+  - action: todowrite
+    resource: "*"
+    effect: allow
+  - action: question
+    resource: "*"
+    effect: allow
+  - action: subagent
+    resource: "*"
+    effect: ask
+  - action: webfetch
+    resource: "*"
+    effect: allow
+  - action: websearch
+    resource: "*"
+    effect: allow
 ---
 
 # Architect Mode
@@ -184,7 +382,7 @@ In any other situation, do not request write or edit. Propose content
 in chat as fenced code blocks and instruct the user to apply it manually
 (copy, paste, or save to a file they specify).
 
-The frontmatter sets `permission: { edit: ask, write: ask }` as the hard
+The frontmatter sets `edit: ask` permissions as the hard
 gate: every write or edit must receive explicit user approval before it
 executes. Combined with the rules above, this means:
 
@@ -454,13 +652,13 @@ These are always wrong, regardless of override:
 - Spawning any subagent (`research`, `debug`, `review`, `ask-only`)
   without explicit user approval. Subagent invocations may clone
   repositories, install dependencies, or otherwise leave artifacts on
-  disk. The `task: ask` permission gates this, but the rule stands
+  disk. The `subagent: ask` permission gates this, but the rule stands
   even if that gate is later relaxed: ask first, with the rationale,
   and wait for approval.
 - Running exploratory disk-writing commands without explicit user
   approval. This includes `git clone`, `npm install`, `pip install`,
   `cargo build`, `curl -o`, `wget`, `tar -xf`, and anything else that
-  persists data outside the working tree. The `bash: "*": ask`
+  persists data outside the working tree. The `shell: "*": ask`
   permission already routes these to the user; this rule makes the
   policy explicit and forbids rationalizing around it.
 

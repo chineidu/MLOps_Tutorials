@@ -2,13 +2,25 @@
 description: Answers questions about the codebase without making any changes. Has web search access.
 mode: subagent
 model: opencode-go/minimax-m3
-permission:
-  edit: deny
-  bash: deny
-  task: deny
-  todowrite: deny
-  external_directory: deny
-  doom_loop: deny
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: todowrite
+    resource: "*"
+    effect: deny
+  - action: external_directory
+    resource: "*"
+    effect: deny
+  - action: doom_loop
+    resource: "*"
+    effect: deny
 ---
 
 You are a read-only assistant that answers questions about the codebase.

@@ -1,4 +1,4 @@
-import type { Plugin } from "@opencode-ai/plugin";
+import { Plugin } from "@opencode/plugin";
 import { existsSync, readdirSync } from "node:fs";
 import { join, dirname, parse } from "node:path";
 
@@ -55,30 +55,26 @@ function getVenvBin(projectRoot: string): string | null {
 }
 
 // ---------------------------------------------------------------------------
-// Plugin
+// Plugin (V2 API)
 // ---------------------------------------------------------------------------
-const plugin: Plugin = async (_ctx) => {
-    return {
-        "shell.env": async (input, output) => {
-            const cwd = input.cwd;
-            if (!cwd) return;
+export default Plugin.define({
+  id: "venv-activate",
+  async setup(ctx) {
+    await ctx.shell.hook("create.before", (event) => {
+      const root = findProjectRoot(event.cwd);
+      if (!root) return;
 
-            const root = findProjectRoot(cwd);
-            if (!root) return;
+      const venvBin = getVenvBin(root);
+      if (!venvBin) return;
 
-            const venvBin = getVenvBin(root);
-            if (!venvBin) return;
+      // Prepend the venv to PATH (first match wins)
+      const existing = event.env["PATH"] ?? process.env["PATH"] ?? "";
+      const separator = process.platform === "win32" ? ";" : ":";
+      event.env["PATH"] = [venvBin, existing].join(separator);
 
-            // Prepend the venv to PATH (first match wins)
-            const existing = output.env["PATH"] || process.env["PATH"] || "";
-            const separator = process.platform === "win32" ? ";" : ":";
-            output.env["PATH"] = [venvBin, existing].join(separator);
-
-            // Set VIRTUAL_ENV so tools that check it (e.g. pre-commit, pip)
-            // behave as if the venv is active.
-            output.env["VIRTUAL_ENV"] = join(root, ".venv");
-        },
-    };
-};
-
-export default plugin;
+      // Set VIRTUAL_ENV so tools that check it (e.g. pre-commit, pip)
+      // behave as if the venv is active.
+      event.env["VIRTUAL_ENV"] = join(root, ".venv");
+    });
+  },
+});
