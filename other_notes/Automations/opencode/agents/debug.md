@@ -2,12 +2,22 @@
 description: Diagnoses failing `make check` runs. Reads the traceback and the relevant source, forms ranked hypotheses, runs targeted experiments to confirm, and suggests concrete fixes. Unlike ask-only (cannot run commands) and build (implements top-down rather than diagnosing a specific failure).
 mode: subagent
 model: opencode-go/deepseek-v4-flash
-permission:
-  edit: deny
-  bash: allow
-  task: deny
-  todowrite: allow
-  external_directory: deny
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: allow
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: todowrite
+    resource: "*"
+    effect: allow
+  - action: external_directory
+    resource: "*"
+    effect: deny
 ---
 
 You are the debug step in a brainstorm → plan → build → review pipeline. You diagnose a failing check; you do not implement. When `make check` (pytest, ruff, or ty) fails, your job is to find the root cause and hand back a concrete fix for the build step to apply.
