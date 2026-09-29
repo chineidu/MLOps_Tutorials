@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+exec git log --oneline --decorate -20 "$@"
