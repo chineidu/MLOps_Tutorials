@@ -26,9 +26,11 @@ The command must be **idempotent**. Running it multiple times without repository
 # Paths
 
 ```text
-REPO_MIRROR: /Users/mac/Desktop/Projects/MLOps_Tutorials/other_notes/Automations/opencode
+REPO_MIRROR: $OPENCODE_REPO_MIRROR (default: ${HOME}/path/to/sync-opencode-repo)
 GLOBAL_CONFIG: ~/.config/opencode
 ```
+
+Resolve `REPO_MIRROR` in this order: (1) `$OPENCODE_REPO_MIRROR` when set and pointing at an existing directory; (2) the default below. The location differs per machine, so never hard-code a new absolute path here - update the default only when the canonical checkout moves. If neither resolves to an existing directory, ask the user to paste the path to their checkout, show it back, and get explicit confirmation before syncing anything - sync overwrites global files, so a wrong paste is destructive. Then remind them they can add `export OPENCODE_REPO_MIRROR="<pasted-path>"` to their shell profile to skip this step next time.
 
 ---
 
@@ -37,13 +39,15 @@ GLOBAL_CONFIG: ~/.config/opencode
 | Repository | Global |
 |------------|--------|
 | `REPO_MIRROR/agents/*.md` | `GLOBAL_CONFIG/agents/` |
-| `REPO_MIRROR/command/*.md` | `GLOBAL_CONFIG/command/` |
+| `REPO_MIRROR/commands/*.md` | `GLOBAL_CONFIG/commands/` |
 | `REPO_MIRROR/skills/<name>/SKILL.md` | `GLOBAL_CONFIG/skills/<name>/SKILL.md` |
 | `REPO_MIRROR/configs/config.json` | `GLOBAL_CONFIG/config.json` |
 | `REPO_MIRROR/configs/opencode.jsonc` | `GLOBAL_CONFIG/opencode.jsonc` |
-| `REPO_MIRROR/configs/tui.json` | `GLOBAL_CONFIG/tui.json` |
+| `REPO_MIRROR/configs/cli.json` | `GLOBAL_CONFIG/cli.json` |
+| `REPO_MIRROR/configs/package.json` | `GLOBAL_CONFIG/package.json` |
 | `REPO_MIRROR/AGENTS.md` | `GLOBAL_CONFIG/AGENTS.md` |
 | `REPO_MIRROR/plugins/*.ts` | `GLOBAL_CONFIG/plugins/` |
+| `REPO_MIRROR/lib/<name>/**` (all contents) | `GLOBAL_CONFIG/lib/<name>/` (all contents) |
 | `REPO_MIRROR/mcp-servers/<name>/*` | `GLOBAL_CONFIG/mcp-servers/<name>/` |
 
 Create parent directories if they do not already exist.
@@ -60,9 +64,10 @@ Never copy:
 - `REPO_MIRROR/skills/python-skills/`
 - `REPO_MIRROR/skills/customize-opencode/`
 - `REPO_MIRROR/mcp-servers/<name>/README.md` (per-server docs stay in the repo)
+- `REPO_MIRROR/lib/<name>/**/*.bak` (backup files inside the lib tree, if any)
+- `REPO_MIRROR/configs/cli.json` is treated as a standard file - see Rule 2.
 - `.git`
 - `node_modules`
-- `package.json`
 - `package-lock.json`
 
 ---
@@ -94,13 +99,15 @@ Leave them untouched.
 Applies to:
 
 - `agents/`
-- `command/`
+- `commands/`
 - `skills/`
 - `plugins/`
+- `lib/`
 - `mcp-servers/`
 - `AGENTS.md`
 - `config.json`
-- `tui.json`
+- `cli.json`
+- `package.json`
 
 For every mapped file:
 
@@ -133,8 +140,7 @@ For every top-level key:
 Examples include:
 
 - `instructions`
-- `permission`
-- `lsp`
+- `permissions`
 
 ### MCP
 
@@ -201,11 +207,12 @@ For each mapped directory in the table, find files that exist in
 
 | Mapped pattern | Expected extension(s) | Anything else is unexpected |
 |----------------|----------------------|------------------------------|
-| `command/*.md` | `.md` only | `command/foo.py`, `command/subdir/` |
+| `commands/*.md` | `.md` only | `commands/foo.py`, `commands/subdir/` |
 | `skills/<name>/SKILL.md` | `SKILL.md` only | `skills/<name>/scripts/`, `skills/<name>/references.md` |
 | `agents/*.md` | `.md` only | `agents/brainstorm.py`, `agents/subdir/` |
 | `plugins/*.ts` | `.ts` only | `plugins/foo.js`, `plugins/foo.tsx` |
 | `mcp-servers/<name>/*` | any | (no constraint - vendored as-is) |
+| `lib/<name>/**` | any | (no constraint - vendored as-is) |
 
 Honour the existing Exclusions list when scanning: a `.md` inside
 `docs/` or a `SKILL.md` inside `skills/python-skills/` is excluded,
@@ -217,7 +224,7 @@ which to include in this run:
 ```text
 Unexpected files in mapped directories:
 
-  command/foo.py              Python-backed command, not in the mapping table
+  commands/foo.py             Python-backed command, not in the mapping table
   skills/polars/scripts/      Helper scripts under a skill, not covered by SKILL.md
 
 Include any of these in this sync? [y/N per file, or 'all' / 'none']
@@ -255,6 +262,7 @@ Expected result:
 
 6. Validate:
 
+- `REPO_MIRROR` resolves to an existing directory (env var, default, or user-pasted-and-confirmed path); if none exists and the user does not provide one, abort - this is a setup problem, not a sync problem
 - `opencode.jsonc` parses successfully as JSONC.
 - Every deployed MCP `cwd` is absolute (no leading `~/`) and exists on this machine.
 - No copied configuration references nonexistent machine-specific paths (for example `/Users/neidu/...`).
@@ -270,7 +278,7 @@ Produce a summary table.
 | File | Action | Reason |
 |------|--------|--------|
 | ... | Added / Updated / Skipped | ... |
-| command/foo.py | Added (ad-hoc) | User included at runtime - not in mapping table |
+| commands/foo.py | Added (ad-hoc) | User included at runtime - not in mapping table |
 | skills/polars/scripts/build.sh | Skipped (unexpected) | User opted out at runtime |
 
 Then report:

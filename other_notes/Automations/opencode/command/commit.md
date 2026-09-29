@@ -25,13 +25,13 @@ Check `$ARGUMENTS` for `--quick` (or `-Q`).
 
 ## Step 3 — Review
 
-Dispatch the review subagent first. Use the `task` tool with `subagent_type: review` and this exact prompt:
+Dispatch the review subagent first. Use the `subagent` tool with `subagent_type: review` and this exact prompt:
 
 ```
 Review the staged changes in this repository. Run git diff --staged for the diff, git log --oneline -5 for context, and read the plan file if one exists (plan.md or notes/plan.md). Report gaps, scope creep, untested paths, convention violations, and edge cases. End with a verdict: ready to commit OR fix first.
 ```
 
-Wait for the review to complete. If the `task` tool fails or the review returns no verdict (timeout, crash, tool unavailable), report the error to the user and STOP without committing.
+Wait for the review to complete. If the `subagent` tool fails or the review returns no verdict (timeout, crash, tool unavailable), report the error to the user and STOP without committing.
 
 ## Step 4 — Act on findings
 

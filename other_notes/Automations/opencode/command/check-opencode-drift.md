@@ -39,9 +39,11 @@ Any other argument is an error: print the usage block and stop without modifying
 # Paths
 
 ```text
-REPO_MIRROR: /Users/mac/Desktop/Projects/MLOps_Tutorials/other_notes/Automations/opencode
+REPO_MIRROR: $OPENCODE_REPO_MIRROR (default: ${HOME}/path/to/sync-opencode-repo)
 GLOBAL_CONFIG: ~/.config/opencode
 ```
+
+Resolve `REPO_MIRROR` in this order: (1) `$OPENCODE_REPO_MIRROR` when set and pointing at an existing directory; (2) the default below. The location differs per machine, so never hard-code a new absolute path here - update the default only when the canonical checkout moves. If neither resolves to an existing directory, ask the user to paste the path to their checkout and use it for this run only (this command is read-only, so a wrong paste is harmless). Then remind them they can add `export OPENCODE_REPO_MIRROR="<pasted-path>"` to their shell profile to skip this step next time.
 
 ---
 
@@ -50,22 +52,27 @@ GLOBAL_CONFIG: ~/.config/opencode
 | Global | Repository |
 |--------|------------|
 | `GLOBAL_CONFIG/agents/*.md` | `REPO_MIRROR/agents/*.md` |
-| `GLOBAL_CONFIG/command/*.md` | `REPO_MIRROR/command/*.md` |
+| `GLOBAL_CONFIG/commands/*.md` | `REPO_MIRROR/commands/*.md` |
 | `GLOBAL_CONFIG/skills/<name>/` (all contents) | `REPO_MIRROR/skills/<name>/` (all contents) |
 | `GLOBAL_CONFIG/config.json` | `REPO_MIRROR/configs/config.json` |
 | `GLOBAL_CONFIG/opencode.jsonc` | `REPO_MIRROR/configs/opencode.jsonc` |
-| `GLOBAL_CONFIG/tui.json` | `REPO_MIRROR/configs/tui.json` |
+| `GLOBAL_CONFIG/cli.json` | `REPO_MIRROR/configs/cli.json` |
+| `GLOBAL_CONFIG/package.json` | `REPO_MIRROR/configs/package.json` |
 | `GLOBAL_CONFIG/AGENTS.md` | `REPO_MIRROR/AGENTS.md` |
 | `GLOBAL_CONFIG/plugins/*.ts` | `REPO_MIRROR/plugins/*.ts` |
+| `GLOBAL_CONFIG/lib/<name>/**` (all contents) | `REPO_MIRROR/lib/<name>/**` (all contents) |
 | `GLOBAL_CONFIG/mcp-servers/<name>/*` (excluding `README.md`) | `REPO_MIRROR/mcp-servers/<name>/*` (excluding `README.md`) |
 
-The config files (`config.json`, `opencode.jsonc`, `tui.json`) live in `REPO_MIRROR/configs/` (not repo root) because the repo root holds the mirror itself.
+The config files (`config.json`, `opencode.jsonc`, `cli.json`) live in `REPO_MIRROR/configs/` (not repo root) because the repo root holds the mirror itself.
 
 ---
 
 # Exclusions (skip these entirely)
 
-- `GLOBAL_CONFIG/.gitignore`, `GLOBAL_CONFIG/node_modules/`, `GLOBAL_CONFIG/package.json`, `GLOBAL_CONFIG/package-lock.json`
+- `GLOBAL_CONFIG/.gitignore`, `GLOBAL_CONFIG/node_modules/`, `GLOBAL_CONFIG/package-lock.json`
+- `GLOBAL_CONFIG/tui.json` (legacy V1 client config; V2 reads `cli.json` and ignores this file - kept for reference only)
+- `GLOBAL_CONFIG/**/*.bak`, `GLOBAL_CONFIG/**/*.v1.bak` (backup directories created during the V1-to-V2 migration; never shipped to the repo)
+- `GLOBAL_CONFIG/service.json` (machine-specific service auth password)
 - `REPO_MIRROR/docs/`, `REPO_MIRROR/README.md`, `REPO_MIRROR/shift-enter-newline.md`
 - `REPO_MIRROR/skills/python-skills/`, `REPO_MIRROR/skills/customize-opencode/`
 - `REPO_MIRROR/mcp-servers/<name>/README.md` and any global `GLOBAL_CONFIG/mcp-servers/<name>/README.md` (per-server docs)
@@ -89,11 +96,12 @@ mapping table:
 
 | Mapped pattern | Expected | Anything else is unexpected |
 |----------------|----------|------------------------------|
-| `command/*.md` | `.md` only | `command/foo.py`, `command/subdir/` |
+| `commands/*.md` | `.md` only | `commands/foo.py`, `commands/subdir/` |
 | `skills/<name>/SKILL.md` | `SKILL.md` only | `skills/<name>/scripts/`, `skills/<name>/references.md` |
 | `agents/*.md` | `.md` only | `agents/brainstorm.py`, `agents/subdir/` |
 | `plugins/*.ts` | `.ts` only | `plugins/foo.js`, `plugins/foo.tsx` |
 | `mcp-servers/<name>/*` | any | (no constraint - vendored as-is) |
+| `lib/<name>/**` | any | (no constraint - vendored as-is) |
 
 Honour the existing Exclusions list when scanning: a `.md` inside
 `docs/` or a `SKILL.md` inside `skills/python-skills/` is excluded,
@@ -136,7 +144,7 @@ Rules for the Detail column:
 - `REPO_ONLY`: file count
 - `DIFFER`: first meaningful difference (truncated). For JSONC, note specific top-level keys or MCP servers that differ, not raw diff.
 - `IDENTICAL`: leave **Detail** blank
-- `UNEXPECTED_GLOBAL` / `UNEXPECTED_REPO` / `UNEXPECTED_BOTH`: the relative path under the mapped directory, plus a one-line hint (e.g. `command/foo.py - not covered by *.md pattern`). If many unexpected files share a directory, collapse to one row per directory with a count.
+- `UNEXPECTED_GLOBAL` / `UNEXPECTED_REPO` / `UNEXPECTED_BOTH`: the relative path under the mapped directory, plus a one-line hint (e.g. `commands/foo.py - not covered by *.md pattern`). If many unexpected files share a directory, collapse to one row per directory with a count.
 
 After the table, produce a summary section.
 
@@ -180,7 +188,7 @@ In report mode, never suggest resolving conflicts automatically. Push mode is no
 | REPO_ONLY | skills/python-skills/SKILL.md | 1 file under skills/python-skills/`
 | DIFFER | AGENTS.md | line 98: "- **Line length:** 110 characters" vs "100 characters"
 | IDENTICAL | agents/brainstorm.md | |
-| UNEXPECTED_REPO | command/foo.py | Python-backed command, not in *.md pattern |
+| UNEXPECTED_REPO | commands/foo.py | Python-backed command, not in *.md pattern |
 
 ... (remaining identical files grouped as "[N] files")
 
@@ -260,9 +268,10 @@ GLOBAL_CONFIG → REPO_MIRROR
 
 After the report, check:
 
+- `REPO_MIRROR` resolves to an existing directory (env var, default, or user-pasted path for this run); if none exists and the user does not provide one, stop - this is a setup problem, not drift - and skip the remaining checks
 - No mapped file was excluded from the scan
 - File counts match actual filesystem contents in both locations
-- `REPO_MIRROR/configs/opencode.jsonc` parses successfully as JSONC and `REPO_MIRROR/configs/tui.json` parses successfully as JSON (report if not; this is a repo-side problem)
+- `REPO_MIRROR/configs/opencode.jsonc` parses successfully as JSONC and `REPO_MIRROR/configs/cli.json` parses successfully as JSON (report if not; this is a repo-side problem)
 - In push mode: every pushed path re-classifies as `IDENTICAL`, no `REPO_ONLY` item was deleted, and the only modifications were to mapped paths in `REPO_MIRROR`
 
 Report any validation failures at the bottom.
