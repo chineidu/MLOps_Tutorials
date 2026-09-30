@@ -40,13 +40,16 @@ Resolve `REPO_MIRROR` in this order: (1) `$OPENCODE_REPO_MIRROR` when set and po
 |------------|--------|
 | `REPO_MIRROR/agents/*.md` | `GLOBAL_CONFIG/agents/` |
 | `REPO_MIRROR/commands/*.md` | `GLOBAL_CONFIG/commands/` |
-| `REPO_MIRROR/skills/<name>/SKILL.md` | `GLOBAL_CONFIG/skills/<name>/SKILL.md` |
+| `REPO_MIRROR/skills/<name>/**` (all contents) | `GLOBAL_CONFIG/skills/<name>/` (all contents) |
 | `REPO_MIRROR/configs/config.json` | `GLOBAL_CONFIG/config.json` |
 | `REPO_MIRROR/configs/opencode.jsonc` | `GLOBAL_CONFIG/opencode.jsonc` |
 | `REPO_MIRROR/configs/cli.json` | `GLOBAL_CONFIG/cli.json` |
 | `REPO_MIRROR/configs/package.json` | `GLOBAL_CONFIG/package.json` |
+| `REPO_MIRROR/configs/tui.json` | `GLOBAL_CONFIG/tui.json` |
 | `REPO_MIRROR/AGENTS.md` | `GLOBAL_CONFIG/AGENTS.md` |
 | `REPO_MIRROR/plugins/*.ts` | `GLOBAL_CONFIG/plugins/` |
+| `REPO_MIRROR/shell-aliases/**` (all contents) | `GLOBAL_CONFIG/shell-aliases/` (all contents) |
+| `REPO_MIRROR/archives/*.ts` | `GLOBAL_CONFIG/archives/` |
 | `REPO_MIRROR/lib/<name>/**` (all contents) | `GLOBAL_CONFIG/lib/<name>/` (all contents) |
 | `REPO_MIRROR/mcp-servers/<name>/*` | `GLOBAL_CONFIG/mcp-servers/<name>/` |
 
@@ -101,6 +104,7 @@ Applies to:
 - `agents/`
 - `commands/`
 - `skills/`
+- `shell-aliases/`
 - `plugins/`
 - `lib/`
 - `mcp-servers/`
@@ -208,9 +212,10 @@ For each mapped directory in the table, find files that exist in
 | Mapped pattern | Expected extension(s) | Anything else is unexpected |
 |----------------|----------------------|------------------------------|
 | `commands/*.md` | `.md` only | `commands/foo.py`, `commands/subdir/` |
-| `skills/<name>/SKILL.md` | `SKILL.md` only | `skills/<name>/scripts/`, `skills/<name>/references.md` |
+| `skills/<name>/**` | any | (no constraint - skill tree vendored as-is) |
 | `agents/*.md` | `.md` only | `agents/brainstorm.py`, `agents/subdir/` |
 | `plugins/*.ts` | `.ts` only | `plugins/foo.js`, `plugins/foo.tsx` |
+| `shell-aliases/**` | any | (no constraint - vendored as-is) |
 | `mcp-servers/<name>/*` | any | (no constraint - vendored as-is) |
 | `lib/<name>/**` | any | (no constraint - vendored as-is) |
 
@@ -224,11 +229,11 @@ which to include in this run:
 ```text
 Unexpected files in mapped directories:
 
-  commands/foo.py             Python-backed command, not in the mapping table
-  skills/polars/scripts/      Helper scripts under a skill, not covered by SKILL.md
+  agents/brainstorm.py        Python agent file, not in the mapping table
+  plugins/foo.js              Wrong extension for plugins/ (.ts only)
+```
 
 Include any of these in this sync? [y/N per file, or 'all' / 'none']
-```
 
 Per-file decision:
 
@@ -278,8 +283,7 @@ Produce a summary table.
 | File | Action | Reason |
 |------|--------|--------|
 | ... | Added / Updated / Skipped | ... |
-| commands/foo.py | Added (ad-hoc) | User included at runtime - not in mapping table |
-| skills/polars/scripts/build.sh | Skipped (unexpected) | User opted out at runtime |
+| agents/foo.py | Added (ad-hoc) | User included at runtime - not in mapping table |
 
 Then report:
 
