@@ -13,7 +13,7 @@ These scripts make oh-my-zsh's git-plugin aliases work in **non-interactive** sh
 
 ```text
 REPO_MIRROR: $OPENCODE_REPO_MIRROR (default: ${HOME}/path/to/sync-opencode-repo)
-INSTALL_SCRIPT: <REPO_MIRROR>/opencode/shell-aliases/install.sh
+INSTALL_SCRIPT: <REPO_MIRROR>/shell-aliases/install.sh
 TARGET_DIR: ~/.local/bin
 ```
 
@@ -55,7 +55,7 @@ Resolve `REPO_MIRROR` in this order: (1) `$OPENCODE_REPO_MIRROR` when set and po
 
 To add a new alias:
 
-1. Drop a new file at `<REPO>/opencode/shell-aliases/bin/<name>` with the same 2-line format:
+1. Drop a new file at `<REPO_MIRROR>/shell-aliases/bin/<name>` with the same 2-line format:
    ```bash
    #!/usr/bin/env bash
    exec git <subcommand> "$@"

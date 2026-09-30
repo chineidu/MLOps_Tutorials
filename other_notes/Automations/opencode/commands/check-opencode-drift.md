@@ -39,7 +39,7 @@ Any other argument is an error: print the usage block and stop without modifying
 # Paths
 
 ```text
-REPO_MIRROR: $OPENCODE_REPO_MIRROR (default: /Users/neidu/Desktop/Projects/Personal/MLOps_Tutorials/other_notes/Automations/opencode)
+REPO_MIRROR: $OPENCODE_REPO_MIRROR (default: ${HOME}/path/to/sync-opencode-repo)
 GLOBAL_CONFIG: ~/.config/opencode
 ```
 

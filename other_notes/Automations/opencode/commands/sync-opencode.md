@@ -26,7 +26,7 @@ The command must be **idempotent**. Running it multiple times without repository
 # Paths
 
 ```text
-REPO_MIRROR: $OPENCODE_REPO_MIRROR (default: /Users/neidu/Desktop/Projects/Personal/MLOps_Tutorials/other_notes/Automations/opencode)
+REPO_MIRROR: $OPENCODE_REPO_MIRROR (default: ${HOME}/path/to/sync-opencode-repo)
 GLOBAL_CONFIG: ~/.config/opencode
 ```
 

@@ -1,28 +1,27 @@
 #!/usr/bin/env bash
 # install.sh - idempotent installer for git shell aliases.
-# Deploys scripts from <repo>/opencode/shell-aliases/bin/ to ~/.local/bin/.
+# Deploys scripts from <repo>/shell-aliases/bin/ to ~/.local/bin/.
 #
 # Update policy: diff-before-overwrite. Identical files are skipped silently.
 # New files are written and made executable. Different files prompt before
 # overwriting so local customizations are preserved by default.
 #
 # Usage:
-#   bash /path/to/repo/opencode/shell-aliases/install.sh
-#   bash /path/to/repo/opencode/shell-aliases/install.sh --yes   # overwrite diffs without prompting
-#   bash /path/to/repo/opencode/shell-aliases/install.sh --dry-run
+#   bash /path/to/repo/shell-aliases/install.sh
+#   bash /path/to/repo/shell-aliases/install.sh --yes   # overwrite diffs without prompting
+#   bash /path/to/repo/shell-aliases/install.sh --dry-run
 
 set -euo pipefail
 
 # --- Resolve repo location ---------------------------------------------------
 
-# Walk up from this script until we find a directory named opencode/shell-aliases/bin.
-# Falls back to asking the user if not found.
+# Resolve the source bin/ directory next to this script.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_BIN="$SCRIPT_DIR/bin"
 
 if [[ ! -d "$SOURCE_BIN" ]]; then
   echo "ERROR: cannot find bin/ next to this script ($SCRIPT_DIR)." >&2
-  echo "Pass the path to the repo as the first argument, or run from inside the repo." >&2
+  echo "The install script must live next to its bin/ directory." >&2
   exit 2
 fi
 

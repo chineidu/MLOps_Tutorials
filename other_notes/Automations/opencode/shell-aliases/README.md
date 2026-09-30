@@ -23,10 +23,10 @@ Type `/setup-shell-aliases`. The command finds this repo, runs `install.sh`, and
 ### From any shell
 
 ```bash
-bash /path/to/sync-opencode-repo/opencode/shell-aliases/install.sh
+bash /path/to/sync-opencode-repo/shell-aliases/install.sh
 ```
 
-If the repo is not at the expected location, the script asks for the path.
+The installer locates `bin/` relative to its own path, so no repo path is passed explicitly.
 
 ## What gets installed
 
@@ -61,12 +61,12 @@ All scripts:
 
 ## Adding a new alias
 
-1. Drop a new file at `opencode/shell-aliases/bin/<name>` with the same 2-line format as the existing ones.
+1. Drop a new file at `shell-aliases/bin/<name>` with the same 2-line format as the existing ones.
 2. Run `/setup-shell-aliases`.
 3. Commit the new file to the repo.
 
 ## Removing an alias
 
-1. Delete the file under `opencode/shell-aliases/bin/`.
+1. Delete the file under `shell-aliases/bin/`.
 2. The installer does **not** remove existing scripts on its own (preserves local customizations). To remove a stale alias, `rm ~/.local/bin/<name>` by hand.
 3. Commit the deletion.
