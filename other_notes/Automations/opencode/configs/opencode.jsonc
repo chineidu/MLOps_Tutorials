@@ -113,6 +113,11 @@
         "command": ["uvx", "--with", "polars", "--with", "mcp<1.30", "polars-mcp"],
         "disabled": false
       },
+      "fastmcp-docs": {
+        "type": "local",
+        "command": ["fastmcp-docs-mcp"],
+        "disabled": false
+      },
       "langgraph-docs-mcp": {
         "type": "local",
         "command": [
