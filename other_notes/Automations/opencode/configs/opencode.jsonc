@@ -126,10 +126,10 @@
           "python",
           "server.py"
         ],
-        "cwd": "/Users/neidu/.config/opencode/mcp-servers/langgraph-docs",
+        "cwd": "~/.config/opencode/mcp-servers/langgraph-docs",
         "environment": {
-          "PATH": "/Users/neidu/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
-          "DOCS_PATH": "/Users/neidu/docs-mirror/langchain"
+          "PATH": "~/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+          "DOCS_PATH": "~/docs-mirror/langchain"
         },
         "timeout": {
           "catalog": 30000,
@@ -150,14 +150,93 @@
           "python",
           "server.py"
         ],
-        "cwd": "/Users/neidu/.config/opencode/mcp-servers/sklearn-docs",
+        "cwd": "~/.config/opencode/mcp-servers/sklearn-docs",
         "environment": {
-          "PATH": "/Users/neidu/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
-          "DOCS_PATH": "/Users/neidu/docs-mirror/scikit-learn/doc"
+          "PATH": "~/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+          "DOCS_PATH": "~/docs-mirror/scikit-learn/doc"
         },
         "timeout": {
           "catalog": 30000,
           "execution": 30000
+        },
+        "disabled": false
+      },
+      "qdrant-docs-mcp": {
+        "type": "local",
+        "command": [
+          "uv",
+          "run",
+          "--isolated",
+          "--python",
+          "3.14",
+          "--with",
+          "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@v0.3.0",
+          "python",
+          "server.py"
+        ],
+        "cwd": "~/.config/opencode/mcp-servers/qdrant-docs",
+        "environment": {
+          "PATH": "~/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+          "DOCS_PATH": "~/docs-mirror/qdrant"
+        },
+        "timeout": {
+          "catalog": 30000,
+          "execution": 30000
+        },
+        "disabled": false
+      },
+      // v0.4.0 (not v0.3.0 like the other docs servers): .py indexing is
+      // required here - matplotlib's API reference lives in lib/matplotlib
+      // docstrings, which v0.3.0 skips entirely.
+      "matplotlib-docs-mcp": {
+        "type": "local",
+        "command": [
+          "uv",
+          "run",
+          "--isolated",
+          "--python",
+          "3.14",
+          "--with",
+          "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@v0.4.0",
+          "python",
+          "server.py"
+        ],
+        "cwd": "~/.config/opencode/mcp-servers/matplotlib-docs",
+        "environment": {
+          "PATH": "~/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+          "DOCS_PATH": "~/docs-mirror/matplotlib"
+        },
+        // Startup indexes ~1160 files including large lib/*.py docstring
+        // extraction; 30s was too tight for the first cold run.
+        "timeout": {
+          "catalog": 60000,
+          "execution": 60000
+        },
+        "disabled": false
+      },
+      "matplotlib-plot-mcp": {
+        "type": "local",
+        "command": [
+          "uv",
+          "run",
+          "--isolated",
+          "--python",
+          "3.14",
+          "--with",
+          "matplotlib",
+          "--with",
+          "fastmcp",
+          "python",
+          "server.py"
+        ],
+        "cwd": "~/.config/opencode/mcp-servers/matplotlib-plot",
+        "environment": {
+          "PATH": "~/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+          "MPLBACKEND": "Agg"
+        },
+        "timeout": {
+          "catalog": 60000,
+          "execution": 60000
         },
         "disabled": false
       }
