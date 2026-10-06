@@ -1,4 +1,4 @@
-"""LangChain offline docs MCP server entry point."""
+"""LangGraph offline docs MCP server entry point."""
 
 from mcp_for_agents import build_server
 

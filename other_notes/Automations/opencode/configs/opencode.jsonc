@@ -1,8 +1,16 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "instructions": ["AGENTS.md"],
+  "lsp": {
+    "ty": {
+      "command": ["uvx", "ty", "server"],
+      "extensions": [".py", ".pyi"]
+    }
+  },
   "permissions": [
     { "action": "edit", "resource": "*", "effect": "ask" },
+    { "action": "subagent", "resource": "*", "effect": "ask" },
+    { "action": "external_directory", "resource": "*", "effect": "ask" },
     { "action": "shell", "resource": "*", "effect": "ask" },
     { "action": "shell", "resource": "uv run *", "effect": "allow" },
     { "action": "shell", "resource": "echo *", "effect": "allow" },
@@ -106,6 +114,37 @@
     { "action": "shell", "resource": "git worktree list", "effect": "allow" },
     { "action": "shell", "resource": "git submodule status", "effect": "allow" }
   ],
+  "providers": {
+    // Add DeepInfra models that exist on the API but are missing from the models.dev catalog.
+    "deepinfra": {
+      "models": {
+        "XiaomiMiMo/MiMo-V2.6-Flash": {
+          "limit": { "context": 1048576, "output": 1048576 },
+          "cost": { "input": 0.14, "output": 0.28, "cache": { "read": 0.0028 } }
+        },
+        "XiaomiMiMo/MiMo-V2.6-Pro": {
+          "limit": { "context": 1048576, "output": 1048576 },
+          "cost": { "input": 0.435, "output": 0.87, "cache": { "read": 0.0036 } }
+        },
+        "MiniMaxAI/MiniMax-M2.7-Turbo": {
+          "limit": { "context": 196608, "output": 196608 },
+          "cost": { "input": 0.38, "output": 1.7, "cache": { "read": 0.07 } }
+        },
+        "openai/gpt-oss-120b-Turbo": {
+          "limit": { "context": 131072, "output": 131072 },
+          "cost": { "input": 0.15, "output": 0.6 }
+        },
+        "openai/gpt-oss-120b-Ultra": {
+          "limit": { "context": 131072, "output": 131072 },
+          "cost": { "input": 0.2, "output": 0.95 }
+        },
+        // Use DeepInfra's priority tier for faster first-token latency; billed at 1.5x.
+        "zai-org/GLM-5.3-Flash": {
+          "body": { "service_tier": "priority" }
+        }
+      }
+    }
+  },
   "mcp": {
     "servers": {
       "polars-mcp": {
@@ -118,6 +157,9 @@
         "command": ["fastmcp-docs-mcp"],
         "disabled": false
       },
+      // v0.4.0 pinned by commit (not the tag): `uv` re-fetches a tag ref
+      // from GitHub on every launch, which can stall startup past the
+      // catalog timeout; a commit hash resolves from the uv cache.
       "langgraph-docs-mcp": {
         "type": "local",
         "command": [
@@ -127,21 +169,24 @@
           "--python",
           "3.14",
           "--with",
-          "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@v0.3.0",
+          "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@85ae818067a063e57da70a05d51a8681b4557858",
           "python",
           "server.py"
         ],
         "cwd": "~/.config/opencode/mcp-servers/langgraph-docs",
         "environment": {
           "PATH": "~/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
-          "DOCS_PATH": "~/docs-mirror/langchain"
+          "DOCS_PATH": "~/docs-mirror/langgraph/src/oss/langgraph"
         },
+        // ~50 doc pages index quickly; 60s leaves headroom for cold uv setup.
         "timeout": {
-          "catalog": 30000,
+          "catalog": 60000,
           "execution": 30000
         },
         "disabled": false
       },
+      // v0.4.0 pinned by commit hash; a tag ref makes `uv` re-fetch from
+      // GitHub on every launch, which can stall startup past the timeout.
       "sklearn-docs-mcp": {
         "type": "local",
         "command": [
@@ -151,7 +196,7 @@
           "--python",
           "3.14",
           "--with",
-          "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@v0.3.0",
+          "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@85ae818067a063e57da70a05d51a8681b4557858",
           "python",
           "server.py"
         ],
@@ -161,11 +206,13 @@
           "DOCS_PATH": "~/docs-mirror/scikit-learn/doc"
         },
         "timeout": {
-          "catalog": 30000,
+          "catalog": 60000,
           "execution": 30000
         },
         "disabled": false
       },
+      // v0.4.0 pinned by commit hash; a tag ref makes `uv` re-fetch from
+      // GitHub on every launch, which can stall startup past the timeout.
       "qdrant-docs-mcp": {
         "type": "local",
         "command": [
@@ -175,7 +222,7 @@
           "--python",
           "3.14",
           "--with",
-          "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@v0.3.0",
+          "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@85ae818067a063e57da70a05d51a8681b4557858",
           "python",
           "server.py"
         ],
@@ -185,14 +232,14 @@
           "DOCS_PATH": "~/docs-mirror/qdrant"
         },
         "timeout": {
-          "catalog": 30000,
+          "catalog": 60000,
           "execution": 30000
         },
         "disabled": false
       },
-      // v0.4.0 (not v0.3.0 like the other docs servers): .py indexing is
-      // required here - matplotlib's API reference lives in lib/matplotlib
-      // docstrings, which v0.3.0 skips entirely.
+      // v0.4.0 (the version all docs servers are pinned to): .py indexing
+      // is required here - matplotlib's API reference lives in
+      // lib/matplotlib docstrings, which v0.3.0 skips entirely.
       "matplotlib-docs-mcp": {
         "type": "local",
         "command": [
@@ -202,7 +249,7 @@
           "--python",
           "3.14",
           "--with",
-          "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@v0.4.0",
+          "mcp-for-agents @ git+https://github.com/chineidu/mcp_for_agents.git@85ae818067a063e57da70a05d51a8681b4557858",
           "python",
           "server.py"
         ],
