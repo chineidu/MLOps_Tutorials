@@ -1,12 +1,17 @@
-# OpenCode Agents & Skills Documentation
+# OpenCode Configuration Mirror
 
-This directory contains documentation and exact copies of global opencode configurations, agents, and skills for personal reference.
+This directory is the Git-tracked, canonical copy of my reusable opencode
+configuration: agents, commands, skills, plugins, shell aliases, and MCP
+servers. Each machine installs it into `~/.config/opencode/` with
+`/sync-opencode` (one-way: repo -> global).
 
 ## Directory Structure
 
-```
+```text
 opencode/
 ├── README.md                    # This file
+├── AGENTS.md                    # Repo conventions for coding agents (synced)
+├── shift-enter-newline.md       # TUI keybinding notes (repo-only)
 ├── docs/
 │   ├── what-are-agents.md       # Definition and explanation of agents
 │   ├── what-are-skills.md       # Definition and explanation of skills
@@ -14,42 +19,57 @@ opencode/
 │   ├── creating-skills.md       # Step-by-step guide to create skills
 │   └── permission-system.md     # How opencode's permission system works (investigation notes)
 ├── configs/
-│   └── opencode.jsonc           # Global config (from ~/.config/opencode/)
-├── command/
-│   ├── changelog.md             # `/changelog` slash command: draft next CHANGELOG.md entry
-│   ├── check-opencode-drift.md  # `/check-opencode-drift` slash command: verify global vs project drift
-│   ├── commit.md                # `/commit` slash command: stage all + commit with generated message
-│   ├── sync-opencode.md         # `/sync-opencode` slash command: sync global config to docs mirror
-│   └── validate.md              # `/validate` slash command: review uncommitted changes (read-only)
+│   ├── opencode.jsonc           # Global config (merged into ~/.config/opencode/)
+│   ├── cli.json                 # CLI settings (synced)
+│   ├── package.json             # Plugin dependencies (synced)
+│   └── tui.json                 # TUI settings (synced)
+├── commands/
+│   ├── changelog.md             # `/changelog`: draft the next CHANGELOG.md entry
+│   ├── check-opencode-drift.md  # `/check-opencode-drift`: verify global vs mirror drift
+│   ├── commit.md                # `/commit`: stage all + commit with a generated message
+│   ├── go-pricing.md            # `/go-pricing`: render the opencode Go pricing table
+│   ├── setup-shell-aliases.md   # `/setup-shell-aliases`: install shell shortcuts
+│   ├── sync-opencode.md         # `/sync-opencode`: sync global config from this mirror
+│   └── validate.md              # `/validate`: review uncommitted changes (read-only)
 ├── agents/
-│   ├── ask-only.md               # Read-only codebase Q&A agent (minimax-m3)
-│   ├── brainstorm.md             # Progressive idea development (primary agent, minimax-m3)
-│   ├── debug.md                  # Diagnoses failing `make check` runs (deepseek-v4-flash)
-│   ├── research.md               # External docs & dependency research agent (muse-spark-1.2-contributor)
-│   └── review.md                 # Diff review agent (used by /validate, longcat-2.0)
+│   ├── architect.md             # Contract-first build agent (primary)
+│   ├── ask-only.md              # Read-only codebase Q&A agent (minimax-m3)
+│   ├── brainstorm.md            # Progressive idea development (primary, minimax-m3)
+│   ├── debug.md                 # Diagnoses failing `make check` runs (deepseek-v4-flash)
+│   ├── research.md              # External docs & dependency research (muse-spark-1.2-contributor)
+│   └── review.md                # Diff review agent (minimax-m3)
+├── mcp-servers/
+│   ├── fastmcp-docs/README.md   # FastMCP docs proxy: install notes (repo-only)
+│   ├── langgraph-docs/          # LangGraph docs server (README is repo-only)
+│   ├── matplotlib-docs/         # Matplotlib docs server + mirror refresh script
+│   ├── matplotlib-plot/         # Matplotlib render server
+│   ├── polars-mcp/README.md     # Polars docs server: install + pinning (repo-only)
+│   ├── qdrant-docs/             # Qdrant docs server
+│   └── sklearn-docs/            # scikit-learn docs server
 ├── plugins/
-│   └── venv-activate.ts          # Auto-activate Python venv in shell tool
+│   └── venv-activate.ts         # Auto-activate Python venv in shell tool
+├── lib/
+│   └── kdco-primitives/         # Shared TypeScript helpers for plugins
+├── shell-aliases/
+│   ├── README.md                # Shell shortcut docs
+│   ├── install.sh               # Installs bin/ shortcuts into ~/.local/bin
+│   └── bin/                     # Git shortcut scripts (gst, gba, glg, ...)
 ├── archives/
-│   └── auto-approve-pipes.ts     # DEAD plugin (permission.ask hook never fires in 1.18.x)
+│   └── auto-approve-pipes.ts    # DEAD plugin (permission.ask hook never fires in 1.18.x)
 └── skills/
-     ├── cause-and-effect/
-     │   └── SKILL.md             # Root-cause / Fishbone analysis skill
-     ├── changelog/
-     │   └── SKILL.md             # Keep a Changelog conventions skill
-     ├── critique/
-     │   └── SKILL.md             # Multi-perspective code review skill
-     ├── git-commit/
-     │   └── SKILL.md             # Git commit message skill
-     ├── jupyter-notebook/
-     │   └── SKILL.md             # Python → Jupyter notebook (jupytext) skill
-     ├── polars/
-     │   └── SKILL.md             # Polars lazy-API data work skill
-     ├── thought-based-reasoning/
-     │   └── SKILL.md             # Chain-of-Thought reasoning techniques skill
-     ├── python-skills/
-     │   └── SKILL.md             # Python project conventions skill (local)
-     └── customize-opencode/
-         └── SKILL.md             # Built-in opencode customization skill (local)
+    ├── cause-and-effect/SKILL.md
+    ├── changelog/SKILL.md
+    ├── critique/SKILL.md
+    ├── customize-opencode/SKILL.md    # Built-in skill copy (local, excluded from sync)
+    ├── git-commit/SKILL.md
+    ├── jupyter-notebook/SKILL.md
+    ├── makefile/SKILL.md
+    ├── markdown-writer/SKILL.md + scripts/
+    ├── opencode-go-pricing/SKILL.md + scripts/
+    ├── polars/SKILL.md + references/ + plugin.json
+    ├── prompt-engineering/SKILL.md
+    ├── python-skills/SKILL.md         # Personal Python conventions (local, excluded)
+    └── thought-based-reasoning/SKILL.md
 ```
 
 ---
@@ -88,16 +108,17 @@ Subagents are specialized agents that handle focused tasks autonomously. They ru
 
 | Agent | Description | Model | Permissions |
 |-------|-------------|-------|-------------|
+| `architect` | Contract-first build agent: full user visibility, decisions surfaced, no silent defaults | `default` | edit ask; shell ask with read-only allowlist; subagent ask |
 | `brainstorm` | Progressive idea development through dialogue before plan/build | `opencode-go/minimax-m3` | edit ask; bash read-only allow (`ls`/`cat`/`grep`/`git status`/`log` etc.), else ask; todowrite deny |
 
-### Built-in Subagents
+### Subagents
 
 | Agent | Description | Model | Permissions |
 |-------|-------------|-------|-------------|
 | `@ask-only` | Read-only codebase Q&A | `opencode-go/minimax-m3` | No edit, bash, task, todowrite, external_directory deny |
 | `@research` | External docs & dependency research | `opencode-go/muse-spark-1.2-contributor` | Read-only + external_directory allow |
 | `@debug` | Diagnoses failing `make check` runs | `opencode-go/deepseek-v4-flash` | edit deny; bash allow; task deny |
-| `@review` | Diff review (plan → code gaps, scope creep, etc.) | `opencode-go/longcat-2.0` | edit deny; bash limited to git diff/log/status/show |
+| `@review` | Diff review (plan → code gaps, scope creep, etc.) | `opencode-go/minimax-m3` | edit deny; bash limited to git diff/log/status/show |
 
 ### How to Invoke
 
@@ -243,17 +264,19 @@ A **command** (or slash command) in opencode is a custom shortcut triggered via 
 
 - Execute multi-step workflows with a single short invocation
 - Combine skills, agents, and shell commands into repeatable routines
-- Define them globally (`~/.config/opencode/command/`) or per-project (`.opencode/command/`)
+- Define them globally (`~/.config/opencode/commands/`) or per-project (`.opencode/commands/`)
 
 ### Available Commands
 
 | Command | File | Description |
 |---------|------|-------------|
-| `/commit` | `command/commit.md` | Stage all changes (`git add -A`), load the `git-commit` skill to generate a message, show the proposed message, then commit. Pass `--quick`/`-Q` to skip the review step. Optional arguments are treated as extra context for the message. |
-| `/changelog` | `command/changelog.md` | Gather commits/diff since the last release and draft the next `CHANGELOG.md` entry using the `changelog` skill. |
-| `/validate` | `command/validate.md` | Dispatch the `review` subagent to review uncommitted changes. Validate-only — never builds, edits, fixes, or commits. |
-| `/sync-opencode` | `command/sync-opencode.md` | Sync global `~/.config/opencode/` agents/commands/skills to this docs mirror. |
-| `/check-opencode-drift` | `command/check-opencode-drift.md` | Verify global config has not drifted from the mirror; report mismatches. |
+| `/commit` | `commands/commit.md` | Stage all changes (`git add -A`), load the `git-commit` skill to generate a message, show the proposed message, then commit. Pass `--quick`/`-Q` to skip the review step. Optional arguments are treated as extra context for the message. |
+| `/changelog` | `commands/changelog.md` | Gather commits/diff since the last release and draft the next `CHANGELOG.md` entry using the `changelog` skill. |
+| `/validate` | `commands/validate.md` | Dispatch the `review` subagent to review uncommitted changes. Validate-only — never builds, edits, fixes, or commits. |
+| `/sync-opencode` | `commands/sync-opencode.md` | Sync the global config from this repository mirror (repo -> global). |
+| `/check-opencode-drift` | `commands/check-opencode-drift.md` | Verify global config has not drifted from the mirror; report mismatches. |
+| `/go-pricing` | `commands/go-pricing.md` | Render the live opencode Go pricing, usage, and retention table. |
+| `/setup-shell-aliases` | `commands/setup-shell-aliases.md` | Install or update the git shell shortcuts (`gst`, `gp`, ...) in `~/.local/bin/` from this repo. |
 
 ### `/commit` Usage
 
@@ -282,18 +305,25 @@ The command:
 |---------|---------|-------|
 | **Agent** | Specialized AI persona for tasks | Global or Project |
 | **Skill** | Reusable knowledge/capability | Global, Project, or Built-in |
-| **Command** | Custom slash command for multi-step workflows | Global (`~/.config/opencode/command/`) or Project (`.opencode/command/`) |
+| **Command** | Custom slash command for multi-step workflows | Global (`~/.config/opencode/commands/`) or Project (`.opencode/commands/`) |
 | **Config** | Tool permissions, LSP settings | Global (`opencode.jsonc`) or Project (`opencode.jsonc`) |
 
 ---
 
 ## Source of Configurations
 
-All configs in this directory are **exact copies** from:
-- **Global user config**: `~/.config/opencode/`
-- **Built-in skills**: opencode's internal skills
+This repository is the canonical source for the reusable opencode
+configuration. Each machine installs it into `~/.config/opencode/` with
+`/sync-opencode` (one-way: repo -> global). Machine-specific values in
+`opencode.jsonc` (absolute paths, per-machine pins) are preserved by the
+merge; servers are never removed.
 
-Last synced: August 26, 2026 — models: brainstorm/minimax-m3, ask-only/minimax-m3, debug/deepseek-v4-flash, review/longcat-2.0, research/muse-spark-1.2-contributor
+The vendored `customize-opencode` (built-in) and `python-skills` (local)
+trees are excluded from sync and kept for reference only.
+
+Last synced: October 7, 2026 - models: architect (default),
+brainstorm/minimax-m3, ask-only/minimax-m3, debug/deepseek-v4-flash,
+review/minimax-m3, research/muse-spark-1.2-contributor
 
 ---
 

@@ -147,9 +147,13 @@
   },
   "mcp": {
     "servers": {
+      // Pinned to 1.44.2: unpinned polars resolves to 2.0.0, whose ~52MB
+      // polars-runtime-32 wheel cannot finish downloading inside opencode's
+      // ~30s MCP startup window. See mcp-servers/polars-mcp/README.md
+      // before bumping this pin.
       "polars-mcp": {
         "type": "local",
-        "command": ["uvx", "--with", "polars", "--with", "mcp<1.30", "polars-mcp"],
+        "command": ["uvx", "--with", "polars==1.44.2", "--with", "mcp<1.30", "polars-mcp"],
         "disabled": false
       },
       "fastmcp-docs": {
