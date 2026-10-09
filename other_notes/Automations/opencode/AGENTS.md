@@ -102,6 +102,16 @@ Tool configuration lives in `pyproject.toml`. Do not override it inline or pass 
 - **Docstrings:** NumPy style for public APIs; omit for private helpers unless the logic is non-obvious
 - **Line length:** 110 characters
 
+### Simplicity
+
+AI-generated code is notoriously prone to unnecessary complexity. Favour simple, modular code over clever, tangled code - the result must be easy to understand and maintain:
+
+- Modular is good: split code into small, focused units (modules, services, functions) with clear boundaries and single responsibilities
+- Complex is bad: avoid clever one-liners, nested ternaries, dense comprehensions, deep nesting, and long tangled functions
+- Do not confuse modularity with indirection: abstraction layers, wrappers, factories, registries, base classes, and plugin hooks need a concrete second use case before they earn their keep
+- Keep names concrete, and functions short and single-purpose - they should say what the code does
+- Delete dead code, unused parameters, and unreachable branches instead of keeping them "just in case"
+
 ### Comments
 
 - Use one short block comment per logical step in non-trivial functions to show flow
