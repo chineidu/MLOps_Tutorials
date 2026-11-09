@@ -130,6 +130,22 @@ This project targets 3.14+. Write for it, not for older idioms carried over from
 - `@dataclass(slots=True)` or Pydantic models for structured data - not bare dicts passed between layers
 - PEP 758 except tuples (3.14+): write `except A, B:` with no parentheses. Do not add parentheses for "compat" - `requires-python = ">=3.14"` and `ruff format` strips them, so adding them only creates churn. Exception: with `as` parentheses are still required: `except (A, B) as e:`.
 
+### Type Annotations
+
+Always annotate variables declared inside a function, even when the type is obvious from the assignment. This applies to every local binding, not just parameters and return values:
+
+```python
+reader: csv.DictReader = csv.DictReader(io.StringIO(raw_csv.strip()))
+employees: list[Employee] = []
+count: int = 0
+```
+
+- Annotate every assignment target in a function body with its concrete type
+- Prefer concrete types over `Any`; import the types you need
+- Do not leave a local unannotated just because the right-hand side makes the type clear - state it explicitly
+- Loop targets and comprehension variables cannot be annotated in Python; annotate the iterable they come from instead
+- Function parameters and return types are always annotated as well
+
 ### Naming Conventions
 
 - Functions and variables: `snake_case`
@@ -173,9 +189,9 @@ class TestFunctionName:
     def test_<scenario>(self, some_fixture: SomeType) -> None:
         """One-line description of what this test verifies."""
         # Given
-        expected = ...
+        expected: SomeType = ...
         # When
-        result = function_under_test(...)
+        result: SomeType = function_under_test(...)
         # Then
         assert result == expected
 ```
