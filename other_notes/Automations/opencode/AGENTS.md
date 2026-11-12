@@ -41,7 +41,7 @@ uv sync --dev
 uv run <command>
 ```
 
-**Python version:** 3.14+
+**Python version:** 3.14 for a new project. An existing project keeps the version it already targets (`requires-python`).
 **Package manager:** uv + `pyproject.toml`
 
 Never activate a venv manually or call bare `python`/`pytest`. Always go through `uv run`.
@@ -121,14 +121,14 @@ AI-generated code is notoriously prone to unnecessary complexity. Favour simple,
 
 ### Modern Python
 
-This project targets 3.14+. Write for it, not for older idioms carried over from training data:
+Write for the version the project targets (`requires-python`): 3.14 for a new project, and the version it already has for an existing one. Do not use older idioms carried over from training data when that version has a better one:
 
 - Built-in generics: `list[str]`, `dict[str, int]` - not `typing.List`, `typing.Dict`
 - Unions: `str | None` - not `Optional[str]` or `Union[str, int]`
 - `StrEnum` from `enum` - not `class Foo(str, Enum)`
 - `pathlib.Path` for filesystem work - not `os.path`
 - `@dataclass(slots=True)` or Pydantic models for structured data - not bare dicts passed between layers
-- PEP 758 except tuples (3.14+): write `except A, B:` with no parentheses. Do not add parentheses for "compat" - `requires-python = ">=3.14"` and `ruff format` strips them, so adding them only creates churn. Exception: with `as` parentheses are still required: `except (A, B) as e:`.
+- PEP 758 except tuples (3.14+): when `requires-python` is `>=3.14`, write `except A, B:` with no parentheses. Do not add parentheses for "compat" - `ruff format` strips them, so adding them only creates churn. On an older version it is a syntax error, so keep the parentheses there. Exception: with `as` parentheses are still required: `except (A, B) as e:`.
 
 ### Type Annotations
 
