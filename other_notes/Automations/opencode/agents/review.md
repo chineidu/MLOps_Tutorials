@@ -21,6 +21,73 @@ permissions:
   - action: shell
     resource: "git show *"
     effect: allow
+  # read-only inspection: OpenCode checks every segment of a command
+  # separately, so each segment needs its own allow rule.
+  - action: shell
+    resource: "printf *"
+    effect: allow
+  - action: shell
+    resource: "echo *"
+    effect: allow
+  - action: shell
+    resource: "ls *"
+    effect: allow
+  - action: shell
+    resource: "cat *"
+    effect: allow
+  - action: shell
+    resource: "head *"
+    effect: allow
+  - action: shell
+    resource: "tail *"
+    effect: allow
+  - action: shell
+    resource: "wc *"
+    effect: allow
+  - action: shell
+    resource: "grep *"
+    effect: allow
+  - action: shell
+    resource: "rg *"
+    effect: allow
+  - action: shell
+    resource: "find *"
+    effect: allow
+  - action: shell
+    resource: "fd *"
+    effect: allow
+  - action: shell
+    resource: "pwd"
+    effect: allow
+  # keep the .env protection that the read action gets by default
+  - action: shell
+    resource: "cat *.env"
+    effect: deny
+  # additional git read-only
+  - action: shell
+    resource: "git ls-files *"
+    effect: allow
+  - action: shell
+    resource: "git ls-tree *"
+    effect: allow
+  - action: shell
+    resource: "git blame *"
+    effect: allow
+  - action: shell
+    resource: "git rev-parse *"
+    effect: allow
+  - action: shell
+    resource: "git branch *"
+    effect: allow
+  - action: shell
+    resource: "git describe *"
+    effect: allow
+  - action: shell
+    resource: "git show-ref *"
+    effect: allow
+  - action: shell
+    resource: "git cat-file *"
+    effect: allow
   - action: subagent
     resource: "*"
     effect: deny
@@ -40,6 +107,10 @@ You are strictly read-only. You report findings; you never edit files, run tests
 
 1. **The plan.** Search the repository for `plan.md` or `notes/plan.md` and read it. If no plan file exists, use the plan text supplied in the invocation prompt instead.
 2. **The diff.** Run `git status` to see what changed, then `git diff HEAD` to review all changes to tracked files (staged and unstaged together), reading untracked files directly from disk. Read `git log --oneline -5` for context.
+
+## Shell usage
+
+OpenCode checks each segment of a shell command separately, so a chained command is rejected as a whole if any single segment is not allowlisted. Run one command per tool call. Do not chain with `&&`, `;`, or pipes. Use the `grep`, `glob`, and `read` tools for searching and reading files instead of shell equivalents.
 
 ## Methodology
 

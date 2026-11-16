@@ -61,6 +61,9 @@ permissions:
   - action: shell
     resource: "echo *"
     effect: allow
+  - action: shell
+    resource: "printf *"
+    effect: allow
   # read-only archive inspection
   - action: shell
     resource: "tar -tf *"
@@ -89,6 +92,24 @@ permissions:
     effect: allow
   - action: shell
     resource: "git rev-parse *"
+    effect: allow
+  - action: shell
+    resource: "git branch *"
+    effect: allow
+  - action: shell
+    resource: "git show-ref *"
+    effect: allow
+  - action: shell
+    resource: "git cat-file *"
+    effect: allow
+  - action: shell
+    resource: "git describe *"
+    effect: allow
+  - action: shell
+    resource: "git blame *"
+    effect: allow
+  - action: shell
+    resource: "git diff *"
     effect: allow
   # sandboxed clone: destination must be inside the cache root
   - action: shell
@@ -127,6 +148,10 @@ When you need to inspect a Git repository, clone it into the cache root:
 (`$XDG_CACHE_HOME/opencode/research/<repo-name>/` if `XDG_CACHE_HOME` is set.)
 
 Never clone anywhere else. Never clone into the user's workspace, never clone into `/tmp` directly, never clone into a sibling of the working tree. The cache root is the only writable area on disk.
+
+## Shell usage
+
+OpenCode checks each segment of a shell command separately, so a chained command is rejected as a whole if any single segment is not allowlisted. Run one command per tool call. Do not chain with `&&`, `;`, or pipes. Use the `grep`, `glob`, and `read` tools for searching and reading files instead of shell equivalents.
 
 ## Cleanup is mandatory
 
