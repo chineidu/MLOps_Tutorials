@@ -3,7 +3,7 @@
 This directory is the Git-tracked, canonical copy of my reusable opencode
 configuration: agents, commands, skills, plugins, shell aliases, and MCP
 servers. Each machine installs it into `~/.config/opencode/` with
-`/sync-opencode` (one-way: repo -> global).
+`/deploy-oc-config` (one-way: repo -> global).
 
 ## Directory Structure
 
@@ -25,11 +25,11 @@ opencode/
 │   └── tui.json                 # TUI settings (synced)
 ├── commands/
 │   ├── changelog.md             # `/changelog`: draft the next CHANGELOG.md entry
-│   ├── check-opencode-drift.md  # `/check-opencode-drift`: verify global vs mirror drift
 │   ├── commit.md                # `/commit`: stage all + commit with a generated message
+│   ├── deploy-oc-config.md      # `/deploy-oc-config`: sync global config from this mirror
 │   ├── go-pricing.md            # `/go-pricing`: render the opencode Go pricing table
+│   ├── oc-config-diff.md        # `/oc-config-diff`: verify global vs mirror drift
 │   ├── setup-shell-aliases.md   # `/setup-shell-aliases`: install shell shortcuts
-│   ├── sync-opencode.md         # `/sync-opencode`: sync global config from this mirror
 │   └── validate.md              # `/validate`: review uncommitted changes (read-only)
 ├── agents/
 │   ├── architect.md             # Contract-first build agent (primary)
@@ -273,8 +273,8 @@ A **command** (or slash command) in opencode is a custom shortcut triggered via 
 | `/commit` | `commands/commit.md` | Stage all changes (`git add -A`), load the `git-commit` skill to generate a message, show the proposed message, then commit. Pass `--quick`/`-Q` to skip the review step. Optional arguments are treated as extra context for the message. |
 | `/changelog` | `commands/changelog.md` | Gather commits/diff since the last release and draft the next `CHANGELOG.md` entry using the `changelog` skill. |
 | `/validate` | `commands/validate.md` | Dispatch the `review` subagent to review uncommitted changes. Validate-only — never builds, edits, fixes, or commits. |
-| `/sync-opencode` | `commands/sync-opencode.md` | Sync the global config from this repository mirror (repo -> global). |
-| `/check-opencode-drift` | `commands/check-opencode-drift.md` | Verify global config has not drifted from the mirror; report mismatches. |
+| `/deploy-oc-config` | `commands/deploy-oc-config.md` | Sync the global config from this repository mirror (repo -> global). |
+| `/oc-config-diff` | `commands/oc-config-diff.md` | Verify global config has not drifted from the mirror; report mismatches. |
 | `/go-pricing` | `commands/go-pricing.md` | Render the live opencode Go pricing, usage, and retention table. |
 | `/setup-shell-aliases` | `commands/setup-shell-aliases.md` | Install or update the git shell shortcuts (`gst`, `gp`, ...) in `~/.local/bin/` from this repo. |
 
@@ -314,7 +314,7 @@ The command:
 
 This repository is the canonical source for the reusable opencode
 configuration. Each machine installs it into `~/.config/opencode/` with
-`/sync-opencode` (one-way: repo -> global). Machine-specific values in
+`/deploy-oc-config` (one-way: repo -> global). Machine-specific values in
 `opencode.jsonc` (absolute paths, per-machine pins) are preserved by the
 merge; servers are never removed.
 

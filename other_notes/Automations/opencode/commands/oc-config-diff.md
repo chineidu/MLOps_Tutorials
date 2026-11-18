@@ -5,7 +5,7 @@ agent: build
 
 Compare the global opencode configuration against the repository mirror and report what has drifted.
 
-The repository mirror (`REPO_MIRROR`) is the **canonical source of truth**. The global configuration (`GLOBAL_CONFIG`) is the machine-specific installation. Any edit should start in the repo and be pushed out via `/sync-opencode`.
+The repository mirror (`REPO_MIRROR`) is the **canonical source of truth**. The global configuration (`GLOBAL_CONFIG`) is the machine-specific installation. Any edit should start in the repo and be pushed out via `/deploy-oc-config`.
 
 This command is **read-only by default**. It detects drift and never modifies either side. The `push` argument (see **Arguments**) is the sanctioned exception: it adopts global-side changes into `REPO_MIRROR` when the global files were edited directly.
 
@@ -27,9 +27,9 @@ Raw arguments: `$ARGUMENTS` (empty when the command was invoked bare).
 Usage (print this block for `help` and for any invalid argument):
 
 ```text
-/check-opencode-drift                  read-only drift report
-/check-opencode-drift push             adopt global changes into the repo
-/check-opencode-drift push <path>...   adopt only the named paths
+/oc-config-diff                read-only drift report
+/oc-config-diff push           adopt global changes into the repo
+/oc-config-diff push <path>... adopt only the named paths
 ```
 
 Any other argument is an error: print the usage block and stop without modifying anything.
@@ -168,11 +168,11 @@ All other files excluded per mapping.
 
 Interpretation guidance (report mode):
 
-- `GLOBAL_ONLY` items were likely added directly to global. To adopt them into the repo, run `/check-opencode-drift push`, then commit in the repo. After that, the repo is canonical again.
-- `REPO_ONLY` items exist in the repo but not globally. If they should be deployed, run `/sync-opencode`. If they are stale, remove them from the repo. Push mode never touches them.
-- `DIFFER` items mean both sides were edited independently. Treat this as a conflict: examine both versions before acting. `/check-opencode-drift push` resolves it by overwriting the repo copy with the global one, so push only after confirming the global version is the one to keep.
-- `UNEXPECTED_GLOBAL` items exist in global under a mapped directory but the mapping table does not cover them. They were likely added by hand or by an older sync. Adopt into the repo with `/check-opencode-drift push` only if the mapping table is widened to cover them - otherwise the next sync will silently drop them from global.
-- `UNEXPECTED_REPO` items exist in the repo under a mapped directory but the mapping table does not cover them. They will be silently ignored by `/sync-opencode`. Either update the mapping table in `sync-opencode.md` so they ship, or remove them from the repo if they are stale.
+- `GLOBAL_ONLY` items were likely added directly to global. To adopt them into the repo, run `/oc-config-diff push`, then commit in the repo. After that, the repo is canonical again.
+- `REPO_ONLY` items exist in the repo but not globally. If they should be deployed, run `/deploy-oc-config`. If they are stale, remove them from the repo. Push mode never touches them.
+- `DIFFER` items mean both sides were edited independently. Treat this as a conflict: examine both versions before acting. `/oc-config-diff push` resolves it by overwriting the repo copy with the global one, so push only after confirming the global version is the one to keep.
+- `UNEXPECTED_GLOBAL` items exist in global under a mapped directory but the mapping table does not cover them. They were likely added by hand or by an older sync. Adopt into the repo with `/oc-config-diff push` only if the mapping table is widened to cover them - otherwise the next sync will silently drop them from global.
+- `UNEXPECTED_REPO` items exist in the repo under a mapped directory but the mapping table does not cover them. They will be silently ignored by `/deploy-oc-config`. Either update the mapping table in `deploy-oc-config.md` so they ship, or remove them from the repo if they are stale.
 - `UNEXPECTED_BOTH` items exist on both sides at the same unexpected path. Same resolution as `UNEXPECTED_REPO`: widen the mapping table, or remove from both sides.
 
 In report mode, never suggest resolving conflicts automatically. Push mode is not automatic resolution: it runs only on explicit user request, behind a confirmation step.
@@ -214,7 +214,7 @@ For unexpected files, collapse to one row per directory with a count (same as dr
 In report mode, when the report contains `GLOBAL_ONLY` or `DIFFER` items, end with exactly this line:
 
 ```text
-To adopt these into the repo: /check-opencode-drift push  (optionally add paths to scope)
+To adopt these into the repo: /oc-config-diff push  (optionally add paths to scope)
 ```
 
 Skip this line in push mode (the report there is a preview) and when there is nothing to push.
@@ -223,7 +223,7 @@ When the report contains any `UNEXPECTED_*` items, end with:
 
 ```text
 N unexpected file(s) are not covered by the mapping table.
-Update the table in sync-opencode.md to ship them, or remove from the repo.
+Update the table in deploy-oc-config.md to ship them, or remove from the repo.
 ```
 
 Skip this line when there are no unexpected files.
@@ -260,7 +260,7 @@ GLOBAL_CONFIG → REPO_MIRROR
 
 - Re-classify every pushed path. Expected: all `IDENTICAL`.
 - Remind the user that `REPO_MIRROR` now has uncommitted changes, and offer to commit following the repo's existing commit style (check `git log`). Commit only with explicit confirmation.
-- Do not run `/sync-opencode` automatically; global and repo now agree on the pushed paths.
+- Do not run `/deploy-oc-config` automatically; global and repo now agree on the pushed paths.
 
 ---
 

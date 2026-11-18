@@ -313,5 +313,5 @@ If any ad-hoc additions were made, end with:
 
 ```text
 N file(s) were copied via ad-hoc decision. Update the mapping table in
-sync-opencode.md if these should persist across runs.
+deploy-oc-config.md if these should persist across runs.
 ```

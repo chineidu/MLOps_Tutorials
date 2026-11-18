@@ -10,7 +10,7 @@ This installer deploys equivalent scripts to `~/.local/bin/`, which is on `$PATH
 
 ## When to run this
 
-- On a fresh machine, after cloning this repo and running `/sync-opencode`.
+- On a fresh machine, after cloning this repo and running `/deploy-oc-config`.
 - After pulling changes that added or modified any script under `bin/`.
 - Any time you want to re-sync the shell aliases from the canonical repo copy.
 

@@ -67,6 +67,6 @@ To remove an alias, delete it from `bin/` and commit. The installer does **not**
 
 ---
 
-# Why this is its own command (not part of `/sync-opencode`)
+# Why this is its own command (not part of `/deploy-oc-config`)
 
-`/sync-opencode` is strictly `REPO → ~/.config/opencode/` and explicitly does not touch files outside its mapping table. Shell aliases deploy to `~/.local/bin/`, which is outside that scope by design. Keeping them separate preserves the boundary and means each command can evolve independently.
+`/deploy-oc-config` is strictly `REPO → ~/.config/opencode/` and explicitly does not touch files outside its mapping table. Shell aliases deploy to `~/.local/bin/`, which is outside that scope by design. Keeping them separate preserves the boundary and means each command can evolve independently.

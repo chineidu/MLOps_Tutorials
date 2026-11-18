@@ -35,7 +35,7 @@ launches normally run from cache in about a second.
    curl -LsSf https://astral.sh/uv/install.sh | sh
    ```
 
-2. **Run `/sync-opencode`** from any opencode session.
+2. **Run `/deploy-oc-config`** from any opencode session.
 
    This merges the `polars-mcp` block into
    `~/.config/opencode/opencode.jsonc`. Nothing is vendored - the server
@@ -153,7 +153,7 @@ stays failed.
    - `configs/opencode.jsonc` (canonical, repo)
    - `~/.config/opencode/opencode.jsonc` (this machine)
 
-   `/sync-opencode` preserves existing server definitions, so it will not
+   `/deploy-oc-config` preserves existing server definitions, so it will not
    update the global entry for you - edit it directly.
 
 4. **Restart opencode and verify:**
@@ -185,7 +185,7 @@ Notes:
 ## Configuration
 
 The entry in `configs/opencode.jsonc` (merged into each machine's global
-config by `/sync-opencode`):
+config by `/deploy-oc-config`):
 
 ```jsonc
 "polars-mcp": {
@@ -206,7 +206,7 @@ polars, either accept the mismatch or re-pin this server to match.
 
 | Path | Purpose |
 |---|---|
-| `README.md` | This file. Excluded from `/sync-opencode`. |
+| `README.md` | This file. Excluded from `/deploy-oc-config`. |
 
 There is no server source to vendor; `uvx` fetches and caches the package
 on first launch.

@@ -49,7 +49,7 @@ The fastest path. Assumes you have cloned the MLOps repo somewhere on disk.
 
    This places `uv` at `~/.local/bin/uv`. Confirm with `uv --version`.
 
-2. **Run `/sync-opencode`** from any opencode session:
+2. **Run `/deploy-oc-config`** from any opencode session:
 
    This copies the vendored server source into
    `~/.config/opencode/mcp-servers/langgraph-docs/` and merges the
@@ -93,11 +93,11 @@ The fastest path. Assumes you have cloned the MLOps repo somewhere on disk.
 
 ---
 
-## Install (existing machine with `/sync-opencode` already wired)
+## Install (existing machine with `/deploy-oc-config` already wired)
 
-If `/sync-opencode` is already in your `~/.config/opencode/command/`:
+If `/deploy-oc-config` is already in your `~/.config/opencode/command/`:
 
-1. `/sync-opencode` - updates the server source and config block.
+1. `/deploy-oc-config` - updates the server source and config block.
 2. Ensure `~/docs-mirror/langchain` exists; bootstrap it with the sparse-clone commands above if missing.
 3. Restart opencode.
 
@@ -163,7 +163,7 @@ clients is derived from the directory basename (e.g. `langchain` ->
 
 | Path | Purpose |
 |---|---|
-| `langgraph_docs_mcp.py` | Server source. Copied verbatim by `/sync-opencode`. |
+| `langgraph_docs_mcp.py` | Server source. Copied verbatim by `/deploy-oc-config`. |
 | `client.py` | FastMCP test client mirroring this README's opencode config. |
 | `README.md` | This file. Excluded from sync. |
 

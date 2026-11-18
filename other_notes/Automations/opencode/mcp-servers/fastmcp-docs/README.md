@@ -7,7 +7,7 @@ page reads do not re-hit upstream.
 Unlike the other MCP servers in this repo, the source is NOT vendored
 here. It lives in the MLOps_Tutorials repository at
 `src/fastmcp_docs_server.py` and is installed per machine as a uv tool.
-`/sync-opencode` deploys the config block only - the `fastmcp-docs-mcp`
+`/deploy-oc-config` deploys the config block only - the `fastmcp-docs-mcp`
 binary must be installed manually on each machine.
 
 Tools exposed over stdio:
@@ -48,7 +48,7 @@ offline docs servers).
    environment named `mlops-tutorials`. The install includes the repo's
    full dependency set and snapshots it - see **Updating** below.
 
-2. **Run `/sync-opencode`** from any opencode session.
+2. **Run `/deploy-oc-config`** from any opencode session.
 
    This adds the `fastmcp-docs` block to
    `~/.config/opencode/opencode.jsonc` on machines that do not have it.
@@ -87,7 +87,7 @@ Then restart opencode.
 ## Configuration
 
 The entry in `configs/opencode.jsonc` (merged into each machine's global
-config by `/sync-opencode`):
+config by `/deploy-oc-config`):
 
 ```jsonc
 "fastmcp-docs": {
@@ -113,7 +113,7 @@ that opencode passes to MCP servers:
 
 | Path | Purpose |
 |---|---|
-| `README.md` | This file. Excluded from `/sync-opencode`. |
+| `README.md` | This file. Excluded from `/deploy-oc-config`. |
 
 The server source is not stored in this repo - see
 `MLOps_Tutorials/src/fastmcp_docs_server.py`.
@@ -124,7 +124,7 @@ The server source is not stored in this repo - see
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `fastmcp-docs` not listed on a machine at all | Config block was never synced to that machine | Run `/sync-opencode`, restart opencode |
+| `fastmcp-docs` not listed on a machine at all | Config block was never synced to that machine | Run `/deploy-oc-config`, restart opencode |
 | `failed: ENOENT posix_spawn 'fastmcp-docs-mcp'` | Tool not installed, or `~/.local/bin` not on opencode's PATH | `uv tool install .` from the MLOps checkout; add `environment.PATH` if launched from the Dock |
 | Tool calls fail while the server shows connected | No outbound access to `gofastmcp.com` | Check network or proxy; upstream is required at runtime |
 | Behavior is stale after changing the source | `uv tool install` snapshotted the old code | `uv tool install --force .`, restart opencode |
