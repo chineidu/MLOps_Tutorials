@@ -273,6 +273,7 @@ A **command** (or slash command) in opencode is a custom shortcut triggered via 
 | `/commit` | `commands/commit.md` | Stage all changes (`git add -A`), load the `git-commit` skill to generate a message, show the proposed message, then commit. Pass `--quick`/`-Q` to skip the review step. Optional arguments are treated as extra context for the message. |
 | `/changelog` | `commands/changelog.md` | Gather commits/diff since the last release and draft the next `CHANGELOG.md` entry using the `changelog` skill. |
 | `/validate` | `commands/validate.md` | Dispatch the `review` subagent to review uncommitted changes. Validate-only — never builds, edits, fixes, or commits. |
+| `/autopilot` | `commands/autopilot.md` | Run the current task in autopilot: the agent decides the contract and implementation, you review the diff. |
 | `/deploy-oc-config` | `commands/deploy-oc-config.md` | Sync the global config from this repository mirror (repo -> global). |
 | `/oc-config-diff` | `commands/oc-config-diff.md` | Verify global config has not drifted from the mirror; report mismatches. |
 | `/go-pricing` | `commands/go-pricing.md` | Render the live opencode Go pricing, usage, and retention table. |

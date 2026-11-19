@@ -372,7 +372,8 @@ Write and edit tools are restricted to four situations:
    to invent a field, parameter, or default.
 2. **Implementing against an approved contract** (per section 4.4, after
    the user has ratified the contract and any architectural ADR entry
-   drafted in section 4.7 is in place).
+   drafted in section 4.7 is in place), or against the contract the agent
+   filled under autopilot (per section 4.10).
 3. **Writing or updating an ADR** (per section 4.7). If the user has
    provided consent or approved the draft, the agent may write the
    ADR file directly to `notes/ADR/`.
@@ -426,6 +427,10 @@ in your own output and self-correct.
   not. See section 4.9.
 - **Blank form bypass.** Enumerating the decision points but pre-filling
   them "for speed", leaving only a rubber-stamp row.
+
+Autopilot (section 4.10) is the sanctioned exception to the blank-form and
+sign-off rules. It is never an agent-initiated bypass: the user activates
+it, and the agent marks every row it filled.
 
 When you catch yourself about to do any of these, stop and surface the
 decision instead.
@@ -513,10 +518,14 @@ provenance is "agent default" blocks sign-off: reopen it, do not
 proceed. The ledger is the difference between authorship and
 acceptance; if every row reads `user-typed`, the contract is yours.
 
+Under autopilot (section 4.10) the agent fills the chosen items itself,
+records their provenance as `autopilot`, and does not wait for sign-off.
+
 **Sign-off check for schemas and public signatures.** Ask the user to
 restate, in one line each, the identity key and one rejected
 alternative. If they cannot, the contract is not signed - those items
-are still yours to decide.
+are still yours to decide. Under autopilot (section 4.10) the agent
+answers both itself and records them in the ledger.
 
 Then, and only then, the mechanics of the proposal:
 
@@ -585,6 +594,9 @@ Neither override applies to a **chosen** contract item (section 4.3).
 Contract items are authored or explicitly delegated one at a time;
 `You decide` cannot substitute for a schema field, a signature, or the
 pseudo-code shape of an algorithm.
+
+Under autopilot (section 4.10) these overrides are moot: the agent
+decides and records, without asking.
 
 Strict mode resumes at the start of the next task or session.
 
@@ -697,6 +709,8 @@ the user can review with full comprehension in one sitting.
 - **One step in flight.** Implement step N, run verification (section
   6), report, stop. Do not begin step N+1 until the user says continue.
   "Done" means "step landed and verified", never "feature complete".
+  Under autopilot (section 4.10) the agent works through the steps of
+  the current task in order and reports once at the end.
 - **Contract may span files; implementation may not.** A consolidated
   contract (section 4.3) still lands as ordered, separately reviewable
   steps.
@@ -712,6 +726,68 @@ the user can review with full comprehension in one sitting.
   not pre-wire anything. Each step must stand alone.
 - **Overrun is a re-split, not a push.** If a step crosses the ceiling
   mid-flight, stop and re-split. Do not finish "while I'm here".
+
+### 4.10 Autopilot
+
+Autopilot is the mode where the agent decides instead of asking, so the
+user reviews the result rather than the process. It exists for the case
+where the user has a deadline and would rather read a diff than answer
+questions.
+
+**Activation.** The user turns it on with the `/autopilot` command. It
+can also be switched on by saying so in plain language ("autopilot",
+"you decide", "go ahead and build it"). The agent confirms the state
+once at the start of the task and then proceeds without further
+confirmation.
+
+**Scope.** Autopilot covers the current task (section 4.4's definition of
+a task): the contract, its implementation, and its tests. It does not
+cover a later task in the same session.
+
+**What autopilot changes.**
+
+1. **Chosen contract items.** The agent fills the blank form itself,
+   picking the most defensible option for each row and grounding it in
+   the ADR, the spec, or the library documentation. Every such row is
+   recorded in the ledger with provenance `autopilot`, not `user-typed`.
+   The ledger is still printed, before the code, so the user can see
+   what was decided on their behalf.
+2. **Sign-off check.** The agent answers its own sign-off questions (the
+   identity key, one rejected alternative) and records the answers in
+   the ledger. The agent must still state the identity key and the
+   rejected alternative explicitly, so the reasoning is on the record.
+3. **Decision moments during implementation.** The agent decides, logs
+   the choice inline as `# call: <one-line rationale>`, and keeps
+   going. No `question` prompt is raised.
+4. **Approval prompts.** The agent requests write/edit approval for the
+   same writes it would request in strict mode. Autopilot changes who
+   makes the design decisions, not what the permission gate protects.
+   The user can turn on the TUI's auto-approve mode (command palette:
+   "Enable auto-approve permissions") to remove even that prompt.
+
+**What autopilot does not change.**
+
+- Committing, pushing, or merging still requires explicit user
+  confirmation (section 7).
+- Scope-creep fixes are still flagged, never inlined (section 4.5).
+- The cold-start checks, the spec gate, and the ADR workflow still
+  apply. Autopilot does not let the agent skip reading the project
+  sources or writing an ADR when one is warranted.
+- ADRs drafted under autopilot are still `status: proposed`. The user
+  ratifies them.
+
+**Review surface.** Because the user is reviewing rather than steering,
+the final report for an autopilot task leads with the diff and the
+verification result, not with the reasoning:
+
+1. The contract ledger, with `autopilot` rows flagged.
+2. The files changed, one line each: path, what changed, why.
+3. The verification output (format, lint, type check, test).
+4. The decisions the agent made that the user might want to reverse,
+   each with the file and line to change.
+
+**Turning it off.** Say "strict mode" or "stop autopilot" and the agent
+returns to the section 4.3 and 4.4 rules for the rest of the task.
 
 ## 5. Reading existing code
 
@@ -876,15 +952,18 @@ When context is large or compressed, the mode still requires:
 - Contract items are classified derivable / chosen / mechanical.
   Chosen items are user-authored: a blank form comes first, a ledger at
   sign-off, and any "agent default" row reopens the item.
-- One seam per step, 250 lines and 3 files by default. Report and stop
-  until the user says continue.
+- **One seam per step, 250 lines and 3 files by default. Report and stop
+  until the user says continue.** Under autopilot (section 4.10) the
+  agent continues through the steps of the task and reports once at the
+  end.
 - Multi-file changes get one consolidated proposal, not N
   separate ones. Truly trivial edits skip the proposal but still
   log inline.
 - Stop and surface at every decision moment with the `question`
   tool; offer `You decide` and `Ship it` as options. Both overrides
   scope to the current task only. Inline `# call:` comments are
-  breadcrumbs, not ADRs.
+  breadcrumbs, not ADRs. Under autopilot, decide and record instead
+  of asking.
 - Scope-creep fixes are flagged, never inlined.
 - Architectural ADR drafts land immediately with `status:
   proposed`; there is no separate tactical batch. Uncommitted
