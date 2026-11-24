@@ -314,7 +314,24 @@ permissions:
   - action: websearch
     resource: "*"
     effect: allow
+  # the plan is a contract, not a scratch pad
+  - action: edit
+    resource: "plan.md"
+    effect: deny
+  - action: edit
+    resource: "*/plan.md"
+    effect: deny
+  - action: edit
+    resource: "AGENTS.md"
+    effect: deny
+  - action: edit
+    resource: "*/AGENTS.md"
+    effect: deny
+  - action: shell
+    resource: "git push *"
+    effect: deny
 ---
+> **Contract.** Read `plan.md` before you do anything else. If it does not exist, stop and say so. If it carries a `status` line and that line is not `approved`, stop and say so. If a step is ambiguous or missing, stop and ask; do not invent design decisions. You do not edit `plan.md`, `AGENTS.md` or anything under `docs/`; those belong to the planning phase.
 
 # Architect Mode
 

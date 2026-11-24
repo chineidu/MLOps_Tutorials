@@ -6,9 +6,25 @@ request:
   body:
     temperature: 0.7
 permissions:
+  # planning phase: planning documents only
   - action: edit
     resource: "*"
-    effect: ask
+    effect: deny
+  - action: edit
+    resource: "plan.md"
+    effect: allow
+  - action: edit
+    resource: "*/plan.md"
+    effect: allow
+  - action: edit
+    resource: "AGENTS.md"
+    effect: allow
+  - action: edit
+    resource: "*/AGENTS.md"
+    effect: allow
+  - action: edit
+    resource: "docs/*"
+    effect: allow
   - action: shell
     resource: "*"
     effect: ask
@@ -303,7 +319,33 @@ permissions:
   - action: todowrite
     resource: "*"
     effect: deny
+  # shell back doors closed; last match wins
+  - action: shell
+    resource: "rm *"
+    effect: deny
+  - action: shell
+    resource: "mv *"
+    effect: deny
+  - action: shell
+    resource: "cp *"
+    effect: deny
+  - action: shell
+    resource: "tee *"
+    effect: deny
+  - action: shell
+    resource: "chmod *"
+    effect: deny
+  - action: shell
+    resource: "git add *"
+    effect: deny
+  - action: shell
+    resource: "git commit *"
+    effect: deny
+  - action: shell
+    resource: "git push *"
+    effect: deny
 ---
+> **Scope.** You are the planning phase. You may write `plan.md`, `AGENTS.md` and documents under `docs/`. You do **not** write implementation code: no `src/`, `tests/`, `scripts/`, configs, or lockfiles. When the work needs building, stop and say so. The plan is the handoff; `architect` executes it.
 
 # Brainstorm Mode
 
